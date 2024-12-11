@@ -1,0 +1,506 @@
+[
+    {
+        "prompt": "What's my BMI?",
+        "emoji": "🧮"
+    },
+    {
+        "prompt": "How fast was I descending stairs?",
+        "emoji": "⬇️"
+    },
+    {
+        "prompt": "How many strokes did I swim last time?",
+        "emoji": "🏊‍♀️"
+    },
+    {
+        "prompt": "Did I have any breathing disturbances last night?",
+        "emoji": "😴"
+    },
+    {
+        "prompt": "How many active calories did I burn today?",
+        "emoji": "🔥"
+    },
+    {
+        "prompt": "How much did I bounce while running?",
+        "emoji": "🏃‍♂️"
+    },
+    {
+        "prompt": "What's my average walking speed?",
+        "emoji": "💨"
+    },
+    {
+        "prompt": "How much exercise have I done today?",
+        "emoji": "⏱️"
+    },
+    {
+        "prompt": "What's my walking step length?",
+        "emoji": "📏"
+    },
+    {
+        "prompt": "What's my resting heart rate?",
+        "emoji": "❤️"
+    },
+    {
+        "prompt": "What's my cycling cadence?",
+        "emoji": "🚴‍♀️"
+    },
+    {
+        "prompt": "How's my heart rate recovery after a minute?",
+        "emoji": "⏳"
+    },
+    {
+        "prompt": "How far did I walk or run?",
+        "emoji": "🏃‍♀️"
+    },
+    {
+        "prompt": "What's my exposure to environmental noise?",
+        "emoji": "🔊"
+    },
+    {
+        "prompt": "What's my running stride length?",
+        "emoji": "🏃‍♂️"
+    },
+    {
+        "prompt": "What's my heart rate right now?",
+        "emoji": "❤️"
+    },
+    {
+        "prompt": "How far did I walk in six minutes?",
+        "emoji": "⏱️"
+    },
+    {
+        "prompt": "How long have I been standing today?",
+        "emoji": "🧍‍♂️"
+    },
+    {
+        "prompt": "What's my running power? ",
+        "emoji": "⚡"
+    },
+    {
+        "prompt": "How many basal calories did I burn?",
+        "emoji": "🔥"
+    },
+    {
+        "prompt": "How far did I cycle? ",
+        "emoji": "📏"
+    },
+    {
+        "prompt": "How loud was my headphone audio?",
+        "emoji": "🎧"
+    },
+    {
+        "prompt": "What's my lean body mass?",
+        "emoji": "🏋️‍♂️"
+    },
+    {
+        "prompt": "What's my sleeping wrist temperature?",
+        "emoji": "🌡️"
+    },
+    {
+        "prompt": "How much time did I spend in daylight?",
+        "emoji": "☀️"
+    },
+    {
+        "prompt": "What's my current body weight?",
+        "emoji": "⚖️"
+    },
+    {
+        "prompt": "What's my heart rate variability?",
+        "emoji": "📊"
+    },
+    {
+        "prompt": "Do I have any walking asymmetry?",
+        "emoji": "↔️"
+    },
+    {
+        "prompt": "What's my oxygen saturation level?",
+        "emoji": "🫁"
+    },
+    {
+        "prompt": "How far did I go downhill skiing?",
+        "emoji": "🎿"
+    },
+    {
+        "prompt": "What's my running speed?",
+        "emoji": "🏃‍♂️"
+    },
+    {
+        "prompt": "How much time do I spend on both feet while walking?",
+        "emoji": "🚶‍♂️"
+    },
+    {
+        "prompt": "How far did I swim?",
+        "emoji": "🏊‍♀️"
+    },
+    {
+        "prompt": "What's my ground contact time while running?",
+        "emoji": "🏃‍♂️"
+    },
+    {
+        "prompt": "What's my VO2 Max?",
+        "emoji": "🫁"
+    },
+    {
+        "prompt": "How fast was I climbing stairs? ",
+        "emoji": "⬆️"
+    },
+    {
+        "prompt": "What's my respiratory rate?",
+        "emoji": "🫁"
+    },
+    {
+        "prompt": "How many steps did I take today?",
+        "emoji": "👣"
+    },
+    {
+        "prompt": "What's my average heart rate while walking?",
+        "emoji": "❤️"
+    },
+    {
+        "prompt": "How steady is my walking?",
+        "emoji": "🛤️"
+    },
+    {
+        "prompt": "What's my body fat percentage?",
+        "emoji": "🏋️‍♀️"
+    },
+    {
+        "prompt": "How many flights of stairs did I climb?",
+        "emoji": "🏢"
+    },
+    {
+        "prompt": "How was my last American football workout?",
+        "emoji": "🏈"
+    },
+    {
+        "prompt": "How did I do in archery last time?",
+        "emoji": "🏹"
+    },
+    {
+        "prompt": "How was my last Australian football session?",
+        "emoji": "🏉"
+    },
+    {
+        "prompt": "How was my last badminton game?",
+        "emoji": "🏸"
+    },
+    {
+        "prompt": "How was my last baseball game?",
+        "emoji": "⚾"
+    },
+    {
+        "prompt": "How was my last basketball session?",
+        "emoji": "🏀"
+    },
+    {
+        "prompt": "How did I bowl last time?",
+        "emoji": "🎳"
+    },
+    {
+        "prompt": "How was my last boxing workout?",
+        "emoji": "🥊"
+    },
+    {
+        "prompt": "How was my last climbing session?",
+        "emoji": "🧗‍♂️"
+    },
+    {
+        "prompt": "How did my last cricket game go?",
+        "emoji": "🏏"
+    },
+    {
+        "prompt": "How was my last cross-training workout?",
+        "emoji": "🏋️‍♂️"
+    },
+    {
+        "prompt": "How was my last curling game?",
+        "emoji": "🥌"
+    },
+    {
+        "prompt": "How was my last cycling workout?",
+        "emoji": "🚴"
+    },
+    {
+        "prompt": "How was my last dance session?",
+        "emoji": "💃"
+    },
+    {
+        "prompt": "How was my last dance-inspired workout?",
+        "emoji": "🕺"
+    },
+    {
+        "prompt": "How was my last elliptical session?",
+        "emoji": "🚴‍♂️"
+    },
+    {
+        "prompt": "How was my last equestrian workout?",
+        "emoji": "🐎"
+    },
+    {
+        "prompt": "How was my last fencing match?",
+        "emoji": "🤺"
+    },
+    {
+        "prompt": "How was my last fishing trip?",
+        "emoji": "🎣"
+    },
+    {
+        "prompt": "How was my last functional strength training session?",
+        "emoji": "🏋️"
+    },
+    {
+        "prompt": "How was my last round of golf?",
+        "emoji": "⛳"
+    },
+    {
+        "prompt": "How was my last gymnastics session?",
+        "emoji": "🤸"
+    },
+    {
+        "prompt": "How was my last handball game?",
+        "emoji": "🤾‍♂️"
+    },
+    {
+        "prompt": "How was my last hike?",
+        "emoji": "🥾"
+    },
+    {
+        "prompt": "How was my last hockey game?",
+        "emoji": "🏒"
+    },
+    {
+        "prompt": "How was my last hunting trip?",
+        "emoji": "🦌"
+    },
+    {
+        "prompt": "How was my last lacrosse game?",
+        "emoji": "🥍"
+    },
+    {
+        "prompt": "How was my last martial arts session?",
+        "emoji": "🥋"
+    },
+    {
+        "prompt": "How was my last mind and body session?",
+        "emoji": "🧘‍♂️"
+    },
+    {
+        "prompt": "How was my last metabolic cardio workout?",
+        "emoji": "💪"
+    },
+    {
+        "prompt": "How was my last paddle sport session?",
+        "emoji": "🛶"
+    },
+    {
+        "prompt": "What was my last play activity?",
+        "emoji": "🎭"
+    },
+    {
+        "prompt": "How was my recovery session?",
+        "emoji": "🛌"
+    },
+    {
+        "prompt": "How was my last racquetball game?",
+        "emoji": "🎾"
+    },
+    {
+        "prompt": "How was my last rowing session?",
+        "emoji": "🚣‍♂️"
+    },
+    {
+        "prompt": "How was my last rugby game?",
+        "emoji": "🏉"
+    },
+    {
+        "prompt": "How was my last run?",
+        "emoji": "🏃‍♂️"
+    },
+    {
+        "prompt": "How was my last sailing trip?",
+        "emoji": "⛵"
+    },
+    {
+        "prompt": "How was my last skating session?",
+        "emoji": "⛸️"
+    },
+    {
+        "prompt": "How was my last snow sports activity?",
+        "emoji": "❄️"
+    },
+    {
+        "prompt": "How was my last soccer game?",
+        "emoji": "⚽"
+    },
+    {
+        "prompt": "How was my last softball game?",
+        "emoji": "🥎"
+    },
+    {
+        "prompt": "How was my last squash game?",
+        "emoji": "🏓"
+    },
+    {
+        "prompt": "How was my last stair climbing session?",
+        "emoji": "⬆️"
+    },
+    {
+        "prompt": "How was my last surfing session?",
+        "emoji": "🏄‍♂️"
+    },
+    {
+        "prompt": "How was my last swim?",
+        "emoji": "🏊"
+    },
+    {
+        "prompt": "How was my last table tennis game?",
+        "emoji": "🏓"
+    },
+    {
+        "prompt": "How was my last tennis game?",
+        "emoji": "🎾"
+    },
+    {
+        "prompt": "How was my last track and field event?",
+        "emoji": "🏅"
+    },
+    {
+        "prompt": "How was my last strength training session?",
+        "emoji": "🏋️"
+    },
+    {
+        "prompt": "How was my last volleyball game?",
+        "emoji": "🏐"
+    },
+    {
+        "prompt": "How was my last walk?",
+        "emoji": "🚶‍♂️"
+    },
+    {
+        "prompt": "How was my last water fitness session? ",
+        "emoji": "💦"
+    },
+    {
+        "prompt": "How was my last water polo game?",
+        "emoji": "🤽‍♂️"
+    },
+    {
+        "prompt": "How was my last water sports session?",
+        "emoji": "🌊"
+    },
+    {
+        "prompt": "How was my last wrestling match?",
+        "emoji": "🤼‍♂️"
+    },
+    {
+        "prompt": "How was my last yoga session?",
+        "emoji": "🧘‍♀️"
+    },
+    {
+        "prompt": "How was my last barre class?",
+        "emoji": "🩰"
+    },
+    {
+        "prompt": "How was my last core training session?",
+        "emoji": "💪"
+    },
+    {
+        "prompt": "How was my last cross-country skiing session?",
+        "emoji": "🎿"
+    },
+    {
+        "prompt": "How was my last downhill skiing session?",
+        "emoji": "⛷️"
+    },
+    {
+        "prompt": "How was my last flexibility session?",
+        "emoji": "🤸‍♂️"
+    },
+    {
+        "prompt": "How was my last HIIT workout?",
+        "emoji": "⚡"
+    },
+    {
+        "prompt": "How was my last jump rope session?",
+        "emoji": "🪢"
+    },
+    {
+        "prompt": "How was my last kickboxing workout?",
+        "emoji": "🥊"
+    },
+    {
+        "prompt": "How was my last pilates session?",
+        "emoji": "🧘‍♀️"
+    },
+    {
+        "prompt": "How was my last snowboarding session?",
+        "emoji": "🏂"
+    },
+    {
+        "prompt": "How was my last stair workout? ",
+        "emoji": "⬆️"
+    },
+    {
+        "prompt": "How was my last step training session?",
+        "emoji": "📶"
+    },
+    {
+        "prompt": "What was my wheelchair walk pace?",
+        "emoji": "♿"
+    },
+    {
+        "prompt": "What was my wheelchair run pace?",
+        "emoji": "♿"
+    },
+    {
+        "prompt": "How was my last tai chi session?",
+        "emoji": "🌬️"
+    },
+    {
+        "prompt": "How was my last mixed cardio session?",
+        "emoji": "💓"
+    },
+    {
+        "prompt": "How was my last hand cycling session?",
+        "emoji": "🚴‍♂️"
+    },
+    {
+        "prompt": "How was my last disc sport activity?",
+        "emoji": "🥏"
+    },
+    {
+        "prompt": "How was my last fitness gaming session?",
+        "emoji": "🎮"
+    },
+    {
+        "prompt": "How was my last cardio dance session?",
+        "emoji": "🕺"
+    },
+    {
+        "prompt": "How was my last social dance session?",
+        "emoji": "💃"
+    },
+    {
+        "prompt": "How was my last pickleball game?",
+        "emoji": "🏓"
+    },
+    {
+        "prompt": "How was my last cooldown session?",
+        "emoji": "🛌"
+    },
+    {
+        "prompt": "How was my last triathlon session?",
+        "emoji": "🚴‍♂️"
+    },
+    {
+        "prompt": "How was my last transition in training?",
+        "emoji": "🔄"
+    },
+    {
+        "prompt": "How was my last diving session?",
+        "emoji": "🤿"
+    },
+    {
+        "prompt": "How was my last workout?",
+        "emoji": "🏋️‍♀️"
+    }
+]

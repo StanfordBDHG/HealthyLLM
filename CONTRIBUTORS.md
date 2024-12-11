@@ -11,4 +11,5 @@ SPDX-License-Identifier: MIT
 Template Application Contributors
 =================================
 
+* [Leon Nissen](https://github.com/leonnissen)
 * [Paul Schmiedmayer](https://github.com/PSchmiedmayer)

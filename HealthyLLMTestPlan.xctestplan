@@ -1,0 +1,18 @@
+{
+  "configurations" : [
+    {
+      "id" : "3735030F-BE70-426D-A85F-A2D926808DC8",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+
+  ],
+  "version" : 1
+}

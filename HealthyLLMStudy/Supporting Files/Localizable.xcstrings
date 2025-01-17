@@ -1,0 +1,397 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "CHAT_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chat"
+          }
+        }
+      }
+    },
+    "CLARIFICATION_BUTTON" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Understood"
+          }
+        }
+      }
+    },
+    "CLARIFICATION_ITEM1_DESCIPTION" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All data, including model inputs and outputs, will be securely stored and utilized exclusively for this study. The primary identified risk is the potential for a data breach; however, this risk will be mitigated through the implementation of robust security measures."
+          }
+        }
+      }
+    },
+    "CLARIFICATION_ITEM1_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Risk"
+          }
+        }
+      }
+    },
+    "CLARIFICATION_ITEM2_DESCIPTION" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Participation is voluntary; you can leave the study and delete the app if uncomfortable with the application or survey at any time."
+          }
+        }
+      }
+    },
+    "CLARIFICATION_ITEM2_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voluntary Participation"
+          }
+        }
+      }
+    },
+    "CLARIFICATION_ITEM3_DESCIPTION" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The findings will aid in creating user-friendly digital health tools, enhancing patient education, and providing guidance for healthcare providers and policymakers on implementing AI-driven technologies."
+          }
+        }
+      }
+    },
+    "CLARIFICATION_ITEM3_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Research Contributions"
+          }
+        }
+      }
+    },
+    "CLARIFICATION_ITEM4_DESCIPTION" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Participants may gain better insight into their medical information. However, participation does not promise any direct personal advantages"
+          }
+        }
+      }
+    },
+    "CLARIFICATION_ITEM4_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disclaimer"
+          }
+        }
+      }
+    },
+    "CLARIFICATION_SUBTITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The following items summarize the study’s consent form. Please review each one carefully."
+          }
+        }
+      }
+    },
+    "CLARIFICATION_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Important"
+          }
+        }
+      }
+    },
+    "Debug 💎" : {
+
+    },
+    "DONE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        }
+      }
+    },
+    "DOWNLOAD_MODEL_DESCRIPTION `%@`" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download the Language Model"
+          }
+        }
+      }
+    },
+    "ERROR_ALERT_CANCEL" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "ERROR_ALERT_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error"
+          }
+        }
+      }
+    },
+    "FUNCTION_CALL_SYSTEM_PROMPT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Given the following functions, please respond with a JSON for a function call with its proper arguments that best answers the given prompt.\n\nRespond in the format {\"name\": function name, \"parameters\": dictionary of argument name and its value}. Do not use variables.\n\n{\n    \"type\": \"function\",\n    \"function\": {\n        \"name\": \"query_health\",\n        \"description\": \"Retrieves local health data for the past 14 days based on specified criteria. This function is intended exclusively for scenarios where a user inquires about their health or vital statistics.\",\n        \"parameters\": {\n            \"type\": \"object\",\n            \"properties\": {\n                \"category\": {\n                    \"type\": \"string\",\n                    \"description\": \"Health type to filter by.\",\n                    \"enum\": [\n                        \"bodyMassIndex\",\n                        \"stairDescentSpeed\",\n                        \"swimmingStrokeCount\",\n                        \"appleSleepingBreathingDisturbances\",\n                        \"activeEnergyBurned\",\n                        \"runningVerticalOscillation\",\n                        \"walkingSpeed\",\n                        \"appleExerciseTime\",\n                        \"walkingStepLength\",\n                        \"restingHeartRate\",\n                        \"cyclingCadence\",\n                        \"heartRateRecoveryOneMinute\",\n                        \"distanceWalkingRunning\",\n                        \"environmentalAudioExposure\",\n                        \"runningStrideLength\",\n                        \"heartRate\",\n                        \"sixMinuteWalkTestDistance\",\n                        \"appleStandTime\",\n                        \"runningPower\",\n                        \"basalEnergyBurned\",\n                        \"distanceCycling\",\n                        \"headphoneAudioExposure\",\n                        \"leanBodyMass\",\n                        \"appleSleepingWristTemperature\",\n                        \"timeInDaylight\",\n                        \"bodyMass\",\n                        \"heartRateVariabilitySDNN\",\n                        \"walkingAsymmetryPercentage\",\n                        \"oxygenSaturation\",\n                        \"distanceDownhillSnowSports\",\n                        \"runningSpeed\",\n                        \"walkingDoubleSupportPercentage\",\n                        \"distanceSwimming\",\n                        \"runningGroundContactTime\",\n                        \"vo2Max\",\n                        \"stairAscentSpeed\",\n                        \"respiratoryRate\",\n                        \"stepCount\",\n                        \"walkingHeartRateAverage\",\n                        \"appleWalkingSteadiness\",\n                        \"bodyFatPercentage\",\n                        \"flightsClimbed\"\n                    ]\n                }\n            },\n            \"required\": [\n                \"category\"\n            ],\n            \"additionalProperties\": false\n        }\n    }\n}\n\n{\n    \"type\": \"function\",\n    \"function\": {\n        \"name\": \"query_workout\",\n        \"description\": \"Retrieves workout data from the past 14 days, categorized by activity type. This function should only be used when a user specifically requests information about their workout or activity history.\",\n        \"parameters\": {\n            \"type\": \"object\",\n            \"properties\": {\n                \"category\": {\n                    \"type\": \"string\",\n                    \"description\": \"Workout type to filter by.\",\n                    \"enum\": [\n                        \"americanFootball\",\n                        \"archery\",\n                        \"australianFootball\",\n                        \"badminton\",\n                        \"baseball\",\n                        \"basketball\",\n                        \"bowling\",\n                        \"boxing\",\n                        \"climbing\",\n                        \"cricket\",\n                        \"crossTraining\",\n                        \"curling\",\n                        \"cycling\",\n                        \"dance\",\n                        \"danceInspiredTraining\",\n                        \"elliptical\",\n                        \"equestrianSports\",\n                        \"fencing\",\n                        \"fishing\",\n                        \"functionalStrengthTraining\",\n                        \"golf\",\n                        \"gymnastics\",\n                        \"handball\",\n                        \"hiking\",\n                        \"hockey\",\n                        \"hunting\",\n                        \"lacrosse\",\n                        \"martialArts\",\n                        \"mindAndBody\",\n                        \"mixedMetabolicCardioTraining\",\n                        \"paddleSports\",\n                        \"play\",\n                        \"preparationAndRecovery\",\n                        \"racquetball\",\n                        \"rowing\",\n                        \"rugby\",\n                        \"running\",\n                        \"sailing\",\n                        \"skatingSports\",\n                        \"snowSports\",\n                        \"soccer\",\n                        \"softball\",\n                        \"squash\",\n                        \"stairClimbing\",\n                        \"surfingSports\",\n                        \"swimming\",\n                        \"tableTennis\",\n                        \"tennis\",\n                        \"trackAndField\",\n                        \"traditionalStrengthTraining\",\n                        \"volleyball\",\n                        \"walking\",\n                        \"waterFitness\",\n                        \"waterPolo\",\n                        \"waterSports\",\n                        \"wrestling\",\n                        \"yoga\",\n                        \"barre\",\n                        \"coreTraining\",\n                        \"crossCountrySkiing\",\n                        \"downhillSkiing\",\n                        \"flexibility\",\n                        \"highIntensityIntervalTraining\",\n                        \"jumpRope\",\n                        \"kickboxing\",\n                        \"pilates\",\n                        \"snowboarding\",\n                        \"stairs\",\n                        \"stepTraining\",\n                        \"wheelchairWalkPace\",\n                        \"wheelchairRunPace\",\n                        \"taiChi\",\n                        \"mixedCardio\",\n                        \"handCycling\",\n                        \"discSports\",\n                        \"fitnessGaming\",\n                        \"cardioDance\",\n                        \"socialDance\",\n                        \"pickleball\",\n                        \"cooldown\",\n                        \"swimBikeRun\",\n                        \"transition\",\n                        \"underwaterDiving\",\n                        \"other\"\n                    ]\n                }\n            },\n            \"required\": [\n                \"category\"\n            ],\n            \"additionalProperties\": false\n        }\n    }\n}"
+          }
+        }
+      }
+    },
+    "Get All Health Data" : {
+
+    },
+    "Get All Workout Data" : {
+
+    },
+    "HEALTHKIT_NOT_AVAILABLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Data"
+          }
+        }
+      }
+    },
+    "HEALTHKIT_NOT_AVAILABLE_DESCRIPTION" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unfortunately, HealthKit is not available on your device."
+          }
+        }
+      }
+    },
+    "HEALTHKIT_PERMISSIONS_BUTTON" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grant Access"
+          }
+        }
+      }
+    },
+    "HEALTHKIT_PERMISSIONS_DESCRIPTION" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Most of the data types you can find in the Health App are supported.\n\nAll data will stay on device and is used by a local language model."
+          }
+        }
+      }
+    },
+    "HEALTHKIT_PERMISSIONS_SUBTITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HealthyLLM can access data from HealthKit to use in conversations."
+          }
+        }
+      }
+    },
+    "HEALTHKIT_PERMISSIONS_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HealthKit Access"
+          }
+        }
+      }
+    },
+    "HealthyLLM Study" : {
+
+    },
+    "INTERPRETATION_SYSTEM_PROMPT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You are a medical explanation assistant. Your primary goal is to help users understand health-related data by providing clear, accurate, and user-friendly explanations. You must avoid providing direct medical diagnoses, treatments, or personalized medical advice. Instead, your role is to break down, interpret, and clarify concepts, so users can have a better understanding of the information they have. Always prioritize safety, transparency, and encourage users to consult qualified healthcare professionals for personalized medical advice."
+          }
+        }
+      }
+    },
+    "NEXT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next"
+          }
+        }
+      }
+    },
+    "Prepare LLM" : {
+
+    },
+    "Restart" : {
+
+    },
+    "SHARE_BUTTON_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share Study Data"
+          }
+        }
+      }
+    },
+    "Start" : {
+
+    },
+    "STUDY_INFORMATION_BODY" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In the next step, a chat window will appear where you can ask questions about your health. Once you have asked at least three questions, you can proceed to the next step to rate the chat interaction.\n\nYou will complete two iterations in total, each featuring different types of chat experiences.\n\nFinally, you will be asked to complete a final questionnaire."
+          }
+        }
+      }
+    },
+    "STUDY_INFORMATION_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Study Information"
+          }
+        }
+      }
+    },
+    "WELCOME_AREA1_DESCRIPTION" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This study examines the usability, performance, and acceptance of on-device LLMs in healthcare applications."
+          }
+        }
+      }
+    },
+    "WELCOME_AREA1_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Study"
+          }
+        }
+      }
+    },
+    "WELCOME_AREA2_DESCRIPTION" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HealthyLLM can surface data from Apple Health to use in conversations with a local LLM."
+          }
+        }
+      }
+    },
+    "WELCOME_AREA2_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Health integration"
+          }
+        }
+      }
+    },
+    "WELCOME_AREA3_DESCRIPTION" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Explore three different models designed to explain your health data, all applied to the same use case for clear comparison and insights."
+          }
+        }
+      }
+    },
+    "WELCOME_AREA3_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Models"
+          }
+        }
+      }
+    },
+    "WELCOME_BUTTON" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        }
+      }
+    },
+    "WELCOME_SUBTITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enhancing Usability: A Local LLM Study Powered by Spezi"
+          }
+        }
+      }
+    },
+    "WELCOME_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HealthyLLM Study"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

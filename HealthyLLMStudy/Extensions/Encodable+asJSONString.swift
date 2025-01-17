@@ -9,9 +9,9 @@
 import Foundation
 
 extension Encodable {
-    func asJSONRepresentation(_ outputFormat: JSONEncoder.OutputFormatting? = nil) -> String? {
+    func asJSONRepresentation(_ outputFormat: JSONEncoder.OutputFormatting? = .prettyPrinted) -> Data? {
         let encoder = JSONEncoder()
-        
+        encoder.dateEncodingStrategy = .iso8601
         
         if let outputFormat {
             encoder.outputFormatting = outputFormat
@@ -20,6 +20,12 @@ extension Encodable {
         guard let encoded = try? encoder.encode(self) else {
             return nil
         }
-        return String(data: encoded, encoding: .utf8)
+        return encoded
+    }
+    
+    func asJSONString(_ outputFormat: JSONEncoder.OutputFormatting? = .prettyPrinted) -> String? {
+        guard let json = self.asJSONRepresentation() else { return nil }
+        
+        return String(data: json, encoding: .utf8)
     }
 }

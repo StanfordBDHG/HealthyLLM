@@ -87,6 +87,5 @@ struct HealthyLLMChatView: View {
         } label: {
             Text("DONE")
         }
-
     }
 }

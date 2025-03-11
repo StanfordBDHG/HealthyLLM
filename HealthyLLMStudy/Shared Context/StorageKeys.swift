@@ -8,12 +8,16 @@
 
 enum StorageKeys {
     // MARK: - Onboarding
-    /// A `Bool` flag indicating of the onboarding was completed.
     static let onboardingFlowComplete = "onboardingFlow.complete"
-    /// A `Step` flag indicating the current step in the onboarding process.
     static let onboardingFlowStep = "onboardingFlow.step"
-    
     static let studyFlowComplete = "studyFlow.complete"
-    
+    static let homeStudyFlowComplete = "homeStudyFlow.complete"
     static let studyFlowStep = "studyFlow.step"
+    static let debugViewPresented = "debugView.presented"
+    static let sufficientUsage = "chat.sufficientUsage"
+    static let participantId = "participantId"
+    static let age = "age"
+    static let sex = "sex"
+    static let performanceLogInterval = 0.5
+    static let performanceSaveInterval = 5.0
 }

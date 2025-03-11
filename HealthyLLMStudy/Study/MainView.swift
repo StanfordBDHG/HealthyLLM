@@ -10,42 +10,170 @@ import SwiftUI
 import SwiftData
 import SpeziChat
 import SpeziQuestionnaire
+import SpeziLLMLocalDownload
+import SpeziAccessGuard
 
 
 struct MainView: View {
-    @Environment(\.modelContext) private var storageContext
+    @Environment(\.colorScheme) private var colorScheme
+    @State private var model = MainViewModel()
+    @AppStorage(StorageKeys.homeStudyFlowComplete) private var homeStudyFlowComplete = false
     @AppStorage(StorageKeys.studyFlowComplete) private var studyFlowComplete = false
-    @State private var showShareSheet = false
-    
-    @MainActor private var studyData: Data? {
-        exportData()
-    }
+    @Environment(AccessGuard.self) private var accessGuard
     
     var body: some View {
         NavigationStack {
-            VStack {
-                if studyFlowComplete {
-                    Spacer()
-                    Image(systemName: "checkmark.seal")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .foregroundStyle(.accent)
-                        .frame(width: 100, height: 100)
-                    Spacer()
+            ScrollView(.vertical) {
+                header
+                
+                Text("Steps")
+                    .font(.title2)
+                    .bold()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal)
+                
+                taskCell(number: 1, header: "Download the LLM", disabled: false) {
+                    Text("To use the model we first need to download it. This will take a few minutes. Make sure you have a stable internet connection.")
                     
-                    shareButton
-                    
-                    Spacer()
+                    switch model.downloadManager.state {
+                    case .idle:
+                        Button {
+                            Task {
+                                await model.downloadManager.startDownload()
+                            }
+                        } label: {
+                            Text("Start Download")
+                                .bold()
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 40)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .onAppear {
+                            Task {
+                                if model.downloadManager.modelExist {
+                                    await model.downloadManager.startDownload()
+                                }
+                            }
+                        }
+                    case .downloading(progress: let progress):
+                        ProgressView(value: progress.fractionCompleted * 100, total: 100.0) {
+                            Text("LLM_DOWNLOADING_PROGRESS_TEXT")
+                        }
+                            .progressViewStyle(LinearProgressViewStyle())
+                            .padding()
+                    case .downloaded:
+                        Button { } label: {
+                            Text("Already Downloaded")
+                                .bold()
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 40)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(true)
+                    case .error(let error):
+                        Text("Error: \(error.localizedDescription)")
+                            .foregroundStyle(.gray)
+                        Button {
+                            Task {
+                                await model.downloadManager.startDownload()
+                            }
+                        } label: {
+                            Text("Retry Download")
+                                .bold()
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 40)
+                        }
+                        .buttonStyle(.borderedProminent)
+                    }
+                }
+                
+                taskCell(
+                    number: 2,
+                    header: "Answer Questionnaire",
+                    disabled: !(model.downloadManager.state == .downloaded || model.downloadManager.state.isDownloading || model.downloadManager.state.hasError)
+                ) {
+                    Text("Complete the preliminary questionnaire with basic questions before beginning the study.")
+                        .frame(maxWidth: .infinity)
+                        .multilineTextAlignment(.leading)
+                        
+                    Button {
+                        model.showHomeStudyFlow = true
+                    } label: {
+                        Text(homeStudyFlowComplete ? "Retake Questionnaire" : "Start Questionnaire")
+                            .bold()
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 40)
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+                
+                taskCell(number: 3, header: "Start Study", disabled: !homeStudyFlowComplete) {
+                    Text("Start the study with the study coordinator, please do not start it yourself.")
+                    Group {
+                        AccessGuardButton(.accessGuard) {
+                            Text("Unlock")
+                                .bold()
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 40)
+                        } unlocked: {
+                            Button {
+                                model.showStudyFlow = true
+                            } label: {
+                                Text("Start Study")
+                                    .bold()
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 40)
+                            }
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+                
+                taskCell(number: 4, header: "Export Data", disabled: !studyFlowComplete) {
+                    Text("Export the data from the study. Please note that this only works if you have completed the study.")
+                    Button {
+                        Task {
+                            await model.export()
+                        }
+                    } label: {
+                        Text("Export")
+                            .bold()
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 40)
+                    }
+                    .buttonStyle(.borderedProminent)
                 }
             }
-            .navigationTitle("HealthyLLM Study")
+            .background(Color(.systemGroupedBackground))
+            .viewStateAlert(state: $model.viewState)
+#if(DEBUG)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("DEBUG") {
+                        model.showDebugSheet = true
+                    }
+                }
+            }
+            .sheet(isPresented: $model.showDebugSheet) {
+                DebugView()
+            }
+#endif
         }
-        .sheet(isPresented: !$studyFlowComplete) {
+        .sheet(isPresented: $model.showStudyFlow) {
             StudyFlow()
                 .interactiveDismissDisabled()
+                .presentationSizing(.page)
         }
-        .sheet(isPresented: $showShareSheet) {
-            if let studyData {
+        .sheet(isPresented: $model.showHomeStudyFlow) {
+            QuestionnaireView(
+                questionnaire: .demographics_health_privacy,
+                cancelBehavior: .shouldConfirmCancel,
+                questionnaireResult: model.handleQuestionnaireResult
+            )
+                .presentationSizing(.page)
+        }
+        .sheet(isPresented: $model.showShareSheet) {
+            if let studyData = model.exportedData {
                 ShareSheet(sharedItem: studyData, sharedItemType: .json)
                     .presentationDetents([.medium])
             } else {
@@ -56,50 +184,102 @@ struct MainView: View {
         }
     }
     
-    private var shareButton: some View {
-        Button {
-            showShareSheet = true
-        } label: {
-            Text("SHARE_BUTTON_TITLE")
-                .frame(height: 40)
-                .frame(maxWidth: .infinity)
-        }
-        .buttonStyle(.borderedProminent)
-        .padding()
-    }
-    
-    private func exportData() -> Data? {
-        struct StudyData: Encodable {
-            let steps: [StudyStep]
-            let responses: [StudyResponse]
-            let metadata: [StudyMetadata]
-        }
-        
-        do {
-            let context = storageContext.container.mainContext
-            let steps = try context.fetch(FetchDescriptor<StudyStep>())
-            let responses = try context.fetch(FetchDescriptor<StudyResponse>())
-            let metadata = try context.fetch(FetchDescriptor<StudyMetadata>())
-            
-            let data = StudyData(
-                steps: steps,
-                responses: responses,
-                metadata: metadata
+    @ViewBuilder
+    private var header: some View {
+        ZStack {
+            LinearGradient(
+                colors: [Color(.secondarySystemGroupedBackground), .clear],
+                startPoint: .top,
+                endPoint: .bottom
             )
             
-            let encoder = JSONEncoder()
-            encoder.dateEncodingStrategy = .iso8601
-            encoder.outputFormatting = .prettyPrinted
-            
-            guard let encoded = try? encoder.encode(data) else { return nil }
-            
-            return encoded
-        } catch {
-            return nil
+            VStack {
+                Spacer()
+                
+                Group {
+                    if colorScheme == .dark {
+                        Image("shape")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .colorInvert()
+                    } else {
+                        Image("shape")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                    }
+                }
+                .frame(maxHeight: 300)
+                
+                Text("Join the Study")
+                    .bold()
+                
+                Text("HealthyLLM")
+                    .font(.title)
+                    .bold()
+                
+                Text("Explore the on-device capabilities of LLMs for health research.")
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(.gray)
+            }
         }
+        .padding(.top, -100)
+        .frame(height: 400)
+        .frame(maxWidth: .infinity)
+    }
+    
+    @ViewBuilder
+    private func taskCell(
+        number: Int,
+        header: String,
+        disabled _disabled: Bool,
+        @ViewBuilder content: () -> some View
+    ) -> some View {
+        GroupBox {
+            content()
+        } label: {
+            HStack(alignment: .center) {
+                Text("\(number)")
+                    .bold()
+                    .foregroundStyle(.white)
+                    .background {
+                        Circle()
+                            .foregroundStyle(_disabled ? Color(.gray) : Color(.systemBlue))
+                            .frame(width: 30, height: 30)
+                    }
+                    .padding()
+                Text(header)
+                    .font(.title3)
+                    .bold()
+                    .foregroundStyle(_disabled ? .gray : .primary)
+            }
+        }
+        .disabled(_disabled)
+        .backgroundStyle(Color(.secondarySystemGroupedBackground))
+        .padding()
     }
 }
 
 #Preview {
     MainView()
+}
+
+
+extension SpeziLLMLocalDownload.LLMLocalDownloadManager.DownloadState {
+    var isDownloading: Bool {
+        switch self {
+        case .idle, .downloaded, .error:
+            false
+        case .downloading:
+            true
+        }
+    }
+    
+    var hasError: Bool {
+        switch self {
+        case .idle, .downloaded, .downloading:
+            false
+        case .error:
+            true
+        }
+    }
 }

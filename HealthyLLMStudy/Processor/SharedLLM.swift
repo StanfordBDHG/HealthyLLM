@@ -10,20 +10,19 @@ import Spezi
 import SpeziLLM
 import SpeziLLMLocal
 import os
+import MLX
 
 
 enum SharedLLMError: Error {
     case noSession
 }
 
-
 @Observable
 class SharedLocalLLM: DefaultInitializable, Module, EnvironmentAccessible {
-    @ObservationIgnored private let logger = Logger(subsystem: "HealthyLLMStudy", category: "FunctionCallingProcessor")
+    @ObservationIgnored private let logger = Logger(subsystem: "HealthyLLMStudy", category: "SharedLocalLLM")
     
     private(set) var loaded = false
     
-    @ObservationIgnored @Dependency(HealthDataFetcher.self) private var healthDataFetcher: HealthDataFetcher
     @ObservationIgnored @Dependency(LLMRunner.self) private var runner: LLMRunner
     private var session: LLMLocalSession?
     private var systemPrompt = ""
@@ -44,11 +43,25 @@ class SharedLocalLLM: DefaultInitializable, Module, EnvironmentAccessible {
         self.session = session
     }
     
+    func offloadModel() async {
+        await session?.offload()
+        loaded = false
+    }
+    
+    func clearCache() {
+        GPU.clearCache()
+    }
+    
     func oneShot(
         customContext: [[String: String]],
         parameters: LLMLocalParameters,
-        samplingParameters: LLMLocalSamplingParameters
+        samplingParameters: LLMLocalSamplingParameters,
+        tools: [LLMLocalSchema.LLMTool]? = nil
     ) async throws -> String? {
+        defer {
+            GPU.clearCache()
+        }
+        
         if session == nil,
            !loaded {
             try await prepareLLM()
@@ -56,7 +69,7 @@ class SharedLocalLLM: DefaultInitializable, Module, EnvironmentAccessible {
         
         guard let session else { throw SharedLLMError.noSession }
         
-        session.update(parameters: parameters, samplingParameters: samplingParameters)
+        session.update(parameters: parameters, samplingParameters: samplingParameters, tools: tools)
         
         await MainActor.run {
             session.customContext = customContext
@@ -73,7 +86,8 @@ class SharedLocalLLM: DefaultInitializable, Module, EnvironmentAccessible {
     func oneShotStream(
         customContext: [[String: String]],
         parameters: LLMLocalParameters,
-        samplingParameters: LLMLocalSamplingParameters
+        samplingParameters: LLMLocalSamplingParameters,
+        tools: [LLMLocalSchema.LLMTool] = []
     ) async throws -> AsyncThrowingStream<String, any Error> {
         if session == nil,
            !loaded {
@@ -82,7 +96,7 @@ class SharedLocalLLM: DefaultInitializable, Module, EnvironmentAccessible {
         
         guard let session else { throw SharedLLMError.noSession }
         
-        session.update(parameters: parameters, samplingParameters: samplingParameters)
+        session.update(parameters: parameters, samplingParameters: samplingParameters, tools: tools)
         
         await MainActor.run {
             session.customContext = customContext

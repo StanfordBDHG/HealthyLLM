@@ -5,120 +5,65 @@
 //  Created by Leon Nissen on 1/9/25.
 //
 
+import SpeziViews
 import SwiftUI
 import SpeziChat
 import SpeziOnboarding
 
 
-struct StudyChatView: View {
-    let type: ProcessorType
-    let studyStepName: String
+extension ChatEntity: @retroactive @unchecked Sendable { }
+
+struct StudyChatView: View, Identifiable {
+    let id: String
+    @State var processor: any ChatProcessor
     
-    @Environment(\.modelContext) private var storageContext
-    @Environment(OnboardingNavigationPath.self) private var studyNavigationPath
-    @Environment(ContextWindowProcessor.self) private var contextWindowProcessor
-    @Environment(FunctionCallingProcessor.self) private var functionCallingProcessor
-    @Environment(PerformaceManager.self) private var performanceManager
-    
-    @State private var showErrorAlert = false
-    @State private var errorMessage = ""
+    @Environment(OnboardingNavigationPath.self) private var studyNavigationPath: OnboardingNavigationPath?
+    @State private var showError = false
+    @State private var error: String = ""
     
     var body: some View {
-        let context = Binding {
-            switch type {
-            case .functionCalling:
-                functionCallingProcessor.chat
-            case .contextWindow:
-                contextWindowProcessor.chat
-            }
+        let context = Binding<Chat> {
+            processor.chat
         } set: { newValue in
             Task {
                 do {
-                    performanceManager.startRecording()
-                    switch type {
-                    case .functionCalling:
-                        try await functionCallingProcessor.query(with: newValue)
-                    case .contextWindow:
-                        try await contextWindowProcessor.query(with: newValue)
-                    }
-                } catch {
-                    showErrorAlert = true
-                    errorMessage = "Error querying LLM: \(error.localizedDescription)"
+                    try await processor.query(with: newValue)
+                } catch is CancellationError {
+                    return
+                } catch (let err) {
+                    error = err.localizedDescription
+                    showError = true
                 }
             }
         }
         
-        var continueButtonDisabled: Bool {
-            switch type {
-            case .contextWindow:
-                !contextWindowProcessor.sufficientUsage
-            case .functionCalling:
-                !functionCallingProcessor.sufficientUsage
-            }
-        }
-        
-        ChatView(context)
+        ChatView(context, hideMessages: .custom(hiddenMessageTypes: []))
             .navigationTitle("CHAT_TITLE")
+            .if(condition: { studyNavigationPath != nil }) { view in
+                view.navigationBarBackButtonHidden()
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    resetChatButton
+                    Button(action: { processor.reset() }) {
+                        Image(systemName: "arrow.counterclockwise")
+                    }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    continueButton
-                        .disabled(continueButtonDisabled)
+                    Button("NEXT", action: continueButtonAction)
+                    .disabled(!processor.sufficientUsage)
                 }
             }
-            .alert("ERROR_ALERT_TITLE", isPresented: $showErrorAlert) {
-                Button("ERROR_ALERT_CANCEL", role: .cancel) {}
+            .alert("ERROR", isPresented: $showError) {
+                Button(role: .cancel, action: { }) {
+                    Text("OK")
+                }
             } message: {
-                Text(errorMessage)
+                Text(error)
             }
     }
     
-    private var resetChatButton: some View {
-        Button(
-            action: {
-                switch type {
-                case .functionCalling:
-                    functionCallingProcessor.reset()
-                case .contextWindow:
-                    contextWindowProcessor.reset()
-                }
-            },
-            label: {
-                Image(systemName: "arrow.counterclockwise")
-            }
-        )
-    }
-    
-    private var continueButton: some View {
-        Button {
-            let context = switch type {
-            case .functionCalling:
-                functionCallingProcessor.chat
-            case .contextWindow:
-                contextWindowProcessor.chat
-            }
-            
-            let step = StudyStep(
-                name: studyStepName,
-                chatLog: context.asJSONString(),
-                keyboardMetrics: nil
-            )
-            storageContext.insert(step)
-            
-            switch type {
-                case .functionCalling:
-                functionCallingProcessor.stop()
-            case .contextWindow:
-                contextWindowProcessor.stop()
-            }
-            let performaceData = performanceManager.stopRecording()
-            storageContext.insert(StudyMetadata(metadata: performaceData))
-            
-            studyNavigationPath.nextStep()
-        } label: {
-            Text("NEXT")
-        }
+    private func continueButtonAction() {
+        processor.stop()
+        studyNavigationPath?.nextStep()
     }
 }

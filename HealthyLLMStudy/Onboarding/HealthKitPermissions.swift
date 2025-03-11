@@ -12,7 +12,6 @@ import SpeziOnboarding
 
 struct HealthKitPermissions: View {
     @Environment(OnboardingNavigationPath.self) private var onboardingNavigationPath
-    @Environment(HealthDataFetcher.self) private var healthDataFetcher
     
     @State var healthKitProcessing = false
     
@@ -40,7 +39,7 @@ struct HealthKitPermissions: View {
                     action: {
                         do {
                             healthKitProcessing = true
-                            try await healthDataFetcher.askForAuthorization()
+                            try await HealthDataFetcher.shared.askForAuthorization()
                         } catch {
                             print("Could not request HealthKit permissions: \(error.localizedDescription)")
                         }

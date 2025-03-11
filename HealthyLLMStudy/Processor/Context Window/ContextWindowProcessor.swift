@@ -14,23 +14,25 @@ import os
 
 
 @Observable
-class ContextWindowProcessor: DefaultInitializable, Module, EnvironmentAccessible {
+class ContextWindowProcessor: EnvironmentAccessible, DefaultInitializable, Module, ChatProcessor {
     @ObservationIgnored private let logger = Logger(subsystem: "HealthyLLMStudy", category: "ContextWindowProcessor")
     
     @ObservationIgnored @Dependency(SharedLocalLLM.self) private var llm
-    @ObservationIgnored @Dependency(HealthDataFetcher.self) private var healthDataFetcher: HealthDataFetcher
     
     @ObservationIgnored private let parameters: LLMLocalParameters = .init(maxOutputLength: 512)
     @ObservationIgnored private let samplingParameters: LLMLocalSamplingParameters = .init()
     
     private(set) var chat: Chat = []
     var sufficientUsage: Bool {
-        chat.filter { $0.role == .user }.count >= 3
+        chat.filter { $0.role == .user }.count >= 0
     }
     
     required init() { }
     
     func query(with inputChat: Chat) async throws {
+        await MainActor.run {
+            PerformanceProcessor.shared.start()
+        }
         guard let userInput = inputChat.last,
               userInput.role == .user,
               !userInput.content.isEmpty else {
@@ -43,12 +45,18 @@ class ContextWindowProcessor: DefaultInitializable, Module, EnvironmentAccessibl
         }
         
         chat.append(userInput)
+        Persistance.shared.saveChatMessage(
+            type: "ContextWindow",
+            role: userInput.role.rawValue,
+            message: userInput.content
+        )
         
         try await startInference(prompt: userInput.content)
     }
     
     func stop() {
         llm.cancel()
+        PerformanceProcessor.shared.stop()
     }
     
     func reset() {
@@ -90,15 +98,39 @@ class ContextWindowProcessor: DefaultInitializable, Module, EnvironmentAccessibl
             id: last.id,
             date: last.date
         )
+        
+        llm.clearCache()
+        
+        Persistance.shared.saveChatMessage(
+            type: "ContextWindow",
+            role: last.role.rawValue,
+            message: last.content
+        )
     }
     
     private func load() async {
-        print("system prompt loading...")
-        let health = await healthDataFetcher.fetchAllHealthLastTwoWeeks()
-        let workout = await healthDataFetcher.fetchAllWorkoutsLastTwoWeeks()
+        let interpretationSystemPrompt = LocalizedStringResource("INTERPRETATION_SYSTEM_PROMPT").localizedString()
+        let data = try? await ContextWindowHandler.execute()
+        let formatter = DateFormatter()
+        formatter.dateStyle = .long
+        formatter.timeStyle = .none
         
-        let systemPrompt = PromptGenerator.ContextWindowProcessor.buildSystemPrompt(health: health, workout: workout)
+        let systemPrompt = """
+        \(interpretationSystemPrompt)
         
-        chat.insert(systemPrompt, at: 0)
+        Today's Date: \(formatter.string(from: .now))
+        
+        Make use of the health data below:
+        
+        \(data ?? "No data available")
+        """
+        
+        chat.insert(
+            .init(
+                role: .hidden(type: .system),
+                content: systemPrompt
+            ),
+            at: 0
+        )
     }
 }

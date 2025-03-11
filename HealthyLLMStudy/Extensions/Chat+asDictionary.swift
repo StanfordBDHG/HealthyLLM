@@ -13,32 +13,41 @@ extension Chat {
         var result: [[String: String]] = []
         
         for message in self {
-            
-            switch message.role {
-            case .assistantToolCall, .assistantToolResponse:
-                result.append([
-                    "role": message.role.rawValue,
-                    "tool_calls": message.content
-                ])
-            default:
-                result.append([
-                    "role": message.role.rawValue,
-                    "content": message.content
-                ])
-            }
+            result.append([
+                "role": message.role.rawValue,
+                "content": message.content
+            ])
         }
         
         return result
     }
+    
+//    func asChatLog() -> [ChatLog] {
+//        var result: [ChatLog] = []
+//        
+//        for message in self {
+//            result.append(
+//                .init(
+//                    role: message.role.rawValue,
+//                    content: message.content
+//                )
+//            )
+//        }
+//        
+//        return result
+//    }
+    
 }
+
+
 
 extension ChatEntity.Role {
     var rawValue: String {
         switch self {
         case .user: "user"
         case .assistant: "assistant"
-        case .assistantToolCall: "assistant"
-        case .assistantToolResponse: "assistant"
+        case .assistantToolCall: "assistantToolCall"
+        case .assistantToolResponse: "assistantToolResponse"
         case .hidden(let type): type.name
         }
     }

@@ -10,19 +10,25 @@ import SpeziLLM
 import SpeziLLMOpenAI
 import SpeziLLMLocal
 import SpeziOnboarding
+import SpeziAccessGuard
+
 
 class HealthyLLMStudyAppDelegate: SpeziAppDelegate {
     override var configuration: Configuration {
         Configuration(standard: HealthyLLMStudyStandard()) {
             LLMRunner {
                 LLMLocalPlatform()
-                LLMOpenAIPlatform()
             }
-            HealthDataFetcher()
             SharedLocalLLM()
             FunctionCallingProcessor()
             ContextWindowProcessor()
-            PerformaceManager()
+            AccessGuardModule {
+                FixedAccessGuard(.accessGuard, code: "1111", codeOptions: .fourDigitNumeric)
+            }
         }
     }
+}
+
+extension AccessGuardIdentifier {
+    static let accessGuard = Self("edu.stanford.spezi.accessGuard")
 }

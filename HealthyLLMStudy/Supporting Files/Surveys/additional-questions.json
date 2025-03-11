@@ -1,0 +1,107 @@
+{
+  "resourceType": "Questionnaire",
+  "language": "en-US",
+  "title": "Additional Open Questions",
+  "status": "draft",
+  "meta": {
+    "profile": [
+      "http://spezi.health/fhir/StructureDefinition/sdf-Questionnaire"
+    ],
+    "tag": [
+      {
+        "system": "urn:ietf:bcp:47",
+        "code": "en-US",
+        "display": "English"
+      }
+    ]
+  },
+  "useContext": [
+    {
+      "code": {
+        "system": "http://hl7.org/fhir/ValueSet/usage-context-type",
+        "code": "focus",
+        "display": "Clinical Focus"
+      },
+      "valueCodeableConcept": {
+        "coding": [
+          {
+            "system": "urn:oid:2.16.578.1.12.4.1.1.8655",
+            "display": "Additional Open Questions"
+          }
+        ]
+      }
+    }
+  ],
+  "subjectType": [
+    "Patient"
+  ],
+  "item": [
+    {
+      "linkId": "0160b9ce-0dae-4f1c-b954-6e21ff4ce388",
+      "type": "display",
+      "required": false,
+      "_text": {
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/rendering-markdown",
+            "valueMarkdown": "Please add any questions you would be interested in asking a language model.\n\n_Note: You will not receive a response, and the language model will not be used._"
+          }
+        ]
+      },
+      "text": "Please add any questions you would be interested in asking a language model. Note: You will not receive a response, and the language model will not be used."
+    },
+    {
+      "linkId": "fed244eb-84a2-4770-8206-9161eb5cfaf3",
+      "type": "text",
+      "text": "Question 1",
+      "required": true
+    },
+    {
+      "linkId": "25853766-3b9d-4834-fff9-e61b91ff3d85",
+      "type": "text",
+      "text": "Question 2",
+      "required": true
+    },
+    {
+      "linkId": "7623ddbb-2511-4283-d52e-eeb49bf05c42",
+      "type": "text",
+      "text": "Question 3",
+      "required": true
+    },
+    {
+      "linkId": "be366162-79bb-4810-80d8-0a7a21743b70",
+      "type": "text",
+      "text": "Question 4"
+    },
+    {
+      "linkId": "4a5e0c2f-89f0-4ce4-e334-226bfa362a74",
+      "type": "text",
+      "text": "Question 5"
+    },
+    {
+      "linkId": "d825ba29-f105-4ec5-8480-4789a745fd4b",
+      "type": "text",
+      "text": "Question 6"
+    },
+    {
+      "linkId": "723ddb9c-da3c-4128-a941-f5ef6eb78599",
+      "type": "text",
+      "text": "Question 7"
+    },
+    {
+      "linkId": "4acad6be-2d68-47a1-8f02-e89b804f5a7c",
+      "type": "text",
+      "text": "Question 8"
+    },
+    {
+      "linkId": "10119bd7-4e83-4d2b-9baf-afa99b0a7dfc",
+      "type": "text",
+      "text": "Question 9"
+    },
+    {
+      "linkId": "8e9523e8-1f47-48f0-8cc0-1dd1bfd69df0",
+      "type": "text",
+      "text": "Question 10"
+    }
+  ]
+}

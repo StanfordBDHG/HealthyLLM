@@ -12,55 +12,8 @@ import HealthKit
 extension HKQuantityTypeIdentifier {
     
     // MARK: - Health Data
-    
-    static var importantHealthIdentifiers: [HKQuantityTypeIdentifier] {
-        [
-            .appleSleepingWristTemperature,
-            .bodyFatPercentage,
-            .bodyMass,
-            .bodyMassIndex,
-            .activeEnergyBurned,
-            .appleExerciseTime,
-            .appleMoveTime,
-            .appleStandTime,
-            .distanceCycling,
-            .distanceSwimming,
-            .flightsClimbed,
-            .runningPower,
-            .runningSpeed,
-            .stepCount,
-            .heartRate,
-            .heartRateRecoveryOneMinute,
-            .heartRateVariabilitySDNN,
-            .restingHeartRate,
-            .vo2Max,
-            .walkingHeartRateAverage,
-            .appleWalkingSteadiness,
-            .runningGroundContactTime,
-            .runningStrideLength,
-            .runningVerticalOscillation,
-            .sixMinuteWalkTestDistance,
-            .stairAscentSpeed,
-            .stairDescentSpeed,
-            .walkingAsymmetryPercentage,
-            .walkingDoubleSupportPercentage,
-            .walkingSpeed,
-            .walkingStepLength,
-            .bloodPressureDiastolic,
-            .bloodPressureSystolic,
-            .timeInDaylight,
-            .uvExposure,
-            .basalBodyTemperature,
-            .appleSleepingBreathingDisturbances,
-            .respiratoryRate,
-            .bodyTemperature
-        ]
-    }
-    
     static func from(_ string: String) -> HKQuantityTypeIdentifier? {
-        let string = string
-            .replacingOccurrences(of: "HKQuantityTypeIdentifier", with: "")
-            .lowercased()
+        let string = string.lowercased()
         
         switch string {
         case "bodyMassIndex".lowercased(): return .bodyMassIndex
@@ -232,7 +185,7 @@ extension HKQuantityTypeIdentifier {
         case .distanceWalkingRunning: return "distance Walking Running"
         case .environmentalAudioExposure: return "environmental Audio Exposure"
         case .runningStrideLength: return "running Stride Length"
-        case .heartRate: return "heart Rate"
+        case .heartRate: return "Heart Rate"
         case .sixMinuteWalkTestDistance: return "six Minute Walk Test Distance"
         case .appleStandTime: return "apple Stand Time"
         case .runningPower: return "running Power"

@@ -1,45 +1,72 @@
 //
-//  PerformaceManager.swift
-//  HealthyLLM
+//  PerformaceProcessor.swift
+//  HealthBench
 //
-//  Created by Leon Nissen on 1/15/25.
+//  Created by Leon Nissen on 1/23/25.
 //
 
 import Foundation
-import Spezi
-import os
+import SwiftUI
+import NotificationCenter
 
 
-class PerformaceManager: DefaultInitializable, Module, EnvironmentAccessible {
-    private let logger = Logger(subsystem: "HealthyLLMStudy", category: "PerformaceManager")
-    private(set) var recording: Bool = false
-    private var timer: Timer? = nil
-    private var logs: [String: String] = [:]
+class PerformanceProcessor {
+    static let shared = PerformanceProcessor()
+    private var timer: Timer?
     
-    required init() { }
-    
-    
-    func startRecording() {
-        guard !recording else { return }
-        logs = [:]
-        recording = true
-        timer = .scheduledTimer(withTimeInterval: 1, repeats: true, block: { [weak self] _ in
-            self?.log()
-        })
+    func start() {
+        timer = .scheduledTimer(withTimeInterval: StorageKeys.performanceLogInterval, repeats: true, block: log(_:))
+        UIDevice.current.isBatteryMonitoringEnabled = true
     }
     
-    func stopRecording() -> [String: String] {
+    func stop() {
         timer?.invalidate()
         timer = nil
-        recording = false
-        return logs
+        UIDevice.current.isBatteryMonitoringEnabled = false
     }
     
-    private func log() {
-        logs["\(Date().timeIntervalSince1970)"] = "\(cpuUsage) \(memoryUsage)"
+    private func log(_ timer: Timer) {
+        print("performance logged:", cpuUsage)
+        Persistance.shared.savePerformace(
+            cpu: cpuUsage,
+            memory: memoryUsage,
+            thermalState: thermalState,
+            batteryLevel: Double(UIDevice.current.batteryLevel),
+            batteryState: batteryState
+        )
     }
     
-    private var cpuUsage: String {
+    private var thermalState: String {
+        switch ProcessInfo.processInfo.thermalState {
+        case .critical:
+            return "critical"
+        case .fair:
+            return "fair"
+        case .nominal:
+            return "nominal"
+        case .serious:
+            return "serious"
+        default:
+            return "N/A"
+        }
+    }
+    
+    private var batteryState: String {
+        switch UIDevice.current.batteryState {
+        case .charging:
+            return "charging"
+        case .full:
+            return "full"
+        case .unknown:
+            return "unknown"
+        case .unplugged:
+            return "unplugged"
+        default:
+            return "N/A"
+        }
+    }
+    
+    private var cpuUsage: Double {
         var totalUsageOfCPU: Double = 0.0
         var threadsList: thread_act_array_t?
         var threadsCount = mach_msg_type_number_t(0)
@@ -71,11 +98,10 @@ class PerformaceManager: DefaultInitializable, Module, EnvironmentAccessible {
         }
         
         vm_deallocate(mach_task_self_, vm_address_t(UInt(bitPattern: threadsList)), vm_size_t(Int(threadsCount) * MemoryLayout<thread_t>.stride))
-        return "cpu: \(totalUsageOfCPU.formatted(.number.precision(.significantDigits(3))))%"
-        
+        return totalUsageOfCPU
     }
     
-    private var memoryUsage: String {
+    private var memoryUsage: Double {
         var taskInfo = task_vm_info_data_t()
         var count = mach_msg_type_number_t(MemoryLayout<task_vm_info>.size) / 4
         let result: kern_return_t = withUnsafeMutablePointer(to: &taskInfo) {
@@ -89,31 +115,35 @@ class PerformaceManager: DefaultInitializable, Module, EnvironmentAccessible {
             used = UInt64(taskInfo.phys_footprint)
         }
         
-        let total = ProcessInfo.processInfo.physicalMemory
-        return "memory: (\(used.formatted(.byteCount(style: .memory, allowedUnits: .mb))) / \(total.formatted(.byteCount(style: .memory, allowedUnits: .mb))))"
+        return Double(used)
     }
     
-    static var storageUsage: String {
-        let free = ByteCountFormatter.string(fromByteCount: freeDiskSpaceInBytes, countStyle: ByteCountFormatter.CountStyle.decimal)
-        let total = ByteCountFormatter.string(fromByteCount: totalDiskSpaceInBytes, countStyle: ByteCountFormatter.CountStyle.decimal)
-        
-        return "storage: \(free) / \(total)GB"
+    static var deviceIdentifier: String {
+        var systemInfo = utsname()
+        uname(&systemInfo)
+        let machineMirror = Mirror(reflecting: systemInfo.machine)
+        let identifier = machineMirror.children.reduce("") { identifier, element in
+            guard let value = element.value as? Int8, value != 0 else { return identifier }
+            return identifier + String(UnicodeScalar(UInt8(value)))
+        }
+        return identifier
     }
-
-    private static var totalDiskSpaceInBytes: Int64 {
+    
+    static var totalDiskSpace: String {
         guard let systemAttributes = try? FileManager.default.attributesOfFileSystem(forPath: NSHomeDirectory() as String),
-              let space = (systemAttributes[FileAttributeKey.systemSize] as? NSNumber)?.int64Value else { return 0 }
-        return space
+              let space = (systemAttributes[FileAttributeKey.systemSize] as? NSNumber)?.int64Value else {
+            return String(0)
+        }
+        return String(space)
     }
     
-    
-    private static var freeDiskSpaceInBytes: Int64 {
+    static var freeDiskSpace: String {
         if let space = try? URL(fileURLWithPath: NSHomeDirectory() as String)
             .resourceValues(forKeys: [URLResourceKey.volumeAvailableCapacityForImportantUsageKey])
             .volumeAvailableCapacityForImportantUsage {
-            return space
+            return String(space)
         } else {
-            return 0
+            return String(0)
         }
     }
 }

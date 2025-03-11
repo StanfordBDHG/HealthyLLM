@@ -10,8 +10,5 @@ import SpeziLLMLocal
 
 enum Constants {
     static let llmModel: LLMLocalModel = .custom(id: llmModelName)
-    
-    static let llmModelName = "mlx-community/Llama-3.2-3B-Instruct-4bit" //"mlx-community/Llama3.1-Aloe-Beta-8B"
-    
-    static let workoutLimitJsonRepresentation = 3
+    static let llmModelName = "mlx-community/Llama3.1-Aloe-Beta-8B"
 }

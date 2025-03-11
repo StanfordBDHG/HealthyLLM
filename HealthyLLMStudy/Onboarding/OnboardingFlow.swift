@@ -10,15 +10,13 @@ import SpeziOnboarding
 import HealthKit
 
 struct OnboardingFlow: View {
-    @AppStorage(StorageKeys.onboardingFlowComplete) var completedOnboardingFlow = false
+    @Binding var completedOnboardingFlow: Bool
     
     var body: some View {
         OnboardingStack(onboardingFlowComplete: $completedOnboardingFlow) {
             Welcome()
             
             Clarification()
-            
-            DownloadLLM()
             
             if HKHealthStore.isHealthDataAvailable() {
                 HealthKitPermissions()
@@ -28,6 +26,11 @@ struct OnboardingFlow: View {
                     systemImage: "heart.slash",
                     description: Text("HEALTHKIT_NOT_AVAILABLE_DESCRIPTION")
                 )
+#if DEBUG
+                .onTapGesture(count: 3) {
+                    completedOnboardingFlow = true
+                }
+#endif
             }
         }
         .navigationBarTitleDisplayMode(.inline)

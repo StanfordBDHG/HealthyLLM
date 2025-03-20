@@ -30,6 +30,7 @@
 		444FE29C2D7BB03700130362 /* Exceptions for "HealthyLLMStudy" folder in "HealthyLLMStudy" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				"Supporting Files/Info.plist",
 				"Supporting Files/tools.old",
 			);
 			target = 44E72E382D2C615400520745 /* HealthyLLMStudy */;
@@ -454,6 +455,7 @@
 				DEVELOPMENT_TEAM = W47Y3X8372;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "HealthyLLMStudy/Supporting Files/Info.plist";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Your health data is shared securely and only for approved purposes, such as improving care or supporting research. We prioritize your privacy with encrypted transfers, minimal data sharing, and full transparency. You control what is shared and with whom.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -488,9 +490,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"HealthyLLMStudy/Supporting Files/Preview Content\"";
-				DEVELOPMENT_TEAM = W47Y3X8372;
+				DEVELOPMENT_TEAM = CQRZ4E7K9U;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "HealthyLLMStudy/Supporting Files/Info.plist";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Your health data is shared securely and only for approved purposes, such as improving care or supporting research. We prioritize your privacy with encrypted transfers, minimal data sharing, and full transparency. You control what is shared and with whom.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -504,7 +507,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.digital-medicine.HealthyLLMStudy";
+				PRODUCT_BUNDLE_IDENTIFIER = edu.stanford.bdhg.healthyllm;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;

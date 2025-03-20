@@ -11,7 +11,7 @@ default_platform(:ios)
 APP_CONFIG = {
   default_environment: "staging",
   default_app_identifier: "edu.stanford.bdhg.healthyllm",
-  default_provisioningProfile: "MHealthyLLM - Stanford Biodesign Digital Health",
+  default_provisioningProfile: "HealthyLLM - Stanford Biodesign Digital Health",
   default_version_name: "1.0.0",
   default_release_notes: "Bug fixes and performance improvements.",
   scheme: "HealthyLLMStudy",

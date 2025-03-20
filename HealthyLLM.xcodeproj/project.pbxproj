@@ -31,7 +31,6 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				"Supporting Files/Info.plist",
-				"Supporting Files/tools.old",
 			);
 			target = 44E72E382D2C615400520745 /* HealthyLLMStudy */;
 		};
@@ -43,7 +42,6 @@
 			buildPhase = 44E72E352D2C615400520745 /* Sources */;
 			membershipExceptions = (
 				"Supporting Files/Surveys/additional-questions.json",
-				"Supporting Files/tools.old",
 			);
 		};
 /* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */

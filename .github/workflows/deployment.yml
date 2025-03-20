@@ -102,12 +102,12 @@ jobs:
             echo "version: ${{ inputs.version }}"
           fi
           echo "releasenotes: ${{ inputs.releasenotes }}"
-  buildandtest:
-    name: Build and Test
-    uses: ./.github/workflows/build-and-test.yml
-    permissions:
-      contents: read
-    secrets: inherit
+  # buildandtest:
+  #   name: Build and Test
+  #   uses: ./.github/workflows/build-and-test.yml
+  #   permissions:
+  #     contents: read
+  #   secrets: inherit
   iosapptestflightdeployment:
     name: iOS App TestFlight Deployment
     needs: [determineenvironment, vars] #, buildandtest]

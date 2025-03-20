@@ -1,0 +1,658 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		440072012CFD20ED00DC7C5A /* SpeziLLMLocal in Frameworks */ = {isa = PBXBuildFile; productRef = 440072002CFD20ED00DC7C5A /* SpeziLLMLocal */; };
+		440072032CFD20ED00DC7C5A /* SpeziLLMLocalDownload in Frameworks */ = {isa = PBXBuildFile; productRef = 440072022CFD20ED00DC7C5A /* SpeziLLMLocalDownload */; };
+		4459F7C12D2DE2C500F0190D /* SpeziChat in Frameworks */ = {isa = PBXBuildFile; productRef = 4459F7C02D2DE2C500F0190D /* SpeziChat */; };
+		4459F7C52D2DE31600F0190D /* SpeziOnboarding in Frameworks */ = {isa = PBXBuildFile; productRef = 4459F7C42D2DE31600F0190D /* SpeziOnboarding */; };
+		4459F7C72D2DE31F00F0190D /* SpeziChat in Frameworks */ = {isa = PBXBuildFile; productRef = 4459F7C62D2DE31F00F0190D /* SpeziChat */; };
+		4459F7C92D2DE31F00F0190D /* SpeziOnboarding in Frameworks */ = {isa = PBXBuildFile; productRef = 4459F7C82D2DE31F00F0190D /* SpeziOnboarding */; };
+		4459F7CB2D2DE31F00F0190D /* SpeziQuestionnaire in Frameworks */ = {isa = PBXBuildFile; productRef = 4459F7CA2D2DE31F00F0190D /* SpeziQuestionnaire */; };
+		44E72E6E2D2C62B000520745 /* SpeziLLM in Frameworks */ = {isa = PBXBuildFile; productRef = 44E72E6D2D2C62B000520745 /* SpeziLLM */; };
+		44E72E702D2C62B000520745 /* SpeziLLMLocal in Frameworks */ = {isa = PBXBuildFile; productRef = 44E72E6F2D2C62B000520745 /* SpeziLLMLocal */; };
+		44E72E722D2C62B000520745 /* SpeziLLMLocalDownload in Frameworks */ = {isa = PBXBuildFile; productRef = 44E72E712D2C62B000520745 /* SpeziLLMLocalDownload */; };
+		44E72E742D2C62B000520745 /* SpeziLLMOpenAI in Frameworks */ = {isa = PBXBuildFile; productRef = 44E72E732D2C62B000520745 /* SpeziLLMOpenAI */; };
+		44ED1C1C2D6E4E9300C032AD /* SpeziAccessGuard in Frameworks */ = {isa = PBXBuildFile; productRef = 44ED1C1B2D6E4E9300C032AD /* SpeziAccessGuard */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		440071A82CFD092300DC7C5A /* HealthyLLM.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HealthyLLM.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		44E72E392D2C615400520745 /* HealthyLLMStudy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HealthyLLMStudy.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		444FE29C2D7BB03700130362 /* Exceptions for "HealthyLLMStudy" folder in "HealthyLLMStudy" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Supporting Files/tools.old",
+			);
+			target = 44E72E382D2C615400520745 /* HealthyLLMStudy */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		4446AC592D6BD79D00514B1E /* Exceptions for "HealthyLLMStudy" folder in "Compile Sources" phase from "HealthyLLMStudy" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 44E72E352D2C615400520745 /* Sources */;
+			membershipExceptions = (
+				"Supporting Files/Surveys/additional-questions.json",
+				"Supporting Files/tools.old",
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		440071C92CFD094500DC7C5A /* HealthyLLM */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = HealthyLLM;
+			sourceTree = "<group>";
+		};
+		44E72E3A2D2C615400520745 /* HealthyLLMStudy */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				444FE29C2D7BB03700130362 /* Exceptions for "HealthyLLMStudy" folder in "HealthyLLMStudy" target */,
+				4446AC592D6BD79D00514B1E /* Exceptions for "HealthyLLMStudy" folder in "Compile Sources" phase from "HealthyLLMStudy" target */,
+			);
+			path = HealthyLLMStudy;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		440071A52CFD092300DC7C5A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				440072032CFD20ED00DC7C5A /* SpeziLLMLocalDownload in Frameworks */,
+				4459F7C52D2DE31600F0190D /* SpeziOnboarding in Frameworks */,
+				440072012CFD20ED00DC7C5A /* SpeziLLMLocal in Frameworks */,
+				4459F7C12D2DE2C500F0190D /* SpeziChat in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		44E72E362D2C615400520745 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				44ED1C1C2D6E4E9300C032AD /* SpeziAccessGuard in Frameworks */,
+				4459F7C72D2DE31F00F0190D /* SpeziChat in Frameworks */,
+				44E72E742D2C62B000520745 /* SpeziLLMOpenAI in Frameworks */,
+				4459F7CB2D2DE31F00F0190D /* SpeziQuestionnaire in Frameworks */,
+				44E72E702D2C62B000520745 /* SpeziLLMLocal in Frameworks */,
+				4459F7C92D2DE31F00F0190D /* SpeziOnboarding in Frameworks */,
+				44E72E6E2D2C62B000520745 /* SpeziLLM in Frameworks */,
+				44E72E722D2C62B000520745 /* SpeziLLMLocalDownload in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4400719F2CFD092300DC7C5A = {
+			isa = PBXGroup;
+			children = (
+				440071C92CFD094500DC7C5A /* HealthyLLM */,
+				44E72E3A2D2C615400520745 /* HealthyLLMStudy */,
+				440071FF2CFD20ED00DC7C5A /* Frameworks */,
+				440071A92CFD092300DC7C5A /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		440071A92CFD092300DC7C5A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				440071A82CFD092300DC7C5A /* HealthyLLM.app */,
+				44E72E392D2C615400520745 /* HealthyLLMStudy.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		440071FF2CFD20ED00DC7C5A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		440071A72CFD092300DC7C5A /* HealthyLLM */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 440071B62CFD092400DC7C5A /* Build configuration list for PBXNativeTarget "HealthyLLM" */;
+			buildPhases = (
+				440071A42CFD092300DC7C5A /* Sources */,
+				440071A52CFD092300DC7C5A /* Frameworks */,
+				440071A62CFD092300DC7C5A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				440071C92CFD094500DC7C5A /* HealthyLLM */,
+			);
+			name = HealthyLLM;
+			packageProductDependencies = (
+				440072002CFD20ED00DC7C5A /* SpeziLLMLocal */,
+				440072022CFD20ED00DC7C5A /* SpeziLLMLocalDownload */,
+				4459F7C02D2DE2C500F0190D /* SpeziChat */,
+				4459F7C42D2DE31600F0190D /* SpeziOnboarding */,
+			);
+			productName = HealthyLLM;
+			productReference = 440071A82CFD092300DC7C5A /* HealthyLLM.app */;
+			productType = "com.apple.product-type.application";
+		};
+		44E72E382D2C615400520745 /* HealthyLLMStudy */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 44E72E5A2D2C615500520745 /* Build configuration list for PBXNativeTarget "HealthyLLMStudy" */;
+			buildPhases = (
+				44E72E352D2C615400520745 /* Sources */,
+				44E72E362D2C615400520745 /* Frameworks */,
+				44E72E372D2C615400520745 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				44E72E3A2D2C615400520745 /* HealthyLLMStudy */,
+			);
+			name = HealthyLLMStudy;
+			packageProductDependencies = (
+				44E72E6D2D2C62B000520745 /* SpeziLLM */,
+				44E72E6F2D2C62B000520745 /* SpeziLLMLocal */,
+				44E72E712D2C62B000520745 /* SpeziLLMLocalDownload */,
+				44E72E732D2C62B000520745 /* SpeziLLMOpenAI */,
+				4459F7C62D2DE31F00F0190D /* SpeziChat */,
+				4459F7C82D2DE31F00F0190D /* SpeziOnboarding */,
+				4459F7CA2D2DE31F00F0190D /* SpeziQuestionnaire */,
+				44ED1C1B2D6E4E9300C032AD /* SpeziAccessGuard */,
+			);
+			productName = HealthyLLMStudy;
+			productReference = 44E72E392D2C615400520745 /* HealthyLLMStudy.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		440071A02CFD092300DC7C5A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1620;
+				LastUpgradeCheck = 1610;
+				TargetAttributes = {
+					440071A72CFD092300DC7C5A = {
+						CreatedOnToolsVersion = 16.1;
+					};
+					44E72E382D2C615400520745 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+				};
+			};
+			buildConfigurationList = 440071A32CFD092300DC7C5A /* Build configuration list for PBXProject "HealthyLLM" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 4400719F2CFD092300DC7C5A;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				440071FE2CFD206F00DC7C5A /* XCRemoteSwiftPackageReference "SpeziLLM" */,
+				4459F7BF2D2DE2C500F0190D /* XCRemoteSwiftPackageReference "SpeziChat" */,
+				4459F7C22D2DE2E300F0190D /* XCRemoteSwiftPackageReference "SpeziOnboarding" */,
+				4459F7C32D2DE30100F0190D /* XCRemoteSwiftPackageReference "SpeziQuestionnaire" */,
+				4446AE1D2D6D576B00514B1E /* XCRemoteSwiftPackageReference "SpeziAccessGuard" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 440071A92CFD092300DC7C5A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				440071A72CFD092300DC7C5A /* HealthyLLM */,
+				44E72E382D2C615400520745 /* HealthyLLMStudy */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		440071A62CFD092300DC7C5A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		44E72E372D2C615400520745 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		440071A42CFD092300DC7C5A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		44E72E352D2C615400520745 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		440071B42CFD092400DC7C5A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		440071B52CFD092400DC7C5A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		440071B72CFD092400DC7C5A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "HealthyLLM/Supporting Files/HealthyLLM.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"HealthyLLM/Supporting Files/Preview Content\"";
+				DEVELOPMENT_TEAM = CJ6GKG29BS;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Your health data is shared securely and only for approved purposes, such as improving care or supporting research. We prioritize your privacy with encrypted transfers, minimal data sharing, and full transparency. You control what is shared and with whom.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = im.nissen.HealthyLLM;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		440071B82CFD092400DC7C5A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "HealthyLLM/Supporting Files/HealthyLLM.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"HealthyLLM/Supporting Files/Preview Content\"";
+				DEVELOPMENT_TEAM = CJ6GKG29BS;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Your health data is shared securely and only for approved purposes, such as improving care or supporting research. We prioritize your privacy with encrypted transfers, minimal data sharing, and full transparency. You control what is shared and with whom.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = im.nissen.HealthyLLM;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		44E72E5B2D2C615500520745 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = HealthyLLMStudy/HealthyLLMStudy.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"HealthyLLMStudy/Supporting Files/Preview Content\"";
+				DEVELOPMENT_TEAM = W47Y3X8372;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Your health data is shared securely and only for approved purposes, such as improving care or supporting research. We prioritize your privacy with encrypted transfers, minimal data sharing, and full transparency. You control what is shared and with whom.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "org.digital-medicine.HealthyLLMStudy";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		44E72E5C2D2C615500520745 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = HealthyLLMStudy/HealthyLLMStudy.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"HealthyLLMStudy/Supporting Files/Preview Content\"";
+				DEVELOPMENT_TEAM = W47Y3X8372;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Your health data is shared securely and only for approved purposes, such as improving care or supporting research. We prioritize your privacy with encrypted transfers, minimal data sharing, and full transparency. You control what is shared and with whom.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "org.digital-medicine.HealthyLLMStudy";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		440071A32CFD092300DC7C5A /* Build configuration list for PBXProject "HealthyLLM" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				440071B42CFD092400DC7C5A /* Debug */,
+				440071B52CFD092400DC7C5A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		440071B62CFD092400DC7C5A /* Build configuration list for PBXNativeTarget "HealthyLLM" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				440071B72CFD092400DC7C5A /* Debug */,
+				440071B82CFD092400DC7C5A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		44E72E5A2D2C615500520745 /* Build configuration list for PBXNativeTarget "HealthyLLMStudy" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				44E72E5B2D2C615500520745 /* Debug */,
+				44E72E5C2D2C615500520745 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		440071FE2CFD206F00DC7C5A /* XCRemoteSwiftPackageReference "SpeziLLM" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/StanfordSpezi/SpeziLLM/";
+			requirement = {
+				branch = "feature/add-tools";
+				kind = branch;
+			};
+		};
+		4446AE1D2D6D576B00514B1E /* XCRemoteSwiftPackageReference "SpeziAccessGuard" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/StanfordSpezi/SpeziAccessGuard";
+			requirement = {
+				branch = "feat/LN_access-guard-button";
+				kind = branch;
+			};
+		};
+		4459F7BF2D2DE2C500F0190D /* XCRemoteSwiftPackageReference "SpeziChat" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/StanfordSpezi/SpeziChat";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.2.4;
+			};
+		};
+		4459F7C22D2DE2E300F0190D /* XCRemoteSwiftPackageReference "SpeziOnboarding" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/StanfordSpezi/SpeziOnboarding.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.2;
+			};
+		};
+		4459F7C32D2DE30100F0190D /* XCRemoteSwiftPackageReference "SpeziQuestionnaire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/StanfordSpezi/SpeziQuestionnaire";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		440072002CFD20ED00DC7C5A /* SpeziLLMLocal */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 440071FE2CFD206F00DC7C5A /* XCRemoteSwiftPackageReference "SpeziLLM" */;
+			productName = SpeziLLMLocal;
+		};
+		440072022CFD20ED00DC7C5A /* SpeziLLMLocalDownload */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 440071FE2CFD206F00DC7C5A /* XCRemoteSwiftPackageReference "SpeziLLM" */;
+			productName = SpeziLLMLocalDownload;
+		};
+		4459F7C02D2DE2C500F0190D /* SpeziChat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4459F7BF2D2DE2C500F0190D /* XCRemoteSwiftPackageReference "SpeziChat" */;
+			productName = SpeziChat;
+		};
+		4459F7C42D2DE31600F0190D /* SpeziOnboarding */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4459F7C22D2DE2E300F0190D /* XCRemoteSwiftPackageReference "SpeziOnboarding" */;
+			productName = SpeziOnboarding;
+		};
+		4459F7C62D2DE31F00F0190D /* SpeziChat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4459F7BF2D2DE2C500F0190D /* XCRemoteSwiftPackageReference "SpeziChat" */;
+			productName = SpeziChat;
+		};
+		4459F7C82D2DE31F00F0190D /* SpeziOnboarding */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4459F7C22D2DE2E300F0190D /* XCRemoteSwiftPackageReference "SpeziOnboarding" */;
+			productName = SpeziOnboarding;
+		};
+		4459F7CA2D2DE31F00F0190D /* SpeziQuestionnaire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4459F7C32D2DE30100F0190D /* XCRemoteSwiftPackageReference "SpeziQuestionnaire" */;
+			productName = SpeziQuestionnaire;
+		};
+		44E72E6D2D2C62B000520745 /* SpeziLLM */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 440071FE2CFD206F00DC7C5A /* XCRemoteSwiftPackageReference "SpeziLLM" */;
+			productName = SpeziLLM;
+		};
+		44E72E6F2D2C62B000520745 /* SpeziLLMLocal */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 440071FE2CFD206F00DC7C5A /* XCRemoteSwiftPackageReference "SpeziLLM" */;
+			productName = SpeziLLMLocal;
+		};
+		44E72E712D2C62B000520745 /* SpeziLLMLocalDownload */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 440071FE2CFD206F00DC7C5A /* XCRemoteSwiftPackageReference "SpeziLLM" */;
+			productName = SpeziLLMLocalDownload;
+		};
+		44E72E732D2C62B000520745 /* SpeziLLMOpenAI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 440071FE2CFD206F00DC7C5A /* XCRemoteSwiftPackageReference "SpeziLLM" */;
+			productName = SpeziLLMOpenAI;
+		};
+		44ED1C1B2D6E4E9300C032AD /* SpeziAccessGuard */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4446AE1D2D6D576B00514B1E /* XCRemoteSwiftPackageReference "SpeziAccessGuard" */;
+			productName = SpeziAccessGuard;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 440071A02CFD092300DC7C5A /* Project object */;
+}

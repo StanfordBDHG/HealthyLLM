@@ -5,8 +5,8 @@
 //  Created by Leon Nissen on 2/21/25.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 class Performance: NSManagedObject, Encodable {
     enum CodingKeys: CodingKey {

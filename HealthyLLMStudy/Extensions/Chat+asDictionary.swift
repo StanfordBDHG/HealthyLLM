@@ -40,7 +40,6 @@ extension Chat {
 }
 
 
-
 extension ChatEntity.Role {
     var rawValue: String {
         switch self {

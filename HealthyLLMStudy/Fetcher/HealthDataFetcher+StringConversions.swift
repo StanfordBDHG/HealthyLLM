@@ -9,8 +9,8 @@
 import Foundation
 import HealthKit
 
+// swiftlint:disable all
 extension HKQuantityTypeIdentifier {
-    
     // MARK: - Health Data
     static func from(_ string: String) -> HKQuantityTypeIdentifier? {
         let string = string.lowercased()

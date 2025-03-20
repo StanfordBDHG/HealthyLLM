@@ -6,11 +6,11 @@
 //
 
 import Spezi
-import SpeziLLM
-import SpeziLLMOpenAI
-import SpeziLLMLocal
-import SpeziOnboarding
 import SpeziAccessGuard
+import SpeziLLM
+import SpeziLLMLocal
+import SpeziLLMOpenAI
+import SpeziOnboarding
 
 
 class HealthyLLMStudyAppDelegate: SpeziAppDelegate {

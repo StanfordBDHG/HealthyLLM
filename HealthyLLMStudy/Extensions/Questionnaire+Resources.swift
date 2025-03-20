@@ -9,6 +9,7 @@ import Foundation
 import ModelsR4
 
 extension Questionnaire {
+    // swiftlint:disable:next identifier_name
     static var demographics_health_privacy: Questionnaire {
         load(name: "demographics+health+privacy-questions")
     }

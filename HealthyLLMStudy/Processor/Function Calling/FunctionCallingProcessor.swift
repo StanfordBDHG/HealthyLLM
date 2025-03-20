@@ -6,11 +6,11 @@
 //
 
 import Foundation
+import os
 import Spezi
+import SpeziChat
 import SpeziLLM
 import SpeziLLMLocal
-import SpeziChat
-import os
 
 
 @Observable
@@ -133,7 +133,7 @@ class FunctionCallingProcessor: EnvironmentAccessible, DefaultInitializable, Mod
         
         let context: [[String: String]] = [
             ["role": "system", "content": systemPrompt],
-            ["role": "user", "content": prompt],
+            ["role": "user", "content": prompt]
         ]
         
         let output = try await llm.oneShot(
@@ -270,7 +270,7 @@ class FunctionCallingProcessor: EnvironmentAccessible, DefaultInitializable, Mod
         )
     }
     
-    private func loadTools() -> [[String: any Sendable]]{
+    private func loadTools() -> [[String: any Sendable]] {
         guard let url = Bundle.main.url(forResource: "tools", withExtension: "json"),
         let data = try? Data(contentsOf: url),
         let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [[String: any Sendable]] else {

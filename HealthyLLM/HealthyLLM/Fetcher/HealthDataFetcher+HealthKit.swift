@@ -10,7 +10,6 @@ import Foundation
 import HealthKit
 
 extension HealthDataFetcher {
-    
     func fetchSample(
         for identifier: HKQuantityTypeIdentifier,
         unit: HKUnit,
@@ -42,7 +41,6 @@ extension HealthDataFetcher {
                 quantitySamplePredicate: predicate,
                 options: statisticsOptions
             ) { _, statistics, error in
-                
                 if let error = error {
                     continuation.resume(throwing: error)
                     return
@@ -91,7 +89,7 @@ extension HealthDataFetcher {
                 predicate: nil,
                 limit: 1,
                 sortDescriptors: [sortDescriptor]
-            ) { _, results, error in
+            ) { _, results, _ in
                 guard let sample = results?.first as? HKQuantitySample else {
                     continuation.resume(throwing: HealthDataFetcherError.noValueAvailable)
                     return
@@ -117,7 +115,7 @@ extension HealthDataFetcher {
                     predicate: activityPredicate,
                     limit: limit ?? HKObjectQueryNoLimit,
                     sortDescriptors: [.init(keyPath: \HKSample.startDate, ascending: false)],
-                    resultsHandler: { query, samples, error in
+                    resultsHandler: { _, samples, error in
                         if let hasError = error {
                             continuation.resume(throwing: hasError)
                             return

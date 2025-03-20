@@ -5,12 +5,12 @@
 //  Created by Leon Nissen on 1/15/25.
 //
 
-import SwiftUI
-import SpeziViews
 import Hub
+import SpeziViews
+import SwiftUI
 
 
-fileprivate enum LLMSelection {
+private enum LLMSelection {
     case present(ChatProcessor)
     case hide
 }
@@ -79,7 +79,7 @@ struct DebugView: View {
                            }
                        }
                    }
-                }
+               }
                 
                 Section("Questions") {
                     NavigationLink("Answer Questions") {

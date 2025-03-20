@@ -6,8 +6,8 @@
 //
 
 import Foundation
-import SwiftUI
 import NotificationCenter
+import SwiftUI
 
 
 class PerformanceProcessor {
@@ -71,7 +71,7 @@ class PerformanceProcessor {
         var threadsList: thread_act_array_t?
         var threadsCount = mach_msg_type_number_t(0)
         let threadsResult = withUnsafeMutablePointer(to: &threadsList) {
-            return $0.withMemoryRebound(to: thread_act_array_t?.self, capacity: 1) {
+            $0.withMemoryRebound(to: thread_act_array_t?.self, capacity: 1) {
                 task_threads(mach_task_self_, $0, &threadsCount)
             }
         }

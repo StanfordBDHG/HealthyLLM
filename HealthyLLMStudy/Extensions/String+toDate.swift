@@ -24,7 +24,7 @@ extension String {
             "yyyy/MM/dd HH:mm:ss",
             "MM/dd/yyyy HH:mm:ss",
             "dd/MM/yyyy HH:mm:ss",
-            "EEE, dd MMM yyyy HH:mm:ss Z",  // e.g., RFC1123 format
+            "EEE, dd MMM yyyy HH:mm:ss Z"  // e.g., RFC1123 format
         ]
         
         let formatter = DateFormatter()

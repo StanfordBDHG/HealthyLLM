@@ -5,8 +5,8 @@
 //  Created by Leon Nissen on 3/4/25.
 //
 
-import HealthKit
 import Foundation
+import HealthKit
 
 class GeneralHealthMetricsHandler: ToolHandler {
     static var name: String = "getGeneralHealthMetrics"

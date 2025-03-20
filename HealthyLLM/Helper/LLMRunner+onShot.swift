@@ -6,9 +6,9 @@
 // SPDX-License-Identifier: MIT
 //
 
+import MLXLLM
 import SpeziLLM
 import SpeziLLMLocal
-import MLXLLM
 
 extension LLMRunner {
     public func oneShot(

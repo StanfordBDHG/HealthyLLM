@@ -7,10 +7,10 @@
 //
 
 import HealthKit
-import Spezi
 import os
+import Spezi
 
-
+// swiftlint:disable all
 class HealthDataFetcher {
     static let shared = HealthDataFetcher()
     
@@ -84,7 +84,7 @@ class HealthDataFetcher {
             for quantityIdentifier in allQuantityTypeIdentifiers {
                 if let quantityType = HKObjectType.quantityType(forIdentifier: quantityIdentifier) {
                     group.addTask {
-                        return await fetchOldestSample(for: quantityType,
+                        await fetchOldestSample(for: quantityType,
                                                        identifier: quantityIdentifier.rawValue,
                                                        healthStore: self.healthStore)
                     }
@@ -94,7 +94,7 @@ class HealthDataFetcher {
             for categoryIdentifier in allCategoryTypeIdenfier {
                 if let categoryType = HKObjectType.categoryType(forIdentifier: categoryIdentifier) {
                     group.addTask {
-                        return await fetchOldestSample(for: categoryType,
+                        await fetchOldestSample(for: categoryType,
                                                        identifier: categoryIdentifier.rawValue,
                                                        healthStore: self.healthStore)
                     }
@@ -103,7 +103,7 @@ class HealthDataFetcher {
             // Query workouts.
             let workoutType = HKObjectType.workoutType()
             group.addTask {
-                return await fetchOldestSample(for: workoutType,
+                await fetchOldestSample(for: workoutType,
                                                identifier: "HKWorkoutTypeIdentifier",
                                                healthStore: self.healthStore)
             }
@@ -117,8 +117,8 @@ class HealthDataFetcher {
         }
         
         // Now find the overall oldest sample.
-        var oldestIdentifier: String? = nil
-        var oldestDate: Date? = nil
+        var oldestIdentifier: String?
+        var oldestDate: Date?
         for (sample, identifier) in results {
             let sampleDate = sample.startDate
             if oldestDate == nil || sampleDate < oldestDate! {
@@ -139,7 +139,7 @@ class HealthDataFetcher {
         // Helper function that wraps HKSampleQuery in an async call.
         func fetchSampleCount(for sampleType: HKSampleType) async throws -> Int {
             try await withCheckedThrowingContinuation { continuation in
-                let query = HKSampleQuery(sampleType: sampleType, predicate: nil, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { (_, samples, error) in
+                let query = HKSampleQuery(sampleType: sampleType, predicate: nil, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { _, samples, error in
                     if let error = error {
                         continuation.resume(throwing: error)
                     } else {
@@ -355,7 +355,7 @@ class HealthDataFetcher {
                     var periodicData: [(date: Date, value: Double?)] = []
                     
                     results.enumerateStatistics(from: startDate, to: endDate) { statistics, _ in
-                        var value: Double? = nil
+                        var value: Double?
                         
                         if let sum = statistics.sumQuantity() {
                             switch typeIdentifier {
@@ -396,7 +396,7 @@ class HealthDataFetcher {
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
         
         return try await withCheckedThrowingContinuation { continuation in
-            let query = HKSampleQuery(sampleType: quantityType, predicate: predicate, limit: 1, sortDescriptors: [sortDescriptor]) { query, samples, error in
+            let query = HKSampleQuery(sampleType: quantityType, predicate: predicate, limit: 1, sortDescriptors: [sortDescriptor]) { _, samples, error in
                 guard let sample = samples?.first as? HKQuantitySample, error == nil else {
                     continuation.resume(returning: (nil, "No sample available", .now))
                     return
@@ -520,7 +520,7 @@ class HealthDataFetcher {
         let predicate = HKQuery.predicateForSamples(withStart: startDate, end: endDate, options: .strictEndDate)
         
         return try await withCheckedThrowingContinuation { continuation in
-            let query = HKStatisticsQuery(quantityType: quantityType, quantitySamplePredicate: predicate, options: .cumulativeSum) { query, result, error in
+            let query = HKStatisticsQuery(quantityType: quantityType, quantitySamplePredicate: predicate, options: .cumulativeSum) { _, result, error in
                 guard let result = result, let sum = result.sumQuantity(), error == nil else {
                     continuation.resume(returning: (nil, "No sample available"))
                     return
@@ -568,14 +568,14 @@ class HealthDataFetcher {
                     .discreteAverage
             }
             
-            let query = HKStatisticsQuery(quantityType: quantityType, quantitySamplePredicate: predicate, options: options) { query, result, error in
+            let query = HKStatisticsQuery(quantityType: quantityType, quantitySamplePredicate: predicate, options: options) { _, result, error in
                 guard let result = result, error == nil else {
                     continuation.resume(returning: (nil, "No sample available"))
                     return
                 }
                 
                 var unitString = ""
-                var value: Double? = nil
+                var value: Double?
                 
                 if let avgQuantity = result.averageQuantity() {
                     switch typeIdentifier {

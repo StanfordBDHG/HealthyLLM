@@ -9,7 +9,6 @@
 import Foundation
 
 enum PromptGenerator {
-    
     enum SystemPromptType {
         case functionCall
         case `default`
@@ -23,7 +22,7 @@ enum PromptGenerator {
             """
             \(systemPrompt)
             Here is some general information about the user, only use these information if necessary:
-            \(userInfo != nil ? userInfo!.asJSONRepresentation(.prettyPrinted) ?? "No Data" : "No Data") 
+            \(userInfo != nil ? userInfo!.asJSONRepresentation(.prettyPrinted) ?? "No Data" : "No Data")
             """
         }
         
@@ -55,7 +54,7 @@ enum PromptGenerator {
         )
     }
     
-    static private func generationPrompt(with tools: String?) -> String {
+    private static func generationPrompt(with tools: String?) -> String {
         """
         You are a function calling AI model. You are provided with function signatures within <tools></tools> XML tags. You may call one or more functions to assist with the user query. Don't make assumptions about what values to plug into functions. Here are the available tools: <tools>
         \(tools ?? "")
@@ -68,7 +67,7 @@ enum PromptGenerator {
     }
     
     
-    static private let tools: String = """
+    private static let tools: String = """
     {
       "type": "function",
       "function": {
@@ -110,10 +109,9 @@ enum PromptGenerator {
     """
     
     static let systemPrompt = "You are a bot that responds to health queries. You should reply with the health type asked for in the query."
-    
 }
 //
-//fileprivate struct Tool: Encodable {
+// fileprivate struct Tool: Encodable {
 //    struct FunctionTool: Encodable {
 //        
 //        
@@ -124,4 +122,4 @@ enum PromptGenerator {
 //    
 //    let type: String
 //    let function: FunctionTool
-//}
+// }

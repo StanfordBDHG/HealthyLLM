@@ -5,9 +5,9 @@
 //  Created by Leon Nissen on 1/6/25.
 //
 
-import SwiftUI
-import SpeziOnboarding
 import HealthKit
+import SpeziOnboarding
+import SwiftUI
 
 struct OnboardingFlow: View {
     @Binding var completedOnboardingFlow: Bool

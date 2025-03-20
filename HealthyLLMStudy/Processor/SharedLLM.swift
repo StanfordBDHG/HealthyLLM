@@ -6,11 +6,11 @@
 //
 
 import Foundation
+import MLX
+import os
 import Spezi
 import SpeziLLM
 import SpeziLLMLocal
-import os
-import MLX
 
 
 enum SharedLLMError: Error {

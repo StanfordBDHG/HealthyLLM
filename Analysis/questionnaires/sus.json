@@ -1,0 +1,528 @@
+{
+  "resourceType": "Questionnaire",
+  "language": "en-US",
+  "title": "Usability and User Experience",
+  "status": "draft",
+  "meta": {
+    "profile": [
+      "http://spezi.health/fhir/StructureDefinition/sdf-Questionnaire"
+    ],
+    "tag": [
+      {
+        "system": "urn:ietf:bcp:47",
+        "code": "en-US",
+        "display": "English"
+      }
+    ]
+  },
+  "useContext": [
+    {
+      "code": {
+        "system": "http://hl7.org/fhir/ValueSet/usage-context-type",
+        "code": "focus",
+        "display": "Clinical Focus"
+      },
+      "valueCodeableConcept": {
+        "coding": [
+          {
+            "system": "urn:oid:2.16.578.1.12.4.1.1.8655",
+            "display": "System Usability Scale"
+          }
+        ]
+      }
+    }
+  ],
+  "subjectType": [
+    "Patient"
+  ],
+  "item": [
+    {
+      "linkId": "93e1777a-14a3-4179-83eb-77f27b3fcb2c",
+      "type": "group",
+      "text": "System Usability Scale",
+      "required": false,
+      "item": [
+        {
+          "linkId": "af54b1b8-d138-455e-d248-67f737cdf09d",
+          "type": "choice",
+          "text": "I think that I would like to use this system frequently.",
+          "required": true,
+          "answerOption": [
+            {
+              "valueCoding": {
+                "id": "89ec38c4-b7a3-4141-db83-f4764d1583f6",
+                "code": "strongly-disagree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Strongly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "643dfc40-725e-4e61-8b2e-0705c06b34cb",
+                "code": "slightly-disagree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Slightly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "70e4e7e9-9356-46ba-fc88-bd3be79f14af",
+                "code": "neutral",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Neutral"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "8c01644d-093e-4b22-c342-98e11430456b",
+                "code": "slightly-agree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Slightly Agree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "1e54e23a-56f8-412d-8df3-006a34c5b410",
+                "code": "strongly-agree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Strongly Agree"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "b61fd745-ec5d-4d8e-90e8-08688a239d40",
+          "type": "choice",
+          "text": "I found the system unnecessarily complex.",
+          "required": true,
+          "answerOption": [
+            {
+              "valueCoding": {
+                "id": "89ec38c4-b7a3-4141-db83-f4764d1583f6",
+                "code": "strongly-disagree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Strongly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "643dfc40-725e-4e61-8b2e-0705c06b34cb",
+                "code": "slightly-disagree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Slightly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "70e4e7e9-9356-46ba-fc88-bd3be79f14af",
+                "code": "neutral",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Neutral"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "8c01644d-093e-4b22-c342-98e11430456b",
+                "code": "slightly-agree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Slightly Agree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "1e54e23a-56f8-412d-8df3-006a34c5b410",
+                "code": "strongly-agree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Strongly Agree"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "3bafdf0e-f73a-4452-83e6-866cbef7e1cb",
+          "type": "choice",
+          "text": "I thought the system was easy to use.",
+          "required": true,
+          "answerOption": [
+            {
+              "valueCoding": {
+                "id": "89ec38c4-b7a3-4141-db83-f4764d1583f6",
+                "code": "strongly-disagree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Strongly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "643dfc40-725e-4e61-8b2e-0705c06b34cb",
+                "code": "slightly-disagree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Slightly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "70e4e7e9-9356-46ba-fc88-bd3be79f14af",
+                "code": "neutral",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Neutral"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "8c01644d-093e-4b22-c342-98e11430456b",
+                "code": "slightly-agree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Slightly Agree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "1e54e23a-56f8-412d-8df3-006a34c5b410",
+                "code": "strongly-agree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Strongly Agree"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "e6709d43-db5d-42be-840b-b11591a3a89c",
+          "type": "choice",
+          "text": "I think that I would need the support of a technical person to be able to use this system.",
+          "required": true,
+          "answerOption": [
+            {
+              "valueCoding": {
+                "id": "89ec38c4-b7a3-4141-db83-f4764d1583f6",
+                "code": "strongly-disagree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Strongly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "643dfc40-725e-4e61-8b2e-0705c06b34cb",
+                "code": "slightly-disagree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Slightly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "70e4e7e9-9356-46ba-fc88-bd3be79f14af",
+                "code": "neutral",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Neutral"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "8c01644d-093e-4b22-c342-98e11430456b",
+                "code": "slightly-agree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Slightly Agree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "1e54e23a-56f8-412d-8df3-006a34c5b410",
+                "code": "strongly-agree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Strongly Agree"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "d75b2ebc-89a3-4fca-fe3d-296f973f4b21",
+          "type": "choice",
+          "text": "I found the various functions in this system were well integrated.",
+          "required": true,
+          "answerOption": [
+            {
+              "valueCoding": {
+                "id": "89ec38c4-b7a3-4141-db83-f4764d1583f6",
+                "code": "strongly-disagree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Strongly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "643dfc40-725e-4e61-8b2e-0705c06b34cb",
+                "code": "slightly-disagree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Slightly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "70e4e7e9-9356-46ba-fc88-bd3be79f14af",
+                "code": "neutral",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Neutral"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "8c01644d-093e-4b22-c342-98e11430456b",
+                "code": "slightly-agree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Slightly Agree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "1e54e23a-56f8-412d-8df3-006a34c5b410",
+                "code": "strongly-agree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Strongly Agree"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "30b7c5ea-43da-4a7e-9d04-ce70ce3620d2",
+          "type": "choice",
+          "text": "I thought there was too much inconsistency in this system.",
+          "required": true,
+          "answerOption": [
+            {
+              "valueCoding": {
+                "id": "89ec38c4-b7a3-4141-db83-f4764d1583f6",
+                "code": "strongly-disagree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Strongly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "643dfc40-725e-4e61-8b2e-0705c06b34cb",
+                "code": "slightly-disagree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Slightly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "70e4e7e9-9356-46ba-fc88-bd3be79f14af",
+                "code": "neutral",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Neutral"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "8c01644d-093e-4b22-c342-98e11430456b",
+                "code": "slightly-agree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Slightly Agree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "1e54e23a-56f8-412d-8df3-006a34c5b410",
+                "code": "strongly-agree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Strongly Agree"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "2186f63c-ef48-4236-a1ac-7c8b485e3adb",
+          "type": "choice",
+          "text": "I would imagine that most people would learn to use this system very quickly.",
+          "required": true,
+          "answerOption": [
+            {
+              "valueCoding": {
+                "id": "89ec38c4-b7a3-4141-db83-f4764d1583f6",
+                "code": "strongly-disagree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Strongly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "643dfc40-725e-4e61-8b2e-0705c06b34cb",
+                "code": "slightly-disagree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Slightly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "70e4e7e9-9356-46ba-fc88-bd3be79f14af",
+                "code": "neutral",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Neutral"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "8c01644d-093e-4b22-c342-98e11430456b",
+                "code": "slightly-agree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Slightly Agree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "1e54e23a-56f8-412d-8df3-006a34c5b410",
+                "code": "strongly-agree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Strongly Agree"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "d033f196-c76d-461a-8128-63ae9561070a",
+          "type": "choice",
+          "text": "I found the system very awkward to use.",
+          "required": true,
+          "answerOption": [
+            {
+              "valueCoding": {
+                "id": "89ec38c4-b7a3-4141-db83-f4764d1583f6",
+                "code": "strongly-disagree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Strongly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "643dfc40-725e-4e61-8b2e-0705c06b34cb",
+                "code": "slightly-disagree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Slightly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "70e4e7e9-9356-46ba-fc88-bd3be79f14af",
+                "code": "neutral",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Neutral"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "8c01644d-093e-4b22-c342-98e11430456b",
+                "code": "slightly-agree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Slightly Agree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "1e54e23a-56f8-412d-8df3-006a34c5b410",
+                "code": "strongly-agree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Strongly Agree"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "85ecf8be-61bf-4fc0-995a-b6a2bcae363c",
+          "type": "choice",
+          "text": "I felt very confident using the system.",
+          "required": true,
+          "answerOption": [
+            {
+              "valueCoding": {
+                "id": "89ec38c4-b7a3-4141-db83-f4764d1583f6",
+                "code": "strongly-disagree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Strongly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "643dfc40-725e-4e61-8b2e-0705c06b34cb",
+                "code": "slightly-disagree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Slightly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "70e4e7e9-9356-46ba-fc88-bd3be79f14af",
+                "code": "neutral",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Neutral"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "8c01644d-093e-4b22-c342-98e11430456b",
+                "code": "slightly-agree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Slightly Agree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "1e54e23a-56f8-412d-8df3-006a34c5b410",
+                "code": "strongly-agree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Strongly Agree"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "ec8cdf0b-b051-4a60-f05e-fc2ebee1673e",
+          "type": "choice",
+          "text": "I needed to learn a lot of things before I could get going with this system.",
+          "required": true,
+          "answerOption": [
+            {
+              "valueCoding": {
+                "id": "89ec38c4-b7a3-4141-db83-f4764d1583f6",
+                "code": "strongly-disagree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Strongly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "643dfc40-725e-4e61-8b2e-0705c06b34cb",
+                "code": "slightly-disagree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Slightly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "70e4e7e9-9356-46ba-fc88-bd3be79f14af",
+                "code": "neutral",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Neutral"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "8c01644d-093e-4b22-c342-98e11430456b",
+                "code": "slightly-agree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Slightly Agree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "1e54e23a-56f8-412d-8df3-006a34c5b410",
+                "code": "strongly-agree",
+                "system": "urn:uuid:4a9e8cba-3cf8-4ed9-8817-1e31551cd20f",
+                "display": "Strongly Agree"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

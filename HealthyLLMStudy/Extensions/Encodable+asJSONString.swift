@@ -24,7 +24,9 @@ extension Encodable {
     }
     
     func asJSONString(_ outputFormat: JSONEncoder.OutputFormatting? = .prettyPrinted) -> String? {
-        guard let json = self.asJSONRepresentation() else { return nil }
+        guard let json = self.asJSONRepresentation() else {
+            return nil
+        }
         
         return String(data: json, encoding: .utf8)
     }

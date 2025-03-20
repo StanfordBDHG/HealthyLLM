@@ -36,7 +36,6 @@ struct ChatInputView: View {
                                     .resizable()
                                     .tint(.accent)
                                     .aspectRatio(contentMode: .fit)
-                                    
                             }
                             .frame(width: 25)
                             .padding()

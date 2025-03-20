@@ -6,12 +6,12 @@
 //
 
 
-import SwiftUI
-import SwiftData
-import SpeziChat
-import SpeziQuestionnaire
-import SpeziLLMLocalDownload
 import SpeziAccessGuard
+import SpeziChat
+import SpeziLLMLocalDownload
+import SpeziQuestionnaire
+import SwiftData
+import SwiftUI
 
 
 struct MainView: View {

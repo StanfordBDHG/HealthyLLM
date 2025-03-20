@@ -6,13 +6,13 @@
 //
 
 
-import HealthKit
 import Foundation
+import HealthKit
 
 class ActivityOverviewDataHandler: ToolHandler {
     static var name: String = "getActivityOverview"
     
-    func execute(parameters: [String : String]) async throws -> String {
+    func execute(parameters: [String: String]) async throws -> String {
         guard let typeString = parameters["type"] else {
             throw ToolCallError.missingParameters(names: ["type"])
         }

@@ -5,9 +5,9 @@
 //  Created by Leon Nissen on 1/6/25.
 //
 
-import SwiftUI
 import SpeziOnboarding
 import SpeziQuestionnaire
+import SwiftUI
 
 
 struct StudyFlow: View {
@@ -73,6 +73,12 @@ struct StudyFlow: View {
                 questionnaireResponse: finishStudy(questionnaireResponse:)
             )
             .onboardingIdentifier("SystemUsabilityScale - Questionnaire")
+        }
+        .onAppear {
+            UIApplication.shared.isIdleTimerDisabled = true
+        }
+        .onDisappear {
+            UIApplication.shared.isIdleTimerDisabled = false
         }
     }
     

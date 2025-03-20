@@ -6,8 +6,8 @@
 // SPDX-License-Identifier: MIT
 //
 
-import SwiftUI
 import SpeziChat
+import SwiftUI
 
 struct HealthyLLMChatView: View {
     @Environment(HealthDataInterpreter.self) private var healthDataInterpreter

@@ -27,13 +27,13 @@ class ToolRegistry {
     /// - Parameter name: The function name
     /// - Returns: The handler if found, nil otherwise
     func handler(for name: String) -> ToolHandler? {
-        return functions[name]
+        functions[name]
     }
     
     /// Check if a function with the given name is registered
     /// - Parameter name: The function name
     /// - Returns: True if the function exists
     func hasFunction(named name: String) -> Bool {
-        return functions[name] != nil
+        functions[name] != nil
     }
 }

@@ -5,14 +5,14 @@
 //  Created by Leon Nissen on 3/5/25.
 //
 
-import HealthKit
 import Foundation
+import HealthKit
 
 
 class SleepDataHandler: ToolHandler {
     static var name: String = "getSleep"
     
-    func execute(parameters: [String : String]) async throws -> String {
+    func execute(parameters: [String: String]) async throws -> String {
         guard let maxDaysString = parameters["maxDays"],
               let _maxDays = Int(maxDaysString) else {
             throw ToolCallError.missingParameters(names: ["maxDays"])
@@ -36,14 +36,13 @@ class SleepDataHandler: ToolHandler {
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
         
         return try await withCheckedThrowingContinuation { continuation in
-            let query = HKSampleQuery(sampleType: HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: [sortDescriptor]) { query, samples, error in
-                
+            let query = HKSampleQuery(sampleType: HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: [sortDescriptor]) { _, samples, error in
                 guard let sleepSamples = samples as? [HKCategorySample], error == nil else {
                     continuation.resume(returning: "No sleep data available.")
                     return
                 }
                 
-                let sleepNights = Dictionary(grouping: sleepSamples) { (sample) -> Date in
+                let sleepNights = Dictionary(grouping: sleepSamples) { sample -> Date in
                     let dateComponents = Calendar.current.dateComponents([.year, .month, .day], from: sample.endDate)
                     return Calendar.current.date(from: dateComponents)!
                 }

@@ -5,9 +5,9 @@
 //  Created by Leon Nissen on 2/21/25.
 //
 
-import Spezi
 import CoreData
 import os
+import Spezi
 import SpeziQuestionnaire
 import SwiftUI
 
@@ -159,4 +159,3 @@ struct Exportable: Encodable {
     let healthKitValues: [String: Int]
     let healthKitDatabaseAge: [String: Date]
 }
-

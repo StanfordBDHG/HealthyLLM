@@ -37,7 +37,6 @@ enum ToStringHelper {
         
         return "just now"
     }
-
 }
 
 extension Int {
@@ -45,6 +44,6 @@ extension Int {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         formatter.groupingSeparator = ","
-        return formatter.string(from: NSNumber(value: self)) ?? String(self)
+        return formatter.string(for: self) ?? String(self)
     }
 }

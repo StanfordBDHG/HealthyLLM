@@ -6,9 +6,9 @@
 // SPDX-License-Identifier: MIT
 //
 
-import SwiftUI
-import SpeziOnboarding
 import SpeziLLMLocalDownload
+import SpeziOnboarding
+import SwiftUI
 
 struct DownloadLLM: View {
     @Environment(OnboardingNavigationPath.self) private var onboardingNavigationPath
@@ -18,6 +18,6 @@ struct DownloadLLM: View {
             model: .custom(id: Constants.llmModelName),
             downloadDescription: "DOWNLOAD_MODEL_DESCRIPTION `\(Constants.llmModelName)`") {
                 onboardingNavigationPath.nextStep()
-            }
+        }
     }
 }

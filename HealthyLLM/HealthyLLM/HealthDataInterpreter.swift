@@ -7,11 +7,11 @@
 //
 
 import Foundation
+import OSLog
 import Spezi
+import SpeziChat
 import SpeziLLM
 import SpeziLLMLocal
-import SpeziChat
-import OSLog
 
 @Observable
 class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible {
@@ -47,16 +47,18 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
             maxOutputLength: 1024,
             chatTemplate: Constants.llmModelChatTemplate
         )
+        guard let defaultParameters else { return }
         
         let schema = LLMLocalSchema(
             model: .custom(id: Constants.llmModelName),
-            parameters: defaultParameters!,
+            parameters: defaultParameters,
             injectIntoContext: true
         )
         
         sharedSession = llmRunner.callAsFunction(with: schema)
+        guard let sharedSession else { return }
         
-        try await sharedSession!.setup()
+        try await sharedSession.setup()
         loaded = true
     }
     

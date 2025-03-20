@@ -6,16 +6,9 @@
 // SPDX-License-Identifier: MIT
 //
 
-import Spezi
 import Foundation
+import Spezi
 
 class HealthContextGenerator: DefaultInitializable, Module, EnvironmentAccessible {
-    
-    
     required init() { }
-    
-    
-    
-    
-    
 }

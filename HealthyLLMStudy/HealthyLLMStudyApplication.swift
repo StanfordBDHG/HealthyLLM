@@ -5,9 +5,9 @@
 //  Created by Leon Nissen on 1/6/25.
 //
 
-import SwiftUI
-import SwiftData
 import Spezi
+import SwiftData
+import SwiftUI
 
 @main
 struct HealthyLLMStudyApplication: App {

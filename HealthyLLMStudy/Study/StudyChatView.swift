@@ -5,13 +5,10 @@
 //  Created by Leon Nissen on 1/9/25.
 //
 
-import SpeziViews
-import SwiftUI
 import SpeziChat
 import SpeziOnboarding
-
-
-extension ChatEntity: @retroactive @unchecked Sendable { }
+import SpeziViews
+import SwiftUI
 
 struct StudyChatView: View, Identifiable {
     let id: String
@@ -30,8 +27,8 @@ struct StudyChatView: View, Identifiable {
                     try await processor.query(with: newValue)
                 } catch is CancellationError {
                     return
-                } catch (let err) {
-                    error = err.localizedDescription
+                } catch {
+                    self.error = error.localizedDescription
                     showError = true
                 }
             }
@@ -67,3 +64,5 @@ struct StudyChatView: View, Identifiable {
         studyNavigationPath?.nextStep()
     }
 }
+
+extension ChatEntity: @retroactive @unchecked Sendable { }

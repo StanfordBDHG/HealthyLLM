@@ -5,13 +5,13 @@
 //  Created by Leon Nissen on 3/5/25.
 //
 
-import HealthKit
 import Foundation
+import HealthKit
 
 class NutritionDataHandler: ToolHandler {
     static var name: String = "getNutrition"
     
-    func execute(parameters: [String : String]) async throws -> String {
+    func execute(parameters: [String: String]) async throws -> String {
         guard let typeString = parameters["type"],
               let maxDaysString = parameters["maxDays"] else {
             throw ToolCallError.missingParameters(names: ["type", "maxDays"])

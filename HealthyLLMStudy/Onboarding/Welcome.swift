@@ -6,8 +6,8 @@
 // SPDX-License-Identifier: MIT
 //
 
-import SwiftUI
 import SpeziOnboarding
+import SwiftUI
 
 struct Welcome: View {
     @Environment(OnboardingNavigationPath.self) private var onboardingNavigationPath: OnboardingNavigationPath?
@@ -18,17 +18,17 @@ struct Welcome: View {
             subtitle: "WELCOME_SUBTITLE",
             areas: [
                 .init(
-                    icon: Image(systemName: "list.bullet.clipboard.fill"), // swiftlint:disable:this accessibility_label_for_image
+                    icon: Image(systemName: "list.bullet.clipboard.fill"),
                     title: "WELCOME_AREA1_TITLE",
                     description: "WELCOME_AREA1_DESCRIPTION"
                 ),
                 .init(
-                    icon: Image(systemName: "applewatch.side.right"), // swiftlint:disable:this accessibility_label_for_image
+                    icon: Image(systemName: "applewatch.side.right"),
                     title: "WELCOME_AREA2_TITLE",
                     description: "WELCOME_AREA2_DESCRIPTION"
                 ),
                 .init(
-                    icon: Image(systemName: "shippingbox.fill"), // swiftlint:disable:this accessibility_label_for_image
+                    icon: Image(systemName: "shippingbox.fill"),
                     title: "WELCOME_AREA3_TITLE",
                     description: "WELCOME_AREA3_DESCRIPTION"
                 )

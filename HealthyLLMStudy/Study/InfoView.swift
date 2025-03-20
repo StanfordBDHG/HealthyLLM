@@ -5,8 +5,8 @@
 //  Created by Leon Nissen on 1/15/25.
 //
 
-import SwiftUI
 import SpeziOnboarding
+import SwiftUI
 
 
 struct InfoView: View {
@@ -17,7 +17,7 @@ struct InfoView: View {
     
     var body: some View {
         NavigationView {
-            VStack {
+            ScrollView {
                 Text("STUDY_INFORMATION_BODY")
                     .padding()
                 
@@ -53,7 +53,7 @@ struct InfoView: View {
                     Picker("", selection: $sex) {
                         if sex == nil {
                             Text("required")
-                                .tag(Optional<String>(nil))
+                                .tag(String?(nil))
                         }
                         Text("Male")
                             .tag("male")
@@ -92,4 +92,3 @@ struct InfoView: View {
         }
     }
 }
-

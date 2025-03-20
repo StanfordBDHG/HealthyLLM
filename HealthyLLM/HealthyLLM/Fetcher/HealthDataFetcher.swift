@@ -103,5 +103,4 @@ class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
         
         return result
     }
-    
 }

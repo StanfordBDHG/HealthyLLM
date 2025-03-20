@@ -16,4 +16,3 @@ extension ChatEntity.HiddenMessageType {
     /// Function hidden message type of the `ChatEntity`.
     static let function = ChatEntity.HiddenMessageType(name: "function")
 }
-

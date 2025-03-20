@@ -9,7 +9,6 @@ import Foundation
 import HealthKit
 
 class ContextWindowHandler {
-    
     static func execute() async throws -> String {
         let vitalAverage = try await getVitalSignsAverage()
         let general = try await getGeneralHealthMetrics()
@@ -73,7 +72,7 @@ class ContextWindowHandler {
     
     // Active Energy, Resting Energy, Exercise Minutes, Steps, HRV, HRV Stress, Oxygen Saturation, Wrist Temperature, Sleep
     
-    static private func getVitalSignsAverage(weeksToAverage: Int = 4) async throws -> String {
+    private static func getVitalSignsAverage(weeksToAverage: Int = 4) async throws -> String {
         var resultText = ""
         let weeksPerYear = 52
         
@@ -148,7 +147,7 @@ class ContextWindowHandler {
         return resultText
     }
     
-    static private func getGeneralHealthMetrics() async throws -> String {
+    private static func getGeneralHealthMetrics() async throws -> String {
         var resultText = ""
         
         // Weight
@@ -178,7 +177,7 @@ class ContextWindowHandler {
         return resultText
     }
     
-    static private func getActivityData() async throws -> String {
+    private static func getActivityData() async throws -> String {
         var resultText = ""
         let calendar = Calendar.current
         let today = Date()
@@ -355,7 +354,7 @@ class ContextWindowHandler {
         return resultText
     }
     
-    static private func getRecentWorkouts(maxDayRange: Int = 30) async throws -> String {
+    private static func getRecentWorkouts(maxDayRange: Int = 30) async throws -> String {
         let calendar = Calendar.current
         let startDate = calendar.date(byAdding: .day, value: -maxDayRange, to: Date())!
         let endDate = Date()
@@ -364,7 +363,7 @@ class ContextWindowHandler {
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
         
         return try await withCheckedThrowingContinuation { continuation in
-            let query = HKSampleQuery(sampleType: HKObjectType.workoutType(), predicate: predicate, limit: 10, sortDescriptors: [sortDescriptor]) { query, samples, error in
+            let query = HKSampleQuery(sampleType: HKObjectType.workoutType(), predicate: predicate, limit: 10, sortDescriptors: [sortDescriptor]) { _, samples, error in
                 var resultText = ""
                 
                 guard let workouts = samples as? [HKWorkout], error == nil, !workouts.isEmpty else {
@@ -386,7 +385,7 @@ class ContextWindowHandler {
                     
                     if distance > 0 {
                         if distance >= 1000 {
-                            resultText += ", Distance: \(String(format: "%.2f", distance/1000)) km"
+                            resultText += ", Distance: \(String(format: "%.2f", distance / 1000)) km"
                         } else {
                             resultText += ", Distance: \(Int(distance)) m"
                         }
@@ -416,7 +415,7 @@ class ContextWindowHandler {
         }
     }
     
-    static private func getSleepData() async throws -> String {
+    private static func getSleepData() async throws -> String {
         let calendar = Calendar.current
         let startDate = calendar.date(byAdding: .day, value: -14, to: Date())!
         let endDate = Date()
@@ -425,14 +424,13 @@ class ContextWindowHandler {
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
         
         return try await withCheckedThrowingContinuation { continuation in
-            let query = HKSampleQuery(sampleType: HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: [sortDescriptor]) { query, samples, error in
-                
+            let query = HKSampleQuery(sampleType: HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: [sortDescriptor]) { _, samples, error in
                 guard let sleepSamples = samples as? [HKCategorySample], error == nil else {
                     continuation.resume(returning: "No sleep data available.")
                     return
                 }
                 
-                let sleepNights = Dictionary(grouping: sleepSamples) { (sample) -> Date in
+                let sleepNights = Dictionary(grouping: sleepSamples) { sample -> Date in
                     let dateComponents = Calendar.current.dateComponents([.year, .month, .day], from: sample.endDate)
                     return Calendar.current.date(from: dateComponents)!
                 }
@@ -528,7 +526,7 @@ class ContextWindowHandler {
         }
     }
     
-    static private func getNutritionData() async throws -> String {
+    private static func getNutritionData() async throws -> String {
         let calendar = Calendar.current
         let startDate = calendar.date(byAdding: .day, value: -7, to: Date())!
         let endDate = Date()

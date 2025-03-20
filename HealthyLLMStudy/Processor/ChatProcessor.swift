@@ -5,8 +5,8 @@
 //  Created by Leon Nissen on 2/21/25.
 //
 
-import SwiftUI
 import SpeziChat
+import SwiftUI
 
 
 protocol ChatProcessor: Observable {
@@ -16,4 +16,3 @@ protocol ChatProcessor: Observable {
     func reset()
     func stop()
 }
-

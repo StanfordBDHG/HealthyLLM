@@ -9,4 +9,3 @@ import Foundation
 import Spezi
 
 actor HealthyLLMStudyStandard: Standard, EnvironmentAccessible { }
-

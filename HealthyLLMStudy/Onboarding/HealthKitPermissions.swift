@@ -6,9 +6,9 @@
 // SPDX-License-Identifier: MIT
 //
 
-import SwiftUI
 import HealthKit
 import SpeziOnboarding
+import SwiftUI
 
 struct HealthKitPermissions: View {
     @Environment(OnboardingNavigationPath.self) private var onboardingNavigationPath

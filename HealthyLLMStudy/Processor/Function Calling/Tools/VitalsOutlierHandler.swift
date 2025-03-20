@@ -11,7 +11,7 @@ import HealthKit
 class VitalsOutlierHandler: ToolHandler {
     static var name: String = "VitalsOutlier"
     
-    func execute(parameters: [String : String]) async throws -> String {
+    func execute(parameters: [String: String]) async throws -> String {
         guard let maxDaysString = parameters["maxDays"],
               let maxDays = Int(maxDaysString) else {
             throw ToolCallError.missingParameters(names: ["maxDays"])

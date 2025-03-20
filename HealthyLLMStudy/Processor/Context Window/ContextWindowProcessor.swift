@@ -6,11 +6,11 @@
 //
 
 import Foundation
+import os
 import Spezi
+import SpeziChat
 import SpeziLLM
 import SpeziLLMLocal
-import SpeziChat
-import os
 
 
 @Observable

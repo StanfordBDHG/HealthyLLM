@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @AppStorage(StorageKeys.advancedMode) private var advancedMode: Bool = false
+    @AppStorage(StorageKeys.advancedMode) private var advancedMode = false
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {

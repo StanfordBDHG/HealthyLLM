@@ -14,7 +14,8 @@ extension NSManagedObjectContext {
      
      - returns: true if saved
      */
-    @discardableResult func saveOrRollback() -> Bool {
+    @discardableResult
+    func saveOrRollback() -> Bool {
         do {
             try save()
             return true

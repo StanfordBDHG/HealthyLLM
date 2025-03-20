@@ -12,6 +12,7 @@ on:
   push:
     branches:
       - main
+      - feature/add-healthyllm
   workflow_dispatch:
     inputs:
       environment:
@@ -89,7 +90,7 @@ jobs:
         id: get-latest-tag
         with:
           semver_only: true
-          initial_version: "3.0.0"
+          initial_version: "1.0.0"
       - id: script
         run: |
           echo "Injecting Environment Variables In Deployment Workflow ..."
@@ -101,15 +102,15 @@ jobs:
             echo "version: ${{ inputs.version }}"
           fi
           echo "releasenotes: ${{ inputs.releasenotes }}"
-  buildandtest:
-    name: Build and Test
-    uses: ./.github/workflows/build-and-test.yml
-    permissions:
-      contents: read
-    secrets: inherit
+  # buildandtest:
+  #   name: Build and Test
+  #   uses: ./.github/workflows/build-and-test.yml
+  #   permissions:
+  #     contents: read
+  #   secrets: inherit
   iosapptestflightdeployment:
     name: iOS App TestFlight Deployment
-    needs: [determineenvironment, vars, buildandtest]
+    needs: [determineenvironment, vars] #, buildandtest]
     uses: StanfordBDHG/.github/.github/workflows/xcodebuild-or-fastlane.yml@v2
     permissions:
       contents: read

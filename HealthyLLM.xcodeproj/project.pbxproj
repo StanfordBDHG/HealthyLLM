@@ -21,9 +21,29 @@
 		44ED1C1C2D6E4E9300C032AD /* SpeziAccessGuard in Frameworks */ = {isa = PBXBuildFile; productRef = 44ED1C1B2D6E4E9300C032AD /* SpeziAccessGuard */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		657F8C122DCAB0DE00BE4C4E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 440071A02CFD092300DC7C5A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 440071A72CFD092300DC7C5A;
+			remoteInfo = HealthyLLM;
+		};
+		657F8C212DCAB0F500BE4C4E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 440071A02CFD092300DC7C5A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 440071A72CFD092300DC7C5A;
+			remoteInfo = HealthyLLM;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		440071A82CFD092300DC7C5A /* HealthyLLM.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HealthyLLM.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		44E72E392D2C615400520745 /* HealthyLLMStudy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HealthyLLMStudy.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		657F8C0E2DCAB0DE00BE4C4E /* HealthyLLMTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HealthyLLMTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		657F8C1B2DCAB0F500BE4C4E /* HealthyLLMUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HealthyLLMUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		657F8C262DCAB13500BE4C4E /* HealthyLLM.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = HealthyLLM.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -61,6 +81,16 @@
 			path = HealthyLLMStudy;
 			sourceTree = "<group>";
 		};
+		657F8C0F2DCAB0DE00BE4C4E /* HealthyLLMTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = HealthyLLMTests;
+			sourceTree = "<group>";
+		};
+		657F8C1C2DCAB0F500BE4C4E /* HealthyLLMUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = HealthyLLMUITests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,14 +120,31 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		657F8C0B2DCAB0DE00BE4C4E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		657F8C182DCAB0F500BE4C4E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		4400719F2CFD092300DC7C5A = {
 			isa = PBXGroup;
 			children = (
+				657F8C262DCAB13500BE4C4E /* HealthyLLM.xctestplan */,
 				440071C92CFD094500DC7C5A /* HealthyLLM */,
 				44E72E3A2D2C615400520745 /* HealthyLLMStudy */,
+				657F8C0F2DCAB0DE00BE4C4E /* HealthyLLMTests */,
+				657F8C1C2DCAB0F500BE4C4E /* HealthyLLMUITests */,
 				440071FF2CFD20ED00DC7C5A /* Frameworks */,
 				440071A92CFD092300DC7C5A /* Products */,
 			);
@@ -108,6 +155,8 @@
 			children = (
 				440071A82CFD092300DC7C5A /* HealthyLLM.app */,
 				44E72E392D2C615400520745 /* HealthyLLMStudy.app */,
+				657F8C0E2DCAB0DE00BE4C4E /* HealthyLLMTests.xctest */,
+				657F8C1B2DCAB0F500BE4C4E /* HealthyLLMUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -178,6 +227,52 @@
 			productReference = 44E72E392D2C615400520745 /* HealthyLLMStudy.app */;
 			productType = "com.apple.product-type.application";
 		};
+		657F8C0D2DCAB0DE00BE4C4E /* HealthyLLMTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 657F8C142DCAB0DE00BE4C4E /* Build configuration list for PBXNativeTarget "HealthyLLMTests" */;
+			buildPhases = (
+				657F8C0A2DCAB0DE00BE4C4E /* Sources */,
+				657F8C0B2DCAB0DE00BE4C4E /* Frameworks */,
+				657F8C0C2DCAB0DE00BE4C4E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				657F8C132DCAB0DE00BE4C4E /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				657F8C0F2DCAB0DE00BE4C4E /* HealthyLLMTests */,
+			);
+			name = HealthyLLMTests;
+			packageProductDependencies = (
+			);
+			productName = HealthyLLMTests;
+			productReference = 657F8C0E2DCAB0DE00BE4C4E /* HealthyLLMTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		657F8C1A2DCAB0F500BE4C4E /* HealthyLLMUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 657F8C232DCAB0F500BE4C4E /* Build configuration list for PBXNativeTarget "HealthyLLMUITests" */;
+			buildPhases = (
+				657F8C172DCAB0F500BE4C4E /* Sources */,
+				657F8C182DCAB0F500BE4C4E /* Frameworks */,
+				657F8C192DCAB0F500BE4C4E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				657F8C222DCAB0F500BE4C4E /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				657F8C1C2DCAB0F500BE4C4E /* HealthyLLMUITests */,
+			);
+			name = HealthyLLMUITests;
+			packageProductDependencies = (
+			);
+			productName = HealthyLLMUITests;
+			productReference = 657F8C1B2DCAB0F500BE4C4E /* HealthyLLMUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -185,7 +280,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1620;
+				LastSwiftUpdateCheck = 1630;
 				LastUpgradeCheck = 1610;
 				TargetAttributes = {
 					440071A72CFD092300DC7C5A = {
@@ -193,6 +288,14 @@
 					};
 					44E72E382D2C615400520745 = {
 						CreatedOnToolsVersion = 16.2;
+					};
+					657F8C0D2DCAB0DE00BE4C4E = {
+						CreatedOnToolsVersion = 16.3;
+						TestTargetID = 440071A72CFD092300DC7C5A;
+					};
+					657F8C1A2DCAB0F500BE4C4E = {
+						CreatedOnToolsVersion = 16.3;
+						TestTargetID = 440071A72CFD092300DC7C5A;
 					};
 				};
 			};
@@ -219,6 +322,8 @@
 			targets = (
 				440071A72CFD092300DC7C5A /* HealthyLLM */,
 				44E72E382D2C615400520745 /* HealthyLLMStudy */,
+				657F8C0D2DCAB0DE00BE4C4E /* HealthyLLMTests */,
+				657F8C1A2DCAB0F500BE4C4E /* HealthyLLMUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -232,6 +337,20 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		44E72E372D2C615400520745 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		657F8C0C2DCAB0DE00BE4C4E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		657F8C192DCAB0F500BE4C4E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -255,7 +374,34 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		657F8C0A2DCAB0DE00BE4C4E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		657F8C172DCAB0F500BE4C4E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		657F8C132DCAB0DE00BE4C4E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 440071A72CFD092300DC7C5A /* HealthyLLM */;
+			targetProxy = 657F8C122DCAB0DE00BE4C4E /* PBXContainerItemProxy */;
+		};
+		657F8C222DCAB0F500BE4C4E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 440071A72CFD092300DC7C5A /* HealthyLLM */;
+			targetProxy = 657F8C212DCAB0F500BE4C4E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		440071B42CFD092400DC7C5A /* Debug */ = {
@@ -406,7 +552,7 @@
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -449,7 +595,7 @@
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -493,7 +639,7 @@
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -541,7 +687,7 @@
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -558,6 +704,80 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		657F8C152DCAB0DE00BE4C4E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CQRZ4E7K9U;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.stanford.HealthyLLMTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HealthyLLM.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/HealthyLLM";
+			};
+			name = Debug;
+		};
+		657F8C162DCAB0DE00BE4C4E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CQRZ4E7K9U;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.stanford.HealthyLLMTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HealthyLLM.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/HealthyLLM";
+			};
+			name = Release;
+		};
+		657F8C242DCAB0F500BE4C4E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CQRZ4E7K9U;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.stanford.HealthyLLMUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = HealthyLLM;
+			};
+			name = Debug;
+		};
+		657F8C252DCAB0F500BE4C4E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CQRZ4E7K9U;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.stanford.HealthyLLMUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = HealthyLLM;
 			};
 			name = Release;
 		};
@@ -587,6 +807,24 @@
 			buildConfigurations = (
 				44E72E5B2D2C615500520745 /* Debug */,
 				44E72E5C2D2C615500520745 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		657F8C142DCAB0DE00BE4C4E /* Build configuration list for PBXNativeTarget "HealthyLLMTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				657F8C152DCAB0DE00BE4C4E /* Debug */,
+				657F8C162DCAB0DE00BE4C4E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		657F8C232DCAB0F500BE4C4E /* Build configuration list for PBXNativeTarget "HealthyLLMUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				657F8C242DCAB0F500BE4C4E /* Debug */,
+				657F8C252DCAB0F500BE4C4E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

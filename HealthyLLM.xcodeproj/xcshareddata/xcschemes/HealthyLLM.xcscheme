@@ -30,10 +30,8 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <TestPlans>
          <TestPlanReference
-            reference = "container:HealthyLLM/HealthyLLMTestPlan.xctestplan">
-         </TestPlanReference>
-         <TestPlanReference
-            reference = "container:HealthyLLM/HealthyLLMTestPlan.xctestplan">
+            reference = "container:HealthyLLM.xctestplan"
+            default = "YES">
          </TestPlanReference>
       </TestPlans>
       <Testables>
@@ -42,7 +40,7 @@
             parallelizable = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "44C146412D0A582600E64050"
+               BlueprintIdentifier = "657F8C0D2DCAB0DE00BE4C4E"
                BuildableName = "HealthyLLMTests.xctest"
                BlueprintName = "HealthyLLMTests"
                ReferencedContainer = "container:HealthyLLM.xcodeproj">
@@ -53,7 +51,7 @@
             parallelizable = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "44C1464E2D0A583800E64050"
+               BlueprintIdentifier = "657F8C1A2DCAB0F500BE4C4E"
                BuildableName = "HealthyLLMUITests.xctest"
                BlueprintName = "HealthyLLMUITests"
                ReferencedContainer = "container:HealthyLLM.xcodeproj">

@@ -9,3 +9,5 @@
 project: HealthyLLM.xcodeproj
 schemes:
 - HealthyLLMStudy
+report_exclude:
+- "**/GeneratedOpenAIClient/OpenAPIGenerator/GeneratedSources/**"

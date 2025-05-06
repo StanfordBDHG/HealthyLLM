@@ -24,7 +24,7 @@ class ContextWindowProcessor: EnvironmentAccessible, DefaultInitializable, Modul
     
     private(set) var chat: Chat = []
     var sufficientUsage: Bool {
-        chat.filter { $0.role == .user }.count >= 0
+        chat.filter { $0.role == .user }.isEmpty
     }
     
     required init() { }

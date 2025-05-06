@@ -35,6 +35,7 @@ platform :ios do
       concurrent_workers: 1,
       max_concurrent_simulators: 1,
       result_bundle: true,
+      scheme: APP_CONFIG[:scheme],
       output_directory: ".",
       xcargs: [
         "-skipPackagePluginValidation",
@@ -49,6 +50,7 @@ platform :ios do
       destination: "generic/platform=iOS Simulator",
       configuration: "Debug",
       derived_data_path: ".derivedData",
+      scheme: APP_CONFIG[:scheme],
       xcargs: [
         "-skipPackagePluginValidation",
         "-skipMacroValidation"

@@ -17,7 +17,8 @@ struct HealthyLLMApplication: App {
         WindowGroup {
             Group {
                 if completedOnboardingFlow {
-                    HealthyLLMView()
+//                    HealthyLLMView()
+                    HealthyMaxView(firstPrompt: "Max is healthy")
                 } else {
                     EmptyView()
                 }

@@ -8,9 +8,11 @@
 
 import SpeziChat
 import SwiftUI
+import SpeziHealthKit
 
 struct HealthyLLMChatView: View {
     @Environment(HealthDataInterpreter.self) private var healthDataInterpreter
+    @Environment(HealthKit.self) private var healthKit
     @Environment(\.dismiss) private var dismiss
     @AppStorage(StorageKeys.advancedMode) private var advancedMode = false
     
@@ -33,7 +35,7 @@ struct HealthyLLMChatView: View {
             } set: { newValue in
                 Task {
                     do {
-                        try await healthDataInterpreter.queryLLM(with: newValue)
+                        try await healthDataInterpreter.queryLLM(with: newValue, healthKit: healthKit)
                     } catch {
                         showErrorAlert = true
                         errorMessage = "Error querying LLM: \(error.localizedDescription)"
@@ -42,7 +44,8 @@ struct HealthyLLMChatView: View {
             }
             ChatView(
                 contextBinding,
-                exportFormat: .text
+                exportFormat: .text,
+//                hideMessages: .custom(hiddenMessageTypes: [.assistantToolCall])
             )
             .navigationTitle("HealthyLLM")
             .toolbar {
@@ -56,6 +59,8 @@ struct HealthyLLMChatView: View {
             .task {
                 await healthDataInterpreter.resetChat()
                 contextBinding.wrappedValue.append(.init(role: .user, content: firstPrompt))
+
+                try! await healthDataInterpreter.fetchHealthData(healthKit, sampleTypeKey: "stepcount")
             }
         }
         .alert("ERROR_ALERT_TITLE", isPresented: $showErrorAlert) {

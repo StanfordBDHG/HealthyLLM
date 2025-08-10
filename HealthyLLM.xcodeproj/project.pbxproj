@@ -19,6 +19,9 @@
 		44E72E722D2C62B000520745 /* SpeziLLMLocalDownload in Frameworks */ = {isa = PBXBuildFile; productRef = 44E72E712D2C62B000520745 /* SpeziLLMLocalDownload */; };
 		44E72E742D2C62B000520745 /* SpeziLLMOpenAI in Frameworks */ = {isa = PBXBuildFile; productRef = 44E72E732D2C62B000520745 /* SpeziLLMOpenAI */; };
 		44ED1C1C2D6E4E9300C032AD /* SpeziAccessGuard in Frameworks */ = {isa = PBXBuildFile; productRef = 44ED1C1B2D6E4E9300C032AD /* SpeziAccessGuard */; };
+		BB95E3212E36E9050054FA4C /* SpeziHealthKit in Frameworks */ = {isa = PBXBuildFile; productRef = BB95E3202E36E9050054FA4C /* SpeziHealthKit */; };
+		BB95E3232E36E9FD0054FA4C /* SpeziHealthKit in Frameworks */ = {isa = PBXBuildFile; productRef = BB95E3222E36E9FD0054FA4C /* SpeziHealthKit */; };
+		BB95E3602E396CB70054FA4C /* SpeziHealthKitUI in Frameworks */ = {isa = PBXBuildFile; productRef = BB95E35F2E396CB70054FA4C /* SpeziHealthKitUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -101,7 +104,9 @@
 				440072032CFD20ED00DC7C5A /* SpeziLLMLocalDownload in Frameworks */,
 				4459F7C52D2DE31600F0190D /* SpeziOnboarding in Frameworks */,
 				440072012CFD20ED00DC7C5A /* SpeziLLMLocal in Frameworks */,
+				BB95E3602E396CB70054FA4C /* SpeziHealthKitUI in Frameworks */,
 				4459F7C12D2DE2C500F0190D /* SpeziChat in Frameworks */,
+				BB95E3232E36E9FD0054FA4C /* SpeziHealthKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -110,6 +115,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				44ED1C1C2D6E4E9300C032AD /* SpeziAccessGuard in Frameworks */,
+				BB95E3212E36E9050054FA4C /* SpeziHealthKit in Frameworks */,
 				4459F7C72D2DE31F00F0190D /* SpeziChat in Frameworks */,
 				44E72E742D2C62B000520745 /* SpeziLLMOpenAI in Frameworks */,
 				4459F7CB2D2DE31F00F0190D /* SpeziQuestionnaire in Frameworks */,
@@ -192,6 +198,8 @@
 				440072022CFD20ED00DC7C5A /* SpeziLLMLocalDownload */,
 				4459F7C02D2DE2C500F0190D /* SpeziChat */,
 				4459F7C42D2DE31600F0190D /* SpeziOnboarding */,
+				BB95E3222E36E9FD0054FA4C /* SpeziHealthKit */,
+				BB95E35F2E396CB70054FA4C /* SpeziHealthKitUI */,
 			);
 			productName = HealthyLLM;
 			productReference = 440071A82CFD092300DC7C5A /* HealthyLLM.app */;
@@ -222,6 +230,7 @@
 				4459F7C82D2DE31F00F0190D /* SpeziOnboarding */,
 				4459F7CA2D2DE31F00F0190D /* SpeziQuestionnaire */,
 				44ED1C1B2D6E4E9300C032AD /* SpeziAccessGuard */,
+				BB95E3202E36E9050054FA4C /* SpeziHealthKit */,
 			);
 			productName = HealthyLLMStudy;
 			productReference = 44E72E392D2C615400520745 /* HealthyLLMStudy.app */;
@@ -314,6 +323,7 @@
 				4459F7C22D2DE2E300F0190D /* XCRemoteSwiftPackageReference "SpeziOnboarding" */,
 				4459F7C32D2DE30100F0190D /* XCRemoteSwiftPackageReference "SpeziQuestionnaire" */,
 				4446AE1D2D6D576B00514B1E /* XCRemoteSwiftPackageReference "SpeziAccessGuard" */,
+				BBF6943D2E134DB3000C570C /* XCRemoteSwiftPackageReference "SpeziHealthKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 440071A92CFD092300DC7C5A /* Products */;
@@ -534,7 +544,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"HealthyLLM/Supporting Files/Preview Content\"";
-				DEVELOPMENT_TEAM = CQRZ4E7K9U;
+				DEVELOPMENT_TEAM = V5G338H5V6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
@@ -552,13 +562,13 @@
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = edu.stanford.bdhg.healthyllm;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.maxrosenblattl.bdhg.healthyllm;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -572,12 +582,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "HealthyLLM/Supporting Files/HealthyLLM.entitlements";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"HealthyLLM/Supporting Files/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = CQRZ4E7K9U;
+				DEVELOPMENT_TEAM = V5G338H5V6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
@@ -595,16 +604,15 @@
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = edu.stanford.bdhg.healthyllm;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.maxrosenblattl.bdhg.healthyllm;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "HealthyLLM - Stanford Biodesign Digital Health";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -620,7 +628,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"HealthyLLMStudy/Supporting Files/Preview Content\"";
-				DEVELOPMENT_TEAM = CQRZ4E7K9U;
+				DEVELOPMENT_TEAM = V5G338H5V6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "HealthyLLMStudy/Supporting Files/Info.plist";
@@ -639,13 +647,13 @@
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = edu.stanford.bdhg.healthyllm;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.maxrosenblattl.bdhg.healthyllm;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -663,12 +671,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "HealthyLLMStudy/Supporting Files/HealthyLLMStudy.entitlements";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"HealthyLLMStudy/Supporting Files/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = CQRZ4E7K9U;
+				DEVELOPMENT_TEAM = V5G338H5V6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "HealthyLLMStudy/Supporting Files/Info.plist";
@@ -687,16 +694,15 @@
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = edu.stanford.bdhg.healthyllm;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.maxrosenblattl.bdhg.healthyllm;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "HealthyLLM - Stanford Biodesign Digital Health";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
@@ -872,6 +878,14 @@
 				minimumVersion = 1.2.3;
 			};
 		};
+		BBF6943D2E134DB3000C570C /* XCRemoteSwiftPackageReference "SpeziHealthKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/StanfordSpezi/SpeziHealthKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -934,6 +948,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4446AE1D2D6D576B00514B1E /* XCRemoteSwiftPackageReference "SpeziAccessGuard" */;
 			productName = SpeziAccessGuard;
+		};
+		BB95E3202E36E9050054FA4C /* SpeziHealthKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BBF6943D2E134DB3000C570C /* XCRemoteSwiftPackageReference "SpeziHealthKit" */;
+			productName = SpeziHealthKit;
+		};
+		BB95E3222E36E9FD0054FA4C /* SpeziHealthKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BBF6943D2E134DB3000C570C /* XCRemoteSwiftPackageReference "SpeziHealthKit" */;
+			productName = SpeziHealthKit;
+		};
+		BB95E35F2E396CB70054FA4C /* SpeziHealthKitUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BBF6943D2E134DB3000C570C /* XCRemoteSwiftPackageReference "SpeziHealthKit" */;
+			productName = SpeziHealthKitUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

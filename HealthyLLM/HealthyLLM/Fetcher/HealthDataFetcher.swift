@@ -8,6 +8,7 @@
 
 import HealthKit
 import Spezi
+import SpeziHealthKit
 
 class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
     @ObservationIgnored let healthStore = HKHealthStore()
@@ -102,5 +103,19 @@ class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
         }
         
         return result
+    }
+
+    func fetchHealthData(_ healthKit: HealthKit, sampleTypeKey: String) async throws {
+        let identifier = hkStringToHKQuantityTypeIdentifier(sampleTypeKey)!.0
+        let sampleType = SampleType(identifier)!
+
+        do {
+            let samples = try await healthKit.query(sampleType, timeRange: .today)
+            for sample in samples {
+                dump(sample)
+            }
+        } catch {
+            print("Error")
+        }
     }
 }

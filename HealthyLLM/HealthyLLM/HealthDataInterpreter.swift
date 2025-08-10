@@ -12,6 +12,9 @@ import Spezi
 import SpeziChat
 import SpeziLLM
 import SpeziLLMLocal
+import SpeziHealthKit
+import SpeziHealthKitUI
+import HealthKit
 
 @Observable
 class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible {
@@ -62,7 +65,7 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
         loaded = true
     }
     
-    func queryLLM(with context: Chat) async throws {
+    func queryLLM(with context: Chat, healthKit: HealthKit) async throws {
         if !loaded {
             throw HealthDataInterpreterError.modelNotLoaded
         }
@@ -77,7 +80,7 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
         self.context.append(.init(.user, content: userPrompt.content))
         self.advancedContext.append(.init(.user, content: userPrompt.content))
         
-        try await checkForFunctionCall(prompt: userPrompt.content)
+        try await checkForFunctionCall(prompt: userPrompt.content, healthKit: healthKit)
         try await defaultResponse()
     }
     
@@ -86,7 +89,7 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
         advancedContext = []
     }
     
-    private func checkForFunctionCall(prompt: String) async throws {
+    private func checkForFunctionCall(prompt: String, healthKit: HealthKit) async throws {
         guard let functionCallParameters = functionCallParameters,
               let functionCallSamplingParameters = functionCallSamplingParameters,
               let sharedSession else {
@@ -117,7 +120,7 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
         
         if functionCallLLMOutput.contains("tool_call") || functionCallLLMOutput.contains("name") && functionCallLLMOutput.contains("arguments") {
             logger.info("Found function call")
-            await executeFunctionCall(output: functionCallLLMOutput)
+            await executeFunctionCall(output: functionCallLLMOutput, healthKit: healthKit)
         } else {
             advancedContext.append(.init(.assistant, content: functionCallLLMOutput))
         }
@@ -174,7 +177,7 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
     
     /// Returns a bool representing if a function call has been made
     @discardableResult
-    private func executeFunctionCall(output: String) async -> Bool {
+    private func executeFunctionCall(output: String, healthKit: HealthKit) async -> Bool {
         struct ToolCall: Codable {
             let name: String
             let arguments: [String: String]
@@ -194,8 +197,10 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
             guard let sampleType = toolCall.arguments["sample_type"] else {
                 return false
             }
+            print(sampleType)
             context.append(.init(.toolCall, content: output))
             advancedContext.append(.init(.toolCall, content: output))
+
             let healthData = await healthDataFetcher.fetchHealth(type: sampleType)
             context.append(PromptGenerator.buildToolResponse(of: healthData))
             advancedContext.append(PromptGenerator.buildToolResponse(of: healthData))
@@ -222,5 +227,10 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
         default:
             return false
         }
+    }
+
+    // Function to bypass tool call output
+    func fetchHealthData(_ healthKit: HealthKit, sampleTypeKey: String) async throws {
+        try await healthDataFetcher.fetchHealthData(healthKit, sampleTypeKey: sampleTypeKey)
     }
 }

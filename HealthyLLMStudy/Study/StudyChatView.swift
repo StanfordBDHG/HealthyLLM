@@ -34,7 +34,7 @@ struct StudyChatView: View, Identifiable {
             }
         }
         
-        ChatView(context, hideMessages: .custom(hiddenMessageTypes: []))
+        ChatView(context, hideMessages: .custom(hiddenMessageTypes: [.assistantToolCall]))
             .navigationTitle("CHAT_TITLE")
             .if(condition: { studyNavigationPath != nil }) { view in
                 view.navigationBarBackButtonHidden()

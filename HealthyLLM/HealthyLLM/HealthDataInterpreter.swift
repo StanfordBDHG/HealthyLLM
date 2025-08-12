@@ -201,10 +201,13 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
             context.append(.init(.toolCall, content: output))
             advancedContext.append(.init(.toolCall, content: output))
 
-            let healthData = await healthDataFetcher.fetchHealth(type: sampleType)
-            context.append(PromptGenerator.buildToolResponse(of: healthData))
-            advancedContext.append(PromptGenerator.buildToolResponse(of: healthData))
-            return true
+            if let healthData = await healthDataFetcher.fetchHealthData(healthKit, sampleTypeKey: sampleType) {
+                context.append(PromptGenerator.buildToolResponse(of: healthData))
+                advancedContext.append(PromptGenerator.buildToolResponse(of: healthData))
+                return true
+            }
+
+            return false
         case "get_workout_info":
             guard let workoutType = toolCall.arguments["workout_type"] else {
                 return false

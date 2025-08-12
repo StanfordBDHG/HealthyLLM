@@ -49,10 +49,17 @@ class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
     
     func fetchHealth(type: String) async -> HealthData? {
         guard let (identifier, _) = hkStringToHKQuantityTypeIdentifier(type),
-              let unit = identifier.siUnit else {
+              let unit = identifier.siUnit,
+              let sampleType = SampleType(identifier) else {
             return nil
         }
-        
+
+        let timeRanges: [HealthKitQueryTimeRange] = [
+            .today,
+            .currentWeek,
+            .currentMonth
+        ]
+
         let endDates = [
             ("day", Calendar.current.date(byAdding: .day, value: -1, to: Date())!),
             ("week", Calendar.current.date(byAdding: .day, value: -7, to: Date())!),
@@ -105,17 +112,39 @@ class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
         return result
     }
 
-    func fetchHealthData(_ healthKit: HealthKit, sampleTypeKey: String) async throws {
-        let identifier = hkStringToHKQuantityTypeIdentifier(sampleTypeKey)!.0
-        let sampleType = SampleType(identifier)!
+    func fetchHealthData(_ healthKit: HealthKit, sampleTypeKey: String) async throws -> HealthData?  {
+        guard let identifier = hkStringToHKQuantityTypeIdentifier(sampleTypeKey) else {
+            return nil
+        }
+
+        let key = identifier.0
+        let unit = identifier.1
+
+        guard let sampleType = SampleType(key) else {
+            return nil
+        }
 
         do {
-            let samples = try await healthKit.query(sampleType, timeRange: .today)
-            for sample in samples {
-                dump(sample)
+            let samples = try await healthKit.query(sampleType, timeRange: .currentMonth)
+
+            let results: [Double] = samples.compactMap { sample in
+                (sample as? HKQuantitySample)?.quantity.doubleValue(for: unit)
             }
+            let average = results.isEmpty ? 0.0 : (results.reduce(0, +) / Double(results.count))
+
+            let healthData = HealthData(
+                name: sampleType.displayTitle,
+                unit: unit.unitString,
+                values: ["day": average])
+
+            print(healthData)
+
+            return healthData
+
         } catch {
             print("Error")
         }
+
+        return nil
     }
 }

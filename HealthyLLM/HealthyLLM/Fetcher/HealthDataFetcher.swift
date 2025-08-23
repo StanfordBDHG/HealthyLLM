@@ -61,26 +61,34 @@ class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
         ]
 
         var result: [String: Double] = [:]
-        for (description, timeRange) in timeRanges {
-            let statistics = try await healthKit.statisticsQuery(sampleType, timeRange: timeRange)
+        try await withThrowingTaskGroup(of: (String, Double).self) { group in
+            for (description, timeRange) in timeRanges {
+                group.addTask {
+                    let statistics = try await healthKit.statisticsQuery(sampleType, timeRange: timeRange)
 
-            switch sampleType.hkSampleType.aggregationStyle {
-            case .cumulative:
-                if let sum = statistics?.sumQuantity() {
-                    let value = sum.doubleValue(for: unit).rounded()
-                    result[description] = value
-                } else {
-                    throw HealthDataFetcherError.noValueAvailable
+                    switch sampleType.hkSampleType.aggregationStyle {
+                    case .cumulative:
+                        if let sum = statistics?.sumQuantity() {
+                            let value = sum.doubleValue(for: unit).rounded()
+                            return (description, value)
+                        } else {
+                            throw HealthDataFetcherError.noValueAvailable
+                        }
+                    case .discreteArithmetic, .discreteTemporallyWeighted:
+                        if let average = statistics?.averageQuantity() {
+                            let value = average.doubleValue(for: unit).rounded()
+                            return (description, value)
+                        } else {
+                            throw HealthDataFetcherError.noValueAvailable
+                        }
+                    default:
+                        throw HealthDataFetcherError.unsupportedAggregationStyle
+                    }
                 }
-            case .discreteArithmetic, .discreteTemporallyWeighted:
-                if let average = statistics?.averageQuantity() {
-                    let value = average.doubleValue(for: unit).rounded()
-                    result[description] = value
-                } else {
-                    throw HealthDataFetcherError.noValueAvailable
-                }
-            default:
-                throw HealthDataFetcherError.unsupportedAggregationStyle
+            }
+
+            for try await (description, value) in group {
+                result[description] = value
             }
         }
 
@@ -103,49 +111,6 @@ class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
         }
         
         return result
-    }
-
-    func fetchHealthData(_ healthKit: HealthKit, sampleTypeKey: String) async throws -> HealthData?  {
-        guard let identifier = hkStringToHKQuantityTypeIdentifier(sampleTypeKey) else {
-            return nil
-        }
-
-        let key = identifier.0
-        let unit = identifier.1
-
-        guard let sampleType = SampleType(key) else {
-            return nil
-        }
-
-        do {
-            let samples = try await healthKit.statisticsQuery(sampleType, timeRange: .today)
-            var result: Double = 0
-
-            switch sampleType.hkSampleType.aggregationStyle {
-            case .discreteArithmetic, .discreteTemporallyWeighted:
-                if let average = samples?.averageQuantity() {
-                    result = average.doubleValue(for: unit).rounded()
-                } else {
-                    throw HealthDataFetcherError.noValueAvailable
-                }
-            default:
-                throw HealthDataFetcherError.unsupportedAggregationStyle
-            }
-
-            let healthData = HealthData(
-                name: sampleType.displayTitle,
-                unit: unit.unitString,
-                values: ["day": result])
-
-            print(healthData)
-
-            return healthData
-
-        } catch {
-            print("Error")
-        }
-
-        return nil
     }
 }
 

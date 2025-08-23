@@ -47,58 +47,51 @@ class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
         )
     }
     
-    func fetchHealth(type: String) async -> HealthData? {
+    func fetchHealth(_ healthKit: HealthKit, type: String) async throws -> HealthData? {
         guard let (identifier, _) = hkStringToHKQuantityTypeIdentifier(type),
               let unit = identifier.siUnit,
               let sampleType = SampleType(identifier) else {
             return nil
         }
 
-        let timeRanges: [HealthKitQueryTimeRange] = [
-            .today,
-            .currentWeek,
-            .currentMonth
+        let timeRanges: [(String, HealthKitQueryTimeRange)] = [
+            ("day", .today),
+            ("week", .currentWeek),
+            ("month", .currentMonth)
         ]
 
-        let endDates = [
-            ("day", Calendar.current.date(byAdding: .day, value: -1, to: Date())!),
-            ("week", Calendar.current.date(byAdding: .day, value: -7, to: Date())!),
-            ("month", Calendar.current.date(byAdding: .month, value: -1, to: Date())!)
-        ]
-        
-        
-        return await withTaskGroup(of: (String, Double?).self, returning: HealthData?.self) { taskGroup in
-            for (description, endDate) in endDates {
-                taskGroup.addTask {
-                    (
-                        description,
-                        try? await self.fetchSample(
-                            for: identifier,
-                            unit: unit,
-                            startDate: endDate,
-                            endDate: .now
-                        )
-                    )
+        var result: [String: Double] = [:]
+        for (description, timeRange) in timeRanges {
+            let statistics = try await healthKit.statisticsQuery(sampleType, timeRange: timeRange)
+
+            switch sampleType.hkSampleType.aggregationStyle {
+            case .cumulative:
+                if let sum = statistics?.sumQuantity() {
+                    let value = sum.doubleValue(for: unit).rounded()
+                    result[description] = value
+                } else {
+                    throw HealthDataFetcherError.noValueAvailable
                 }
-            }
-            
-            var results: [String: Double] = [:]
-            for await (description, value) in taskGroup {
-                if let value {
-                    results[description] = value
+            case .discreteArithmetic, .discreteTemporallyWeighted:
+                if let average = statistics?.averageQuantity() {
+                    let value = average.doubleValue(for: unit).rounded()
+                    result[description] = value
+                } else {
+                    throw HealthDataFetcherError.noValueAvailable
                 }
+            default:
+                throw HealthDataFetcherError.unsupportedAggregationStyle
             }
-            
-            if results.isEmpty {
-                return nil
-            }
-            
-            return HealthData(
-                name: identifier.rawValue,
-                unit: unit.unitString,
-                values: results
-            )
         }
+
+        let healthData = HealthData(
+            name: sampleType.displayTitle,
+            unit: unit.unitString,
+            values: result)
+
+        print(healthData)
+
+        return healthData
     }
     
     func fetchSleep() async -> String { "" }
@@ -156,6 +149,8 @@ class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
     }
 }
 
+// One-off query for aggregating health data
+// TODO: Create Pull Request for SpeziHealthKit
 extension HealthKit {
     public func statisticsQuery<Sample>(
         _ sampleType: SampleType<Sample>,
@@ -171,9 +166,9 @@ extension HealthKit {
 
         switch quantityType.aggregationStyle {
         case .cumulative:
-            statisticsOptions = .cumulativeSum
+            statisticsOptions.insert(.cumulativeSum)
         case .discreteArithmetic, .discreteTemporallyWeighted:
-            statisticsOptions = .discreteAverage
+            statisticsOptions.insert(.discreteAverage)
         default:
             throw HealthDataFetcherError.unsupportedAggregationStyle
         }

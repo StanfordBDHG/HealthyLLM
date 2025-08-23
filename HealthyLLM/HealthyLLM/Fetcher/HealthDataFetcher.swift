@@ -125,17 +125,24 @@ class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
         }
 
         do {
-            let samples = try await healthKit.query(sampleType, timeRange: .currentMonth)
+            let samples = try await healthKit.statisticsQuery(sampleType, timeRange: .today)
+            var result: Double = 0
 
-            let results: [Double] = samples.compactMap { sample in
-                (sample as? HKQuantitySample)?.quantity.doubleValue(for: unit)
+            switch sampleType.hkSampleType.aggregationStyle {
+            case .discreteArithmetic, .discreteTemporallyWeighted:
+                if let average = samples?.averageQuantity() {
+                    result = average.doubleValue(for: unit).rounded()
+                } else {
+                    throw HealthDataFetcherError.noValueAvailable
+                }
+            default:
+                throw HealthDataFetcherError.unsupportedAggregationStyle
             }
-            let average = results.isEmpty ? 0.0 : (results.reduce(0, +) / Double(results.count))
 
             let healthData = HealthData(
                 name: sampleType.displayTitle,
                 unit: unit.unitString,
-                values: ["day": average])
+                values: ["day": result])
 
             print(healthData)
 
@@ -146,5 +153,36 @@ class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
         }
 
         return nil
+    }
+}
+
+extension HealthKit {
+    public func statisticsQuery<Sample>(
+        _ sampleType: SampleType<Sample>,
+        timeRange: HealthKitQueryTimeRange,
+        limit: Int? = nil,
+        sortedBy sortDescriptors: [SortDescriptor<Sample>] = [SortDescriptor<Sample>(\.startDate, order: .forward)],
+        predicate filterPredicate: NSPredicate? = nil,
+        options statisticsOption: HKStatisticsOptions? = nil
+    ) async throws -> HKStatistics? {
+        let basePredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [timeRange.predicate, filterPredicate].compactMap(\.self))
+        let quantityType = sampleType.hkSampleType as! HKQuantityType
+        var statisticsOptions: HKStatisticsOptions = statisticsOption ?? []
+
+        switch quantityType.aggregationStyle {
+        case .cumulative:
+            statisticsOptions = .cumulativeSum
+        case .discreteArithmetic, .discreteTemporallyWeighted:
+            statisticsOptions = .discreteAverage
+        default:
+            throw HealthDataFetcherError.unsupportedAggregationStyle
+        }
+
+        let queryDescriptor = HKStatisticsQueryDescriptor(
+            predicate: HKSamplePredicate<HKQuantitySample>.quantitySample(type: quantityType, predicate: basePredicate),
+            options: statisticsOptions
+        )
+
+        return try await queryDescriptor.result(for: healthStore)
     }
 }

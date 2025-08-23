@@ -201,7 +201,7 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
             context.append(.init(.toolCall, content: output))
             advancedContext.append(.init(.toolCall, content: output))
 
-            if let healthData = await healthDataFetcher.fetchHealthData(healthKit, sampleTypeKey: sampleType) {
+            if let healthData = try! await healthDataFetcher.fetchHealthData(healthKit, sampleTypeKey: sampleType) {
                 context.append(PromptGenerator.buildToolResponse(of: healthData))
                 advancedContext.append(PromptGenerator.buildToolResponse(of: healthData))
                 return true

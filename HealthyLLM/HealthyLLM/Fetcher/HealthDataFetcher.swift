@@ -30,20 +30,37 @@ class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
         )
     }
     
-    func fetchUser() async -> UserInfo? {
-        let height = try? await fetchLastSample(for: .height, unit: .meter())
-        let weight = try? await fetchLastSample(for: .bodyMass, unit: .gramUnit(with: .kilo))
-        let bmi: Double? = if let height, let weight {
-            weight / (height * height)
-        } else { nil }
-        
+    func fetchUser(_ healthKit: HealthKit) async -> UserInfo? {
+        let heightSample = try? await healthKit.query(
+            .height,
+            timeRange: .ever,
+            limit: 1,
+            sortedBy: [SortDescriptor(\.startDate, order: .reverse)]
+        ).first
+        let weightSample = try? await healthKit.query(
+            .bodyMass,
+            timeRange: .ever,
+            limit: 1,
+            sortedBy: [SortDescriptor(\.startDate, order: .reverse)]
+        ).first
+        let bmiSample = try? await healthKit.query(
+            .bodyMassIndex,
+            timeRange: .ever,
+            limit: 1,
+            sortedBy: [SortDescriptor(\.startDate, order: .reverse)]
+        ).first
+
+        let height = heightSample?.quantity.doubleValue(for: .meterUnit(with: .centi)) ?? 0
+        let weight = weightSample?.quantity.doubleValue(for: .gramUnit(with: .kilo)) ?? 0
+        let bmi = bmiSample?.quantity.doubleValue(for: .count()) ?? 0
+
         return .init(
             name: nil,
             dateOfBirth: try? healthStore.dateOfBirthComponents().date,
             sex: try? healthStore.biologicalSex().biologicalSex.description,
-            height: height != nil ? "\((height! / 100).rounded())cm" : nil,
-            weight: weight != nil ? "\(weight!.rounded())kg" : nil,
-            bmi: bmi != nil ? "\(bmi!.rounded())" : nil
+            height: "\(height)cm",
+            weight: "\(weight)kg",
+            bmi: "\(bmi)"
         )
     }
     
@@ -92,14 +109,11 @@ class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
             }
         }
 
-        let healthData = HealthData(
+        return HealthData(
             name: sampleType.displayTitle,
             unit: unit.unitString,
-            values: result)
-
-        print(healthData)
-
-        return healthData
+            values: result
+        )
     }
     
     func fetchSleep() async -> String { "" }

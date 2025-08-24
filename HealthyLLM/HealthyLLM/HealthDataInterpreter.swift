@@ -81,7 +81,7 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
         self.advancedContext.append(.init(.user, content: userPrompt.content))
         
         try await checkForFunctionCall(prompt: userPrompt.content, healthKit: healthKit)
-        try await defaultResponse()
+        try await defaultResponse(healthKit)
     }
     
     func resetChat() async {
@@ -127,7 +127,7 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
     }
     
     
-    private func defaultResponse() async throws {
+    private func defaultResponse(_ healthKit: HealthKit) async throws {
         guard let sharedSession else {
             logger.error("defaultResponse: Not initialized throwing")
             throw HealthDataInterpreterError.modelNotLoaded
@@ -139,7 +139,7 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
         )
         
         if !context.map(\.content).contains(PromptGenerator.systemPrompt) {
-            let userInfo = await healthDataFetcher.fetchUser()
+            let userInfo = await healthDataFetcher.fetchUser(healthKit)
             context.append(PromptGenerator.buildSystemPrompt(for: .default, userInfo: userInfo))
             advancedContext.append(PromptGenerator.buildSystemPrompt(for: .default, userInfo: userInfo))
         }
@@ -234,6 +234,10 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
 
     // Function to bypass tool call output
     func fetchHealthData(_ healthKit: HealthKit, sampleTypeKey: String) async throws {
-        try await healthDataFetcher.fetchHealth(healthKit, type: sampleTypeKey)
+        let healthData = try await healthDataFetcher.fetchHealth(healthKit, type: sampleTypeKey)
+        let user = try await healthDataFetcher.fetchUser(healthKit)
+
+        print(healthData)
+        print(user)
     }
 }

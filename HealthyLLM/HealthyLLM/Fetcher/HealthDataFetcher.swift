@@ -50,14 +50,16 @@ class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
             sortedBy: [SortDescriptor(\.startDate, order: .reverse)]
         ).first
 
+        let sex = try? healthKit.healthStore.biologicalSex().biologicalSex.description
+        let dateOfBirth = try? healthKit.healthStore.dateOfBirthComponents().date
         let height = heightSample?.quantity.doubleValue(for: .meterUnit(with: .centi)) ?? 0
         let weight = weightSample?.quantity.doubleValue(for: .gramUnit(with: .kilo)) ?? 0
         let bmi = bmiSample?.quantity.doubleValue(for: .count()) ?? 0
 
         return .init(
             name: nil,
-            dateOfBirth: try? healthStore.dateOfBirthComponents().date,
-            sex: try? healthStore.biologicalSex().biologicalSex.description,
+            dateOfBirth: dateOfBirth,
+            sex: sex,
             height: "\(height)cm",
             weight: "\(weight)kg",
             bmi: "\(bmi)"

@@ -11,7 +11,7 @@ import Spezi
 import SpeziHealthKit
 
 class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
-    
+
     required init() { }
     
     func askForAuthorization(_ healthKit: HealthKit) async throws {
@@ -174,11 +174,10 @@ extension HealthKit {
         limit: Int? = nil,
         sortedBy sortDescriptors: [SortDescriptor<Sample>] = [SortDescriptor<Sample>(\.startDate, order: .forward)],
         predicate filterPredicate: NSPredicate? = nil,
-        options statisticsOption: HKStatisticsOptions? = nil
     ) async throws -> HKStatistics? {
         let basePredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [timeRange.predicate, filterPredicate].compactMap(\.self))
         let quantityType = sampleType.hkSampleType as! HKQuantityType
-        var statisticsOptions: HKStatisticsOptions = statisticsOption ?? []
+        var statisticsOptions: HKStatisticsOptions = []
 
         switch quantityType.aggregationStyle {
         case .cumulative:

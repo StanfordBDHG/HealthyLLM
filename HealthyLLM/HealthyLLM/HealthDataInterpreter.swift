@@ -214,8 +214,8 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
             }
             context.append(.init(.toolCall, content: output))
             advancedContext.append(.init(.toolCall, content: output))
-            let workoutData = await healthDataFetcher.fetchWorkout(type: workoutType)
-            
+            let workoutData = await healthDataFetcher.fetchWorkout(healthKit, type: workoutType)
+
             if let workoutData,
                workoutData.count > Constants.workoutLimitJsonRepresentation {
                 let csvString = HealthDataFetcher.workoutDataToCSV(workoutData)
@@ -235,9 +235,11 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
     // Function to bypass tool call output
     func fetchHealthData(_ healthKit: HealthKit, sampleTypeKey: String) async throws {
         let healthData = try await healthDataFetcher.fetchHealth(healthKit, type: sampleTypeKey)
+        let workoutData = try await healthDataFetcher.fetchWorkout(healthKit, type: "running")
         let user = try await healthDataFetcher.fetchUser(healthKit)
 
         print(healthData)
+        print(workoutData)
         print(user)
     }
 }

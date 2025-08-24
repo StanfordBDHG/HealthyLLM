@@ -120,12 +120,51 @@ class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
     
     func fetchSleep() async -> String { "" }
     
-    func fetchWorkout(type: String) async -> [WorkoutData]? {
-        guard let identifier = workoutStringToHKWorkoutActivityType(type),
-              let result = await fetchWorkoutData(activity: identifier) else {
+    func fetchWorkout(_ healthKit: HealthKit, type: String) async -> [WorkoutData]? {
+        guard let activity = workoutStringToHKWorkoutActivityType(type),
+              let workouts = try? await healthKit.query(.workout, timeRange: .ever, limit: 10, sortedBy: [SortDescriptor(\.startDate, order: .reverse)]) else {
             return nil
         }
-        
+
+        let filtered = workouts.filter { $0.workoutActivityType == activity }
+        var result: [WorkoutData] = []
+
+        for workout in filtered {
+            var stats: [String: String] = [:]
+
+            for quantityType in workout.allStatistics.keys {
+                guard let statistics = workout.allStatistics[quantityType],
+                      let (identifier, _) = hkStringToHKQuantityTypeIdentifier(quantityType.identifier),
+                      let unit = identifier.siUnit else { continue }
+
+                let shortIdentifier = quantityType.identifier.replacingOccurrences(of: "HKQuantityTypeIdentifier", with: "")
+
+                switch quantityType.aggregationStyle {
+                case .cumulative:
+                    if let sum = statistics.sumQuantity() {
+                        let value = sum.doubleValue(for: unit)
+                        stats[shortIdentifier] = "\(value.rounded()) \(unit)"
+                    }
+                case .discreteArithmetic, .discreteTemporallyWeighted:
+                    if let average = statistics.averageQuantity() {
+                        let value = average.doubleValue(for: unit)
+                        stats[shortIdentifier] = "\(value.rounded()) \(unit)"
+                    }
+                default:
+                    continue
+                }
+            }
+
+            result.append(
+                .init(
+                    name: String(describing: workout.workoutActivityType),
+                    date: workout.startDate.formatted(date: .abbreviated, time: .shortened),
+                    duration: Duration.seconds(workout.duration).formatted(),
+                    statistics: stats
+                )
+            )
+        }
+
         return result
     }
 }

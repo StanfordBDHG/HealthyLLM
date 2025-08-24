@@ -11,11 +11,10 @@ import Spezi
 import SpeziHealthKit
 
 class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
-    @ObservationIgnored let healthStore = HKHealthStore()
     
     required init() { }
     
-    func askForAuthorization() async throws {
+    func askForAuthorization(_ healthKit: HealthKit) async throws {
         let readTypes = Set([
             HKSeriesType.activitySummaryType(),
             HKSeriesType.workoutRoute(),
@@ -23,11 +22,8 @@ class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
         ]).union(
             Set(allHKQuantityTypeIdentifiers().map { HKQuantityType($0) })
         )
-        
-        try await healthStore.requestAuthorization(
-            toShare: [],
-            read: readTypes
-        )
+
+        try await healthKit.askForAuthorization(for: .init(read: readTypes, write: []))
     }
     
     func fetchUser(_ healthKit: HealthKit) async -> UserInfo? {

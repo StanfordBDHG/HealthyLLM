@@ -231,15 +231,4 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
             return false
         }
     }
-
-    // Function to bypass tool call output
-    func fetchHealthData(_ healthKit: HealthKit, sampleTypeKey: String) async throws {
-        let healthData = try await healthDataFetcher.fetchHealth(healthKit, type: sampleTypeKey)
-        let workoutData = try await healthDataFetcher.fetchWorkout(healthKit, type: "running")
-        let user = try await healthDataFetcher.fetchUser(healthKit)
-
-        print(healthData)
-        print(workoutData)
-        print(user)
-    }
 }

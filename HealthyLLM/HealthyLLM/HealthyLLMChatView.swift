@@ -45,7 +45,7 @@ struct HealthyLLMChatView: View {
             ChatView(
                 contextBinding,
                 exportFormat: .text,
-//                hideMessages: .custom(hiddenMessageTypes: [.assistantToolCall])
+                hideMessages: .custom(hiddenMessageTypes: [.assistantToolCall])
             )
             .navigationTitle("HealthyLLM")
             .toolbar {
@@ -59,8 +59,6 @@ struct HealthyLLMChatView: View {
             .task {
                 await healthDataInterpreter.resetChat()
                 contextBinding.wrappedValue.append(.init(role: .user, content: firstPrompt))
-
-                try! await healthDataInterpreter.fetchHealthData(healthKit, sampleTypeKey: "stepcount")
             }
         }
         .alert("ERROR_ALERT_TITLE", isPresented: $showErrorAlert) {

@@ -25,9 +25,7 @@ class HealthyLLMAppDelegate: SpeziAppDelegate {
             HealthContextGenerator()
 
             if HKHealthStore.isHealthDataAvailable() {
-                HealthKit {
-                    CollectSample(.stepCount, continueInBackground: true)
-                }
+                HealthKit()
             }
         }
     }

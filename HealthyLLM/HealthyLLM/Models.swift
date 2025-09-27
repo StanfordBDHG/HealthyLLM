@@ -20,7 +20,7 @@ struct UserInfo: Encodable {
 struct HealthData: Encodable {
     let name: String
     let unit: String
-    let values: [String: Double]
+    let values: [String: [Double]]
 }
 
 struct WorkoutData: Encodable {

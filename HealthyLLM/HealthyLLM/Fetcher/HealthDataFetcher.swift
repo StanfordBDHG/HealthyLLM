@@ -69,41 +69,52 @@ class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
             return nil
         }
 
-        let timeRanges: [(String, HealthKitQueryTimeRange)] = [
-            ("day", .today),
-            ("week", .currentWeek),
-            ("month", .currentMonth)
+        // Description, Time Range, Interval
+        let timeRanges: [(String, HealthKitQueryTimeRange, DateComponents)] = [
+            ("day", .today, DateComponents(hour: 1)),
+            ("week", .currentWeek, DateComponents(day: 1)),
+            ("month", .currentMonth, DateComponents(day: 1))
         ]
 
-        var result: [String: Double] = [:]
-        try await withThrowingTaskGroup(of: (String, Double).self) { group in
-            for (description, timeRange) in timeRanges {
+        var result: [String: [Double]] = [:]
+        try await withThrowingTaskGroup(of: (String, [Double]).self) { group in
+            for (description, timeRange, interval) in timeRanges {
                 group.addTask {
-                    let statistics = try await healthKit.statisticsQuery(sampleType, timeRange: timeRange)
+                    var bucketValues: [Double] = []
+                    let startDate = timeRange.range.lowerBound
+                    let endDate = timeRange.range.upperBound
 
-                    switch sampleType.hkSampleType.aggregationStyle {
-                    case .cumulative:
-                        if let sum = statistics?.sumQuantity() {
-                            let value = sum.doubleValue(for: unit).rounded()
-                            return (description, value)
-                        } else {
-                            throw HealthDataFetcherError.noValueAvailable
+                    let collection = try await healthKit.statisticsQuery(
+                        sampleType,
+                        timeRange: timeRange,
+                        interval: interval
+                    )
+
+                    collection.enumerateStatistics(from: startDate, to: endDate) { stats, _ in
+                        switch sampleType.hkSampleType.aggregationStyle {
+                        case .cumulative:
+                            if let sum = stats.sumQuantity() {
+                                bucketValues.append(sum.doubleValue(for: unit).rounded())
+                            } else {
+                                bucketValues.append(0.0)
+                            }
+                        case .discreteArithmetic, .discreteTemporallyWeighted:
+                            if let avg = stats.averageQuantity() {
+                                bucketValues.append(avg.doubleValue(for: unit).rounded())
+                            } else {
+                                bucketValues.append(0.0)
+                            }
+                        default:
+                            break
                         }
-                    case .discreteArithmetic, .discreteTemporallyWeighted:
-                        if let average = statistics?.averageQuantity() {
-                            let value = average.doubleValue(for: unit).rounded()
-                            return (description, value)
-                        } else {
-                            throw HealthDataFetcherError.noValueAvailable
-                        }
-                    default:
-                        throw HealthDataFetcherError.unsupportedAggregationStyle
                     }
+
+                    return (description, bucketValues)
                 }
             }
 
-            for try await (description, value) in group {
-                result[description] = value
+            for try await (description, values) in group {
+                result[description] = values
             }
         }
 
@@ -174,7 +185,9 @@ extension HealthKit {
         limit: Int? = nil,
         sortedBy sortDescriptors: [SortDescriptor<Sample>] = [SortDescriptor<Sample>(\.startDate, order: .forward)],
         predicate filterPredicate: NSPredicate? = nil,
-    ) async throws -> HKStatistics? {
+        interval: DateComponents,
+    ) async throws -> HKStatisticsCollection {
+        let startDate = timeRange.range.lowerBound
         let basePredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [timeRange.predicate, filterPredicate].compactMap(\.self))
         let quantityType = sampleType.hkSampleType as! HKQuantityType
         var statisticsOptions: HKStatisticsOptions = []
@@ -188,9 +201,14 @@ extension HealthKit {
             throw HealthDataFetcherError.unsupportedAggregationStyle
         }
 
-        let queryDescriptor = HKStatisticsQueryDescriptor(
-            predicate: HKSamplePredicate<HKQuantitySample>.quantitySample(type: quantityType, predicate: basePredicate),
-            options: statisticsOptions
+        let predicate = HKSamplePredicate<HKQuantitySample>
+            .quantitySample(type: quantityType, predicate: basePredicate)
+
+        let queryDescriptor = HKStatisticsCollectionQueryDescriptor(
+            predicate: predicate,
+            options: statisticsOptions,
+            anchorDate: startDate,
+            intervalComponents: interval
         )
 
         return try await queryDescriptor.result(for: healthStore)

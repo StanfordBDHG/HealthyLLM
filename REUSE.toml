@@ -5,6 +5,7 @@ path = [
     "HealthyLLM.xcodeproj/**",
     "HealthyLLM/Supporting Files/**",
     "HealthyLLM.xctestplan",
+    "HealthyLLMTestPlan.xctestplan",
     "Analysis/**",
     "HealthyLLMStudy/Supporting Files/**",
 ]

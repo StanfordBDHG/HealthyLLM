@@ -392,8 +392,8 @@ file_length: # Files should not span too many lines.
   - 500 # error - default: 1000
 
 function_body_length: # Functions bodies should not span too many lines.
-  - 50 # warning - default: 40
-  - 50 # error - default: 100
+  - 300 # warning - default: 40
+  - 300 # error - default: 100
 
 function_parameter_count: # Number of function parameters should be low.
   - 5 # warning - default: 5

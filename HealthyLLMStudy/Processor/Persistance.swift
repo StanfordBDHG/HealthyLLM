@@ -12,6 +12,15 @@ import SpeziQuestionnaire
 import SwiftUI
 
 
+struct Exportable: Encodable {
+    let answers: [Answer]
+    let metadata: [Metadata]
+    let chatMessages: [ChatMessage]
+    let performance: [Performance]
+    let healthKitValues: [String: Int]
+    let healthKitDatabaseAge: [String: Date]
+}
+
 class Persistance: ObservableObject {
     static let shared = Persistance()
     
@@ -36,7 +45,7 @@ class Persistance: ObservableObject {
         backgroundContext.saveOrRollback()
     }
     
-    func saveChatMessage(id: UUID = UUID(), type: String, role: String, message: String, timestamp: Date = .now) {
+    func saveChatMessage(type: String, role: String, message: String, id: UUID = UUID(), timestamp: Date = .now) {
         let chatMessage = ChatMessage(context: backgroundContext)
         chatMessage.id = id
         chatMessage.type = type
@@ -48,12 +57,12 @@ class Persistance: ObservableObject {
     }
     
     func savePerformace(
-        timestamp: Date = .now,
         cpu: Double,
         memory: Double,
         thermalState: String,
         batteryLevel: Double,
-        batteryState: String
+        batteryState: String,
+        timestamp: Date = .now
     ) {
         let performace = Performance(context: backgroundContext)
         performace.timestamp = timestamp
@@ -84,12 +93,12 @@ class Persistance: ObservableObject {
     
     func saveAnswer(
         id: String,
-        answer _answer: String,
+        answerText: String,
         timestamp: Date?
     ) {
         let answer = Answer(context: backgroundContext)
         answer.id = id
-        answer.answer = _answer
+        answer.answer = answerText
         answer.timestamp = timestamp ?? .now
         
         backgroundContext.saveOrRollback()
@@ -104,7 +113,7 @@ class Persistance: ObservableObject {
         for (index, item) in items.enumerated() {
             saveAnswer(
                 id: item.linkId.value?.string ?? "\(id)-\(index)",
-                answer: item.answer?.first?.value.toString() ?? "N/A",
+                answerText: item.answer?.first?.value.toString() ?? "N/A",
                 timestamp: try? questionnaireResponse.authored?.value?.asNSDate()
             )
         }
@@ -149,13 +158,4 @@ class Persistance: ObservableObject {
             try container.viewContext.execute(request)
         }
     }
-}
-
-struct Exportable: Encodable {
-    let answers: [Answer]
-    let metadata: [Metadata]
-    let chatMessages: [ChatMessage]
-    let performance: [Performance]
-    let healthKitValues: [String: Int]
-    let healthKitDatabaseAge: [String: Date]
 }

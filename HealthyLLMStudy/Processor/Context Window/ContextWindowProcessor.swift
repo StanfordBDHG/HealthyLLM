@@ -24,7 +24,7 @@ class ContextWindowProcessor: EnvironmentAccessible, DefaultInitializable, Modul
     
     private(set) var chat: Chat = []
     var sufficientUsage: Bool {
-        chat.filter { $0.role == .user }.isEmpty
+        !chat.contains { $0.role == .user }
     }
     
     required init() { }
@@ -89,7 +89,9 @@ class ContextWindowProcessor: EnvironmentAccessible, DefaultInitializable, Modul
             )
         }
         
-        guard let last = chat.last else { return }
+        guard let last = chat.last else {
+            return
+        }
         
         chat[chat.count - 1] = .init(
             role: last.role,

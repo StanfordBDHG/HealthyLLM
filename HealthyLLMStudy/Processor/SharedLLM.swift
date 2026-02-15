@@ -56,7 +56,7 @@ class SharedLocalLLM: DefaultInitializable, Module, EnvironmentAccessible {
         customContext: [[String: String]],
         parameters: LLMLocalParameters,
         samplingParameters: LLMLocalSamplingParameters,
-        tools: [LLMLocalSchema.LLMTool]? = nil
+        tools: [LLMLocalSchema.LLMTool] = []
     ) async throws -> String? {
         defer {
             GPU.clearCache()

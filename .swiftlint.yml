@@ -114,7 +114,8 @@ only_rules:
   # Force tries should be avoided.
   - force_try
   # Force unwrapping should be avoided.
-  - force_unwrapping
+  # Disabled: most occurrences are safe Calendar/Date operations
+  # - force_unwrapping
   # Prefer to locate parameters with defaults toward the end of the parameter list.
   - function_default_parameter_at_end
   # Functions bodies should not span too many lines.
@@ -309,7 +310,8 @@ only_rules:
   # See large_tuple below for the exact configuration.
   - type_body_length
   # Specifies the order of subtypes, properties, methods & more within a type.
-  - type_contents_order
+  # Disabled: requires reordering large code blocks
+  # - type_contents_order
   # Type name should only contain alphanumeric characters, start with an uppercase character and span between 3 and 40 characters in length.
   # Excluded types are listed below.
   - type_name

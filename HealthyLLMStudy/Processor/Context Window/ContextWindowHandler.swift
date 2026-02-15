@@ -9,7 +9,7 @@
 import Foundation
 import HealthKit
 
-class ContextWindowHandler {
+enum ContextWindowHandler {
     static func execute() async throws -> String {
         let vitalAverage = try await getVitalSignsAverage()
         let general = try await getGeneralHealthMetrics()
@@ -480,7 +480,7 @@ class ContextWindowHandler {
                 sortDescriptors: [sortDescriptor]
             ) { _, samples, error in
                 let resultText = Self.processWorkoutSamples(
-                    samples ?? [], error: error, maxDayRange: maxDayRange
+                    error: error, maxDayRange: maxDayRange, samples ?? []
                 )
                 continuation.resume(returning: resultText)
             }
@@ -488,7 +488,7 @@ class ContextWindowHandler {
         }
     }
     
-    private static func processWorkoutSamples(_ samples: [HKSample] = [], error: (any Error)?, maxDayRange: Int) -> String {
+    private static func processWorkoutSamples(error: (any Error)?, maxDayRange: Int, _ samples: [HKSample] = []) -> String {
         var resultText = ""
 
         guard let workouts = samples as? [HKWorkout], error == nil, !workouts.isEmpty else {

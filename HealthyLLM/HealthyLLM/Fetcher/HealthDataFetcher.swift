@@ -68,16 +68,24 @@ class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
             return nil
         }
 
-        // Description, Time Range, Interval
-        let timeRanges: [(String, HealthKitQueryTimeRange, DateComponents)] = [
-            ("day", .today, DateComponents(hour: 1)),
-            ("week", .currentWeek, DateComponents(day: 1)),
-            ("month", .currentMonth, DateComponents(day: 1))
+        struct TimeRangeConfig {
+            let description: String
+            let timeRange: HealthKitQueryTimeRange
+            let interval: DateComponents
+        }
+
+        let timeRanges: [TimeRangeConfig] = [
+            .init(description: "day", timeRange: .today, interval: DateComponents(hour: 1)),
+            .init(description: "week", timeRange: .currentWeek, interval: DateComponents(day: 1)),
+            .init(description: "month", timeRange: .currentMonth, interval: DateComponents(day: 1))
         ]
 
         var result: [String: [Double]] = [:]
         try await withThrowingTaskGroup(of: (String, [Double]).self) { group in
-            for (description, timeRange, interval) in timeRanges {
+            for config in timeRanges {
+                let description = config.description
+                let timeRange = config.timeRange
+                let interval = config.interval
                 group.addTask {
                     var bucketValues: [Double] = []
                     let startDate = timeRange.range.lowerBound
@@ -181,19 +189,20 @@ class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
 }
 
 // One-off query for aggregating health data
-// TODO: Create Pull Request for SpeziHealthKit
 extension HealthKit {
     public func statisticsQuery<Sample>(
         _ sampleType: SampleType<Sample>,
         timeRange: HealthKitQueryTimeRange,
+        interval: DateComponents,
         limit: Int? = nil,
         sortedBy sortDescriptors: [SortDescriptor<Sample>] = [SortDescriptor<Sample>(\.startDate, order: .forward)],
-        predicate filterPredicate: NSPredicate? = nil,
-        interval: DateComponents,
+        predicate filterPredicate: NSPredicate? = nil
     ) async throws -> HKStatisticsCollection {
         let startDate = timeRange.range.lowerBound
         let basePredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [timeRange.predicate, filterPredicate].compactMap(\.self))
-        let quantityType = sampleType.hkSampleType as! HKQuantityType
+        guard let quantityType = sampleType.hkSampleType as? HKQuantityType else {
+            throw HealthDataFetcherError.unsupportedAggregationStyle
+        }
         var statisticsOptions: HKStatisticsOptions = []
 
         switch quantityType.aggregationStyle {

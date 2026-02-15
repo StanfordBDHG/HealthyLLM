@@ -132,8 +132,6 @@ class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
         )
     }
     
-    func fetchSleep() async -> String { "" }
-    
     func fetchWorkout(_ healthKit: HealthKit, type: String) async -> [WorkoutData] {
         guard let activity = workoutStringToHKWorkoutActivityType(type),
               let workouts = try? await healthKit.query(
@@ -194,8 +192,8 @@ extension HealthKit {
         _ sampleType: SampleType<Sample>,
         timeRange: HealthKitQueryTimeRange,
         interval: DateComponents,
-        limit: Int? = nil,
-        sortedBy sortDescriptors: [SortDescriptor<Sample>] = [SortDescriptor<Sample>(\.startDate, order: .forward)],
+        limit _: Int? = nil,  // swiftlint:disable:this unused_parameter
+        sortedBy _: [SortDescriptor<Sample>] = [SortDescriptor<Sample>(\.startDate, order: .forward)],  // swiftlint:disable:this unused_parameter
         predicate filterPredicate: NSPredicate? = nil
     ) async throws -> HKStatisticsCollection {
         let startDate = timeRange.range.lowerBound

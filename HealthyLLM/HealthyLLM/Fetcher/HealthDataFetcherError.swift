@@ -10,6 +10,4 @@ import Foundation
 
 enum HealthDataFetcherError: Error {
     case unsupportedAggregationStyle
-    case noValueAvailable
-    case quantityTypeIdentifierNotFound
 }

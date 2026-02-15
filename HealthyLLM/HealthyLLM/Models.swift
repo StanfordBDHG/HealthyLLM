@@ -30,8 +30,3 @@ struct WorkoutData: Encodable {
     let statistics: [String: String]
 }
 
-struct SleepData: Encodable {
-    let date: String
-    let duration: String
-    let sleepQuality: String
-}

@@ -63,32 +63,6 @@ struct ChatInputView: View {
             }
         }
     }
-    
-    
-    private func gridBackground<Content: View>(
-        @ViewBuilder content: () -> Content
-    ) -> some View {
-        ZStack {
-            Image(.rasterB)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .opacity(0.025)
-                .frame(maxWidth: .infinity)
-            
-            Ellipse()
-                .fill(
-                    RadialGradient(
-                        gradient: Gradient(colors: [.clear, .init(UIColor.systemBackground)]),
-                        center: .center,
-                        startRadius: 300,
-                        endRadius: 700
-                    )
-                )
-                .frame(width: 2000, height: 2000)
-                
-            content()
-        }
-    }
 }
 
 #Preview {

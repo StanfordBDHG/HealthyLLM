@@ -22,7 +22,8 @@ struct ExportDetails {
     }
 }
 
-@Observable class MainViewModel {
+@Observable
+class MainViewModel {
     var showStudyFlow = false
     var showHomeStudyFlow = false
     var showShareSheet = false

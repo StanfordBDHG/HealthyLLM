@@ -14,11 +14,11 @@ class SleepDataHandler: ToolHandler {
     
     func execute(parameters: [String: String]) async throws -> String {
         guard let maxDaysString = parameters["maxDays"],
-              let _maxDays = Int(maxDaysString) else {
+              let parsedMaxDays = Int(maxDaysString) else {
             throw ToolCallError.missingParameters(names: ["maxDays"])
         }
-        
-        let maxDays = max(1, min(_maxDays, 30)) // 1 <= maxDays <= 30
+
+        let maxDays = max(1, min(parsedMaxDays, 30)) // 1 <= maxDays <= 30
         
         do {
             return try await getSleepData(maxDays: maxDays)
@@ -36,7 +36,12 @@ class SleepDataHandler: ToolHandler {
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
         
         return try await withCheckedThrowingContinuation { continuation in
-            let query = HKSampleQuery(sampleType: HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: [sortDescriptor]) { _, samples, error in
+            let query = HKSampleQuery(
+                sampleType: HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!,
+                predicate: predicate,
+                limit: HKObjectQueryNoLimit,
+                sortDescriptors: [sortDescriptor]
+            ) { _, samples, error in
                 guard let sleepSamples = samples as? [HKCategorySample], error == nil else {
                     continuation.resume(returning: "No sleep data available.")
                     return
@@ -64,7 +69,8 @@ class SleepDataHandler: ToolHandler {
                         if sample.endDate > sample.startDate {
                             let sampleDuration = sample.endDate.timeIntervalSince(sample.startDate)
                             
-                            guard sleepType != HKCategoryValueSleepAnalysis.awake.rawValue && sleepType != HKCategoryValueSleepAnalysis.inBed.rawValue else {
+                            guard sleepType != HKCategoryValueSleepAnalysis.awake.rawValue,
+                                  sleepType != HKCategoryValueSleepAnalysis.inBed.rawValue else {
                                 continue
                             }
                             totalSleepTime += sampleDuration
@@ -104,7 +110,9 @@ class SleepDataHandler: ToolHandler {
                         let nightSamples = sleepNights[night]!
                         var nightSleepTime: TimeInterval = 0
                         
-                        for sample in nightSamples where sample.value != HKCategoryValueSleepAnalysis.awake.rawValue && sample.value != HKCategoryValueSleepAnalysis.inBed.rawValue {
+                        for sample in nightSamples
+                            where sample.value != HKCategoryValueSleepAnalysis.awake.rawValue
+                                && sample.value != HKCategoryValueSleepAnalysis.inBed.rawValue {
                             if sample.endDate > sample.startDate {
                                 nightSleepTime += sample.endDate.timeIntervalSince(sample.startDate)
                             }

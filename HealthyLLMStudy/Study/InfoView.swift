@@ -76,7 +76,9 @@ struct InfoView: View {
                 
                 Spacer()
                 Button {
-                    guard let age = age, let participantId = participantId, let sex = sex else { return }
+                    guard let age = age, let participantId = participantId, let sex = sex else {
+                        return
+                    }
                     Persistance.shared.saveMetadata(participantId: participantId, age: age, sex: sex)
                     studyNavigationPath.nextStep()
                 } label: {

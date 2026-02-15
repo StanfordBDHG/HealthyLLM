@@ -12,6 +12,7 @@ enum Constants {
     static let llmModelName = "mlx-community/Llama3.1-Aloe-Beta-8B"
 //    static let llmModelName = "mlx-community/gemma-3-1b-it-qat-4bit"
 
+    // swiftlint:disable:next line_length
     static let llmModelChatTemplate = "{{bos_token}}{% for message in messages %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}"
     
     static let workoutLimitJsonRepresentation = 3

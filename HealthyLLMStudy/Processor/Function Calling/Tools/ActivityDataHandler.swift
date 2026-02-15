@@ -18,11 +18,11 @@ class ActivityDataHandler: ToolHandler {
         }
         
         guard let type = stringToQuantityTypeIdentifier(typeString),
-              let _maxDays = Int(maxDaysString) else {
+              let parsedMaxDays = Int(maxDaysString) else {
             throw ToolCallError.invalidData
         }
-        
-        let maxDays = max(1, min(_maxDays, 30))
+
+        let maxDays = max(1, min(parsedMaxDays, 30))
         
         do {
             return try await getActivityData(type: type, maxDays: maxDays)
@@ -64,8 +64,12 @@ class ActivityDataHandler: ToolHandler {
         let oneYearAgo = calendar.date(byAdding: .year, value: -1, to: startOfWeek)!
         
         
-        let (dailyValue, _) = try await HealthDataFetcher.shared.getAverageQuantity(for: type, startDate: maxDaysAgo, endDate: startOfDay, intervalType: .day)
-        let (avgDailyValue, _) = try await HealthDataFetcher.shared.getAverageQuantity(for: type, startDate: oneYearAgo, endDate: startOfDay, intervalType: .day)
+        let (dailyValue, _) = try await HealthDataFetcher.shared.getAverageQuantity(
+            for: type, startDate: maxDaysAgo, endDate: startOfDay, intervalType: .day
+        )
+        let (avgDailyValue, _) = try await HealthDataFetcher.shared.getAverageQuantity(
+            for: type, startDate: oneYearAgo, endDate: startOfDay, intervalType: .day
+        )
         
         guard let dailyValue,
               let avgDailyValue else {

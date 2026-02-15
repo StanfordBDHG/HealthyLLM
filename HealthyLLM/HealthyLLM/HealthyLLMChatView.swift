@@ -7,8 +7,8 @@
 //
 
 import SpeziChat
-import SwiftUI
 import SpeziHealthKit
+import SwiftUI
 
 struct HealthyLLMChatView: View {
     @Environment(HealthDataInterpreter.self) private var healthDataInterpreter

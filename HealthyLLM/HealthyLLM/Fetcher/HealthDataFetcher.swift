@@ -11,7 +11,6 @@ import Spezi
 import SpeziHealthKit
 
 class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
-
     required init() { }
     
     func askForAuthorization(_ healthKit: HealthKit) async throws {
@@ -127,10 +126,15 @@ class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
     
     func fetchSleep() async -> String { "" }
     
-    func fetchWorkout(_ healthKit: HealthKit, type: String) async -> [WorkoutData]? {
+    func fetchWorkout(_ healthKit: HealthKit, type: String) async -> [WorkoutData] {
         guard let activity = workoutStringToHKWorkoutActivityType(type),
-              let workouts = try? await healthKit.query(.workout, timeRange: .ever, limit: 10, sortedBy: [SortDescriptor(\.startDate, order: .reverse)]) else {
-            return nil
+              let workouts = try? await healthKit.query(
+                .workout,
+                timeRange: .ever,
+                limit: 10,
+                sortedBy: [SortDescriptor(\.startDate, order: .reverse)]
+              ) else {
+            return []
         }
 
         let filtered = workouts.filter { $0.workoutActivityType == activity }

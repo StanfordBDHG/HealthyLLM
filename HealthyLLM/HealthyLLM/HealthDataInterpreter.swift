@@ -7,14 +7,14 @@
 //
 
 import Foundation
+import HealthKit
 import OSLog
 import Spezi
 import SpeziChat
-import SpeziLLM
-import SpeziLLMLocal
 import SpeziHealthKit
 import SpeziHealthKitUI
-import HealthKit
+import SpeziLLM
+import SpeziLLMLocal
 
 @Observable
 class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible {
@@ -50,7 +50,9 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
             maxOutputLength: 1024,
             chatTemplate: Constants.llmModelChatTemplate
         )
-        guard let defaultParameters else { return }
+        guard let defaultParameters else {
+            return
+        }
         
         let schema = LLMLocalSchema(
             model: .custom(id: Constants.llmModelName),
@@ -59,8 +61,10 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
         )
         
         sharedSession = llmRunner.callAsFunction(with: schema)
-        guard let sharedSession else { return }
-        
+        guard let sharedSession else {
+            return
+        }
+
         try await sharedSession.setup()
         loaded = true
     }
@@ -216,8 +220,7 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
             advancedContext.append(.init(.toolCall, content: output))
             let workoutData = await healthDataFetcher.fetchWorkout(healthKit, type: workoutType)
 
-            if let workoutData,
-               workoutData.count > Constants.workoutLimitJsonRepresentation {
+            if workoutData.count > Constants.workoutLimitJsonRepresentation {
                 let csvString = HealthDataFetcher.workoutDataToCSV(workoutData)
                 context.append(PromptGenerator.buildToolResponse(of: csvString))
                 advancedContext.append(PromptGenerator.buildToolResponse(of: csvString))

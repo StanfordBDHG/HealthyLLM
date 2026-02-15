@@ -54,7 +54,9 @@ class ActivityOverviewDataHandler: ToolHandler {
        let calendar = Calendar.current
        let today = Date()
        let startOfDay = calendar.startOfDay(for: today)
-       let startOfMonth = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month, .day], from: Calendar.current.startOfDay(for: .now)))!
+       let startOfMonth = Calendar.current.date(
+           from: Calendar.current.dateComponents([.year, .month, .day], from: Calendar.current.startOfDay(for: .now))
+       )!
        
        let startOfWeek = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: startOfDay))!
        let oneYearAgo = calendar.date(byAdding: .year, value: -1, to: startOfWeek)!
@@ -63,7 +65,9 @@ class ActivityOverviewDataHandler: ToolHandler {
         // MONTHLY TRENDS
         resultText += "\n#### Monthy Trends\n"
         
-        let values = try await HealthDataFetcher.shared.getPeriodicQuantities(for: type, startDate: oneYearAgo, endDate: startOfMonth, intervalType: .month)
+        let values = try await HealthDataFetcher.shared.getPeriodicQuantities(
+            for: type, startDate: oneYearAgo, endDate: startOfMonth, intervalType: .month
+        )
         
         switch type {
         case .stepCount:

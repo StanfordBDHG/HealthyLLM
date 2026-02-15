@@ -33,7 +33,9 @@ class VitalsOutlierHandler: ToolHandler {
     // Calculates outliers (with dates) from an array of (Date, Double) tuples using the two-standard-deviation rule.
     func calculateOutliersWithDates(from samples: [(date: Date, value: Double)]) -> [(date: Date, value: Double)] {
         let values = samples.map { $0.value }
-        guard !values.isEmpty else { return [] }
+        guard !values.isEmpty else {
+            return []
+        }
         let (mean, std) = meanAndStandardDeviation(from: values)
         let lowerBound = mean - 3 * std
         let upperBound = mean + 3 * std
@@ -112,7 +114,9 @@ class VitalsOutlierHandler: ToolHandler {
         
         // Helper to generate markdown list from outlier tuples.
         func markdownList(from outliers: [(date: Date, value: Double)], unit: String) -> String {
-            guard !outliers.isEmpty else { return "None" }
+            guard !outliers.isEmpty else {
+                return "None"
+            }
             return outliers.map { "- **\(formatter.string(from: $0.date))**: \($0.value) \(unit)" }
                           .joined(separator: "\n")
         }

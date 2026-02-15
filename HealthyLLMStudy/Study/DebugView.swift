@@ -46,7 +46,9 @@ struct DebugView: View {
                             var string = ""
                             
                             for (key, value) in values {
-                                let shortKey = key.replacingOccurrences(of: "HKCategoryTypeIdentifier", with: "").replacingOccurrences(of: "HKQuantityTypeIdentifier", with: "")
+                                let shortKey = key
+                                    .replacingOccurrences(of: "HKCategoryTypeIdentifier", with: "")
+                                    .replacingOccurrences(of: "HKQuantityTypeIdentifier", with: "")
                                 string += "\(shortKey): \(value)\n"
                             }
                             path.append(string)

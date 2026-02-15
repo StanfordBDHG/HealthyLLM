@@ -8,9 +8,9 @@
 
 import HealthKit
 import Spezi
+import SpeziHealthKit
 import SpeziLLM
 import SpeziLLMLocal
-import SpeziHealthKit
 import SwiftUI
 
 

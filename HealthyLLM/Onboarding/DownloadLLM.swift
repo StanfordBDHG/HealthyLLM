@@ -16,8 +16,9 @@ struct DownloadLLM: View {
     var body: some View {
         LLMLocalDownloadView(
             model: .custom(id: Constants.llmModelName),
-            downloadDescription: "DOWNLOAD_MODEL_DESCRIPTION `\(Constants.llmModelName)`") {
-                onboardingNavigationPath.nextStep()
+            downloadDescription: "DOWNLOAD_MODEL_DESCRIPTION `\(Constants.llmModelName)`"
+        ) {
+            onboardingNavigationPath.nextStep()
         }
     }
 }

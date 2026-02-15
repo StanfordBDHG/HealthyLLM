@@ -122,16 +122,18 @@ class PerformanceProcessor {
         var systemInfo = utsname()
         uname(&systemInfo)
         let machineMirror = Mirror(reflecting: systemInfo.machine)
-        let identifier = machineMirror.children.reduce("") { identifier, element in
-            guard let value = element.value as? Int8, value != 0 else { return identifier }
-            return identifier + String(UnicodeScalar(UInt8(value)))
+        let identifier = machineMirror.children.reduce(into: "") { identifier, element in
+            guard let value = element.value as? Int8, value != 0 else {
+                return
+            }
+            identifier += String(UnicodeScalar(UInt8(value)))
         }
         return identifier
     }
     
     static var totalDiskSpace: String {
         guard let systemAttributes = try? FileManager.default.attributesOfFileSystem(forPath: NSHomeDirectory() as String),
-              let space = (systemAttributes[FileAttributeKey.systemSize] as? NSNumber)?.int64Value else {
+              let space = systemAttributes[FileAttributeKey.systemSize] as? Int64 else {
             return String(0)
         }
         return String(space)

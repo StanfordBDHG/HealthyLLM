@@ -1,11 +1,11 @@
 //
-//  FunctionModels.swift
-//  HealthyLLM
+// This source file is part of the HealthyLLM based on the Stanford Spezi Template Application project
 //
-//  Created by Leon Nissen on 3/1/25.
+// SPDX-FileCopyrightText: 2026 Stanford University
+//
+// SPDX-License-Identifier: MIT
 //
 
-/// Struct representing a tool/function call from the LLM
 struct ToolCall: Codable {
     let name: String
     let parameters: [String: String]

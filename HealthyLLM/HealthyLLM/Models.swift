@@ -8,24 +8,21 @@
 
 import Foundation
 
-// periphery:ignore
 struct UserInfo: Encodable {
-    let name: String?
-    let dateOfBirth: Date?
-    let sex: String?
-    let height: String?
-    let weight: String?
-    let bmi: String?
+    let name: String? // periphery:ignore
+    let dateOfBirth: Date? // periphery:ignore
+    let sex: String? // periphery:ignore
+    let height: String? // periphery:ignore
+    let weight: String? // periphery:ignore
+    let bmi: String? // periphery:ignore
 }
 
-// periphery:ignore
 struct HealthData: Encodable {
-    let name: String
-    let unit: String
-    let values: [String: [Double]]
+    let name: String // periphery:ignore
+    let unit: String // periphery:ignore
+    let values: [String: [Double]] // periphery:ignore
 }
 
-// periphery:ignore
 struct WorkoutData: Encodable {
     let name: String
     let date: String

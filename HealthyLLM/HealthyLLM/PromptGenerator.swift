@@ -1,7 +1,7 @@
 //
 // This source file is part of the HealthyLLM based on the Stanford Spezi Template Application project
 //
-// SPDX-FileCopyrightText: 2024 Stanford University
+// SPDX-FileCopyrightText: 2026 Stanford University
 //
 // SPDX-License-Identifier: MIT
 //
@@ -15,11 +15,12 @@ enum PromptGenerator {
     }
     
     static func buildSystemPrompt(for type: SystemPromptType, userInfo: UserInfo? = nil) -> HealthyLLMContextEntity {
-        let prompt = switch type {
+        let prompt: String
+        switch type {
         case .functionCall:
-            generationPrompt(with: tools)
+            prompt = generationPrompt(with: tools)
         case .default:
-            """
+            prompt = """
             \(systemPrompt)
             Here is some general information about the user, only use these information if necessary:
             \(userInfo != nil ? userInfo!.asJSONRepresentation(.prettyPrinted) ?? "No Data" : "No Data")
@@ -56,10 +57,13 @@ enum PromptGenerator {
     
     private static func generationPrompt(with tools: String?) -> String {
         """
-        You are a function calling AI model. You are provided with function signatures within <tools></tools> XML tags. You may call one or more functions to assist with the user query. Don't make assumptions about what values to plug into functions. Here are the available tools: <tools>
+        You are a function calling AI model. You are provided with function signatures within \
+        <tools></tools> XML tags. You may call one or more functions to assist with the user query. \
+        Don't make assumptions about what values to plug into functions. Here are the available tools: <tools>
         \(tools ?? "")
         </tools>
-        For each function call return a json object with function name and arguments within <tool_call></tool_call> XML tags as follows:
+        For each function call return a json object with function name and arguments within \
+        <tool_call></tool_call> XML tags as follows:
         <tool_call>
         {"name": <function-name>, "arguments": <args-dict>}
         </tool_call>
@@ -67,6 +71,7 @@ enum PromptGenerator {
     }
     
     
+    // swiftlint:disable line_length
     private static let tools: String = """
     {
       "type": "function",
@@ -107,6 +112,7 @@ enum PromptGenerator {
       }
     }
     """
+    // swiftlint:enable line_length
     
     static let systemPrompt = "You are a bot that responds to health queries. You should reply with the health type asked for in the query."
 }

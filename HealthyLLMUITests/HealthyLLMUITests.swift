@@ -11,6 +11,7 @@ import XCTest
 
 class HealthyLLMUITests: XCTestCase {
     override func setUpWithError() throws {
+        try super.setUpWithError()
         continueAfterFailure = false
     }
     

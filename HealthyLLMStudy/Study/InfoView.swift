@@ -1,8 +1,9 @@
 //
-//  InfoView.swift
-//  HealthyLLM
+// This source file is part of the HealthyLLM based on the Stanford Spezi Template Application project
 //
-//  Created by Leon Nissen on 1/15/25.
+// SPDX-FileCopyrightText: 2026 Stanford University
+//
+// SPDX-License-Identifier: MIT
 //
 
 import SpeziOnboarding
@@ -76,7 +77,9 @@ struct InfoView: View {
                 
                 Spacer()
                 Button {
-                    guard let age = age, let participantId = participantId, let sex = sex else { return }
+                    guard let age = age, let participantId = participantId, let sex = sex else {
+                        return
+                    }
                     Persistance.shared.saveMetadata(participantId: participantId, age: age, sex: sex)
                     studyNavigationPath.nextStep()
                 } label: {

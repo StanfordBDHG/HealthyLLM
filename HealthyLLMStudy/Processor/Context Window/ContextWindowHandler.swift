@@ -1,14 +1,15 @@
 //
-//  HealthDataFetcher+ContextWindow.swift
-//  HealthyLLM
+// This source file is part of the HealthyLLM based on the Stanford Spezi Template Application project
 //
-//  Created by Leon Nissen on 2/26/25.
+// SPDX-FileCopyrightText: 2026 Stanford University
+//
+// SPDX-License-Identifier: MIT
 //
 
 import Foundation
 import HealthKit
 
-class ContextWindowHandler {
+enum ContextWindowHandler {
     static func execute() async throws -> String {
         let vitalAverage = try await getVitalSignsAverage()
         let general = try await getGeneralHealthMetrics()
@@ -110,8 +111,10 @@ class ContextWindowHandler {
             resultText += "Blood Pressure (avg over \(weeksToAverage) weeks): \(Int(sys))/\(Int(dia)) mmHg\n"
             
             // Compare to average
-            let systolicAvgYear = try await HealthDataFetcher.shared.getAverageQuantityValue(for: .bloodPressureSystolic, weeksToAverage: weeksPerYear)
-            let diastolicAvgYear = try await HealthDataFetcher.shared.getAverageQuantityValue(for: .bloodPressureDiastolic, weeksToAverage: weeksPerYear)
+            let systolicAvgYear = try await HealthDataFetcher.shared
+                .getAverageQuantityValue(for: .bloodPressureSystolic, weeksToAverage: weeksPerYear)
+            let diastolicAvgYear = try await HealthDataFetcher.shared
+                .getAverageQuantityValue(for: .bloodPressureDiastolic, weeksToAverage: weeksPerYear)
             if let sysYear = systolicAvgYear.0, let diaYear = diastolicAvgYear.0 {
                 let percentDiff = (((sys + dia) - (sysYear + diaYear)) / (sysYear + diaYear)) * 100
                 resultText += "\t\(percentDiff >= 0 ? "+" : "")\(Int(percentDiff))% vs 1-year avg (\(Int(sysYear))/\(Int(diaYear)) mmHg)\n"
@@ -182,7 +185,9 @@ class ContextWindowHandler {
         let calendar = Calendar.current
         let today = Date()
         let startOfDay = calendar.startOfDay(for: today)
-        let startOfMonth = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month, .day], from: Calendar.current.startOfDay(for: .now)))!
+        let startOfMonth = Calendar.current.date(
+            from: Calendar.current.dateComponents([.year, .month, .day], from: Calendar.current.startOfDay(for: .now))
+        )!
         
         let fourteenDaysAgo = calendar.date(byAdding: .day, value: -14, to: startOfDay)!
         
@@ -195,12 +200,22 @@ class ContextWindowHandler {
         resultText += "\n#### Last 14-Day's Average Activity Per Day\n"
         
         // Steps
-        let dailySteps = try await HealthDataFetcher.shared.getAverageQuantity(for: .stepCount, startDate: fourteenDaysAgo, endDate: startOfDay, intervalType: .day)
+        let dailySteps = try await HealthDataFetcher.shared.getAverageQuantity(
+            for: .stepCount,
+            startDate: fourteenDaysAgo,
+            endDate: startOfDay,
+            intervalType: .day
+        )
         if let value = dailySteps.0 {
             resultText += "Steps: \(Int(value).formattedWithSeparator)\n"
             
             // Compare to daily average
-            let avgDailySteps = try await HealthDataFetcher.shared.getAverageQuantity(for: .stepCount, startDate: oneYearAgo, endDate: startOfDay, intervalType: .day)
+            let avgDailySteps = try await HealthDataFetcher.shared.getAverageQuantity(
+            for: .stepCount,
+            startDate: oneYearAgo,
+            endDate: startOfDay,
+            intervalType: .day
+        )
             if let avgValue = avgDailySteps.0 {
                 let percentDiff = ((value - avgValue) / avgValue) * 100
                 resultText += "\t\(percentDiff >= 0 ? "+" : "")\(Int(percentDiff))% vs 1-year avg (\(Int(avgValue).formattedWithSeparator) steps)\n"
@@ -208,13 +223,23 @@ class ContextWindowHandler {
         }
         
         // Distance
-        let dailyDistance = try await HealthDataFetcher.shared.getAverageQuantity(for: .distanceWalkingRunning, startDate: fourteenDaysAgo, endDate: today, intervalType: .day)
+        let dailyDistance = try await HealthDataFetcher.shared.getAverageQuantity(
+            for: .distanceWalkingRunning,
+            startDate: fourteenDaysAgo,
+            endDate: today,
+            intervalType: .day
+        )
         if let value = dailyDistance.0 {
             let kilometers = value / 1000 // Convert meters to km
             resultText += "Distance: \(String(format: "%.2f", kilometers)) km\n"
             
             // Compare to daily average
-            let avgDailyDistance = try await HealthDataFetcher.shared.getAverageQuantity(for: .distanceWalkingRunning, startDate: oneYearAgo, endDate: startOfDay, intervalType: .day)
+            let avgDailyDistance = try await HealthDataFetcher.shared.getAverageQuantity(
+                for: .distanceWalkingRunning,
+                startDate: oneYearAgo,
+                endDate: startOfDay,
+                intervalType: .day
+            )
             if let avgValue = avgDailyDistance.0 {
                 let avgKilometers = avgValue / 1000 // Convert meters to km
                 let percentDiff = ((value - avgValue) / avgValue) * 100
@@ -223,12 +248,22 @@ class ContextWindowHandler {
         }
         
         // Active Energy
-        let dailyActiveEnergy = try await HealthDataFetcher.shared.getAverageQuantity(for: .activeEnergyBurned, startDate: fourteenDaysAgo, endDate: today, intervalType: .day)
+        let dailyActiveEnergy = try await HealthDataFetcher.shared.getAverageQuantity(
+            for: .activeEnergyBurned,
+            startDate: fourteenDaysAgo,
+            endDate: today,
+            intervalType: .day
+        )
         if let value = dailyActiveEnergy.0 {
             resultText += "Active calories: \(Int(value).formattedWithSeparator) kcal\n"
             
             // Compare to daily average
-            let avgDailyActiveEnergy = try await HealthDataFetcher.shared.getAverageQuantity(for: .activeEnergyBurned, startDate: oneYearAgo, endDate: startOfDay, intervalType: .day)
+            let avgDailyActiveEnergy = try await HealthDataFetcher.shared.getAverageQuantity(
+                for: .activeEnergyBurned,
+                startDate: oneYearAgo,
+                endDate: startOfDay,
+                intervalType: .day
+            )
             if let avgValue = avgDailyActiveEnergy.0 {
                 let percentDiff = ((value - avgValue) / avgValue) * 100
                 resultText += "\t\(percentDiff >= 0 ? "+" : "")\(Int(percentDiff))% vs 1-year avg (\(Int(avgValue).formattedWithSeparator) kcal)\n"
@@ -236,12 +271,22 @@ class ContextWindowHandler {
         }
         
         // Resting Energy
-        let dailyRestingEnergy = try await HealthDataFetcher.shared.getAverageQuantity(for: .basalEnergyBurned, startDate: fourteenDaysAgo, endDate: startOfDay, intervalType: .day)
+        let dailyRestingEnergy = try await HealthDataFetcher.shared.getAverageQuantity(
+            for: .basalEnergyBurned,
+            startDate: fourteenDaysAgo,
+            endDate: startOfDay,
+            intervalType: .day
+        )
         if let value = dailyRestingEnergy.0 {
             resultText += "Resting calories: \(Int(value).formattedWithSeparator) kcal\n"
             
             // Compare to daily average
-            let avgDailyRestingEnergy = try await HealthDataFetcher.shared.getAverageQuantity(for: .basalEnergyBurned, startDate: oneYearAgo, endDate: startOfDay, intervalType: .day)
+            let avgDailyRestingEnergy = try await HealthDataFetcher.shared.getAverageQuantity(
+                for: .basalEnergyBurned,
+                startDate: oneYearAgo,
+                endDate: startOfDay,
+                intervalType: .day
+            )
             if let avgValue = avgDailyRestingEnergy.0 {
                 let percentDiff = ((value - avgValue) / avgValue) * 100
                 resultText += "\t\(percentDiff >= 0 ? "+" : "")\(Int(percentDiff))% vs 1-year avg (\(Int(avgValue).formattedWithSeparator) kcal)\n"
@@ -249,13 +294,23 @@ class ContextWindowHandler {
         }
         
         // Stand Hours
-        let standTime = try await HealthDataFetcher.shared.getAverageQuantity(for: .appleStandTime, startDate: fourteenDaysAgo, endDate: startOfDay, intervalType: .day)
+        let standTime = try await HealthDataFetcher.shared.getAverageQuantity(
+            for: .appleStandTime,
+            startDate: fourteenDaysAgo,
+            endDate: startOfDay,
+            intervalType: .day
+        )
         if let value = standTime.0 {
             let standHours = Int(value / 3600) // Convert seconds to hours
             resultText += "Stand hours: \(standHours) h\n"
             
             // Compare to daily average
-            let avgDailyStandTime = try await HealthDataFetcher.shared.getAverageQuantity(for: .appleStandTime, startDate: oneYearAgo, endDate: startOfDay, intervalType: .day)
+            let avgDailyStandTime = try await HealthDataFetcher.shared.getAverageQuantity(
+                for: .appleStandTime,
+                startDate: oneYearAgo,
+                endDate: startOfDay,
+                intervalType: .day
+            )
             if let avgValue = avgDailyStandTime.0 {
                 let avgStandHours = avgValue / 3600 // Convert seconds to hours
                 let percentDiff = ((value - avgValue) / avgValue) * 100
@@ -264,13 +319,23 @@ class ContextWindowHandler {
         }
         
         // Exercise Minutes
-        let exerciseTime = try await HealthDataFetcher.shared.getAverageQuantity(for: .appleExerciseTime, startDate: fourteenDaysAgo, endDate: startOfDay, intervalType: .day)
+        let exerciseTime = try await HealthDataFetcher.shared.getAverageQuantity(
+            for: .appleExerciseTime,
+            startDate: fourteenDaysAgo,
+            endDate: startOfDay,
+            intervalType: .day
+        )
         if let value = exerciseTime.0 {
             let exerciseMinutes = Int(value / 60) // Convert seconds to minutes
             resultText += "Exercise minutes: \(exerciseMinutes)\n"
             
             // Compare to daily average
-            let avgDailyExerciseTime = try await HealthDataFetcher.shared.getAverageQuantity(for: .appleExerciseTime, startDate: oneYearAgo, endDate: startOfDay, intervalType: .day)
+            let avgDailyExerciseTime = try await HealthDataFetcher.shared.getAverageQuantity(
+                for: .appleExerciseTime,
+                startDate: oneYearAgo,
+                endDate: startOfDay,
+                intervalType: .day
+            )
             if let avgValue = avgDailyExerciseTime.0 {
                 let avgExerciseMinutes = avgValue / 60 // Convert seconds to minutes
                 let percentDiff = ((value - avgValue) / avgValue) * 100
@@ -279,12 +344,22 @@ class ContextWindowHandler {
         }
         
         // Flights Climbed
-        let flightsClimbed = try await HealthDataFetcher.shared.getAverageQuantity(for: .flightsClimbed, startDate: fourteenDaysAgo, endDate: startOfDay, intervalType: .day)
+        let flightsClimbed = try await HealthDataFetcher.shared.getAverageQuantity(
+            for: .flightsClimbed,
+            startDate: fourteenDaysAgo,
+            endDate: startOfDay,
+            intervalType: .day
+        )
         if let value = flightsClimbed.0 {
             resultText += "Flights climbed: \(Int(value))\n"
             
             // Compare to daily average
-            let avgDailyFlightsClimbed = try await HealthDataFetcher.shared.getAverageQuantity(for: .flightsClimbed, startDate: oneYearAgo, endDate: startOfDay, intervalType: .day)
+            let avgDailyFlightsClimbed = try await HealthDataFetcher.shared.getAverageQuantity(
+                for: .flightsClimbed,
+                startDate: oneYearAgo,
+                endDate: startOfDay,
+                intervalType: .day
+            )
             if let avgValue = avgDailyFlightsClimbed.0 {
                 let percentDiff = ((value - avgValue) / avgValue) * 100
                 resultText += "\t\(percentDiff >= 0 ? "+" : "")\(Int(percentDiff))% vs 1-year avg (\(String(format: "%.1f", avgValue)) flights)\n"
@@ -295,7 +370,12 @@ class ContextWindowHandler {
         // MONTHLY TRENDS
         resultText += "\n#### Monthy Trends\n"
         
-        let monthlyTrendsSteps = try await HealthDataFetcher.shared.getPeriodicQuantities(for: .stepCount, startDate: oneYearAgo, endDate: startOfMonth, intervalType: .month)
+        let monthlyTrendsSteps = try await HealthDataFetcher.shared.getPeriodicQuantities(
+            for: .stepCount,
+            startDate: oneYearAgo,
+            endDate: startOfMonth,
+            intervalType: .month
+        )
         resultText += "\nStep Counts:\n"
         for monthData in monthlyTrendsSteps {
             if let value = monthData.value {
@@ -303,7 +383,12 @@ class ContextWindowHandler {
             }
         }
         
-        let monthlyTrendsDistance = try await HealthDataFetcher.shared.getPeriodicQuantities(for: .distanceWalkingRunning, startDate: oneYearAgo, endDate: startOfMonth, intervalType: .month)
+        let monthlyTrendsDistance = try await HealthDataFetcher.shared.getPeriodicQuantities(
+            for: .distanceWalkingRunning,
+            startDate: oneYearAgo,
+            endDate: startOfMonth,
+            intervalType: .month
+        )
         resultText += "\nDistance:\n"
         for monthData in monthlyTrendsDistance {
             if let value = monthData.value {
@@ -311,7 +396,12 @@ class ContextWindowHandler {
             }
         }
         
-        let monthlyTrendsActiveEnergy = try await HealthDataFetcher.shared.getPeriodicQuantities(for: .activeEnergyBurned, startDate: oneYearAgo, endDate: startOfMonth, intervalType: .month)
+        let monthlyTrendsActiveEnergy = try await HealthDataFetcher.shared.getPeriodicQuantities(
+            for: .activeEnergyBurned,
+            startDate: oneYearAgo,
+            endDate: startOfMonth,
+            intervalType: .month
+        )
         resultText += "\nActive Energy:\n"
         for monthData in monthlyTrendsActiveEnergy {
             if let value = monthData.value {
@@ -319,7 +409,12 @@ class ContextWindowHandler {
             }
         }
         
-        let monthlyTrendsBasalEnergy = try await HealthDataFetcher.shared.getPeriodicQuantities(for: .basalEnergyBurned, startDate: oneYearAgo, endDate: startOfMonth, intervalType: .month)
+        let monthlyTrendsBasalEnergy = try await HealthDataFetcher.shared.getPeriodicQuantities(
+            for: .basalEnergyBurned,
+            startDate: oneYearAgo,
+            endDate: startOfMonth,
+            intervalType: .month
+        )
         resultText += "\nBasal Energy:\n"
         for monthData in monthlyTrendsBasalEnergy {
             if let value = monthData.value {
@@ -327,7 +422,12 @@ class ContextWindowHandler {
             }
         }
         
-        let monthlyTrendsStandTime = try await HealthDataFetcher.shared.getPeriodicQuantities(for: .appleStandTime, startDate: oneYearAgo, endDate: startOfMonth, intervalType: .month)
+        let monthlyTrendsStandTime = try await HealthDataFetcher.shared.getPeriodicQuantities(
+            for: .appleStandTime,
+            startDate: oneYearAgo,
+            endDate: startOfMonth,
+            intervalType: .month
+        )
         resultText += "\nStand Time:\n"
         for monthData in monthlyTrendsStandTime {
             if let value = monthData.value {
@@ -335,7 +435,12 @@ class ContextWindowHandler {
             }
         }
         
-        let monthlyTrendsExerciseTime = try await HealthDataFetcher.shared.getPeriodicQuantities(for: .appleExerciseTime, startDate: oneYearAgo, endDate: startOfMonth, intervalType: .month)
+        let monthlyTrendsExerciseTime = try await HealthDataFetcher.shared.getPeriodicQuantities(
+            for: .appleExerciseTime,
+            startDate: oneYearAgo,
+            endDate: startOfMonth,
+            intervalType: .month
+        )
         resultText += "\nExercise Time:\n"
         for monthData in monthlyTrendsExerciseTime {
             if let value = monthData.value {
@@ -343,7 +448,12 @@ class ContextWindowHandler {
             }
         }
         
-        let monthlyTrendsFlightsClimbed = try await HealthDataFetcher.shared.getPeriodicQuantities(for: .flightsClimbed, startDate: oneYearAgo, endDate: startOfMonth, intervalType: .month)
+        let monthlyTrendsFlightsClimbed = try await HealthDataFetcher.shared.getPeriodicQuantities(
+            for: .flightsClimbed,
+            startDate: oneYearAgo,
+            endDate: startOfMonth,
+            intervalType: .month
+        )
         resultText += "\nFlights climbed:\n"
         for monthData in monthlyTrendsFlightsClimbed {
             if let value = monthData.value {
@@ -363,58 +473,69 @@ class ContextWindowHandler {
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
         
         return try await withCheckedThrowingContinuation { continuation in
-            let query = HKSampleQuery(sampleType: HKObjectType.workoutType(), predicate: predicate, limit: 10, sortDescriptors: [sortDescriptor]) { _, samples, error in
-                var resultText = ""
-                
-                guard let workouts = samples as? [HKWorkout], error == nil, !workouts.isEmpty else {
-                    continuation.resume(returning: "")
-                    return
-                }
-                
-                resultText += "Last \(workouts.count) workouts (past \(maxDayRange) days):\n"
-                
-                for (index, workout) in workouts.enumerated() {
-                    let workoutType = workout.workoutActivityType.name ?? "Unknown Workout"
-                    let duration = Int(workout.duration / 60)
-                    let calories = workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()) ?? 0
-                    let distance = workout.totalDistance?.doubleValue(for: .meter()) ?? 0
-                    let date = workout.endDate
-                    
-                    resultText += "\(index + 1). \(workoutType) - \(date.formatted(.iso8601))\n"
-                    resultText += "   Duration: \(duration) min, Calories: \(Int(calories)) kcal"
-                    
-                    if distance > 0 {
-                        if distance >= 1000 {
-                            resultText += ", Distance: \(String(format: "%.2f", distance / 1000)) km"
-                        } else {
-                            resultText += ", Distance: \(Int(distance)) m"
-                        }
-                    }
-                    resultText += "\n"
-                    
-                    if let heartRateData = workout.metadata?[HKPredicateKeyPathAverageHeartRate] as? Double {
-                        resultText += "   Avg HR: \(Int(heartRateData)) bpm\n"
-                    }
-                }
-                
-                let workoutCounts = Dictionary(grouping: workouts, by: { $0.workoutActivityType })
-                    .mapValues { $0.count }
-                    .sorted { $0.value > $1.value }
-                
-                resultText += "\nWorkout breakdown (\(maxDayRange) days):\n"
-                for (type, count) in workoutCounts {
-                    resultText += "- \(type.name ?? "Unknown Workout"): \(count) sessions\n"
-                }
-                
-                let totalWorkoutTime = workouts.reduce(0) { $0 + $1.duration }
-                resultText += "Total workout time: \(Int(totalWorkoutTime / 60)) minutes\n"
-                
+            let query = HKSampleQuery(
+                sampleType: HKObjectType.workoutType(),
+                predicate: predicate,
+                limit: 10,
+                sortDescriptors: [sortDescriptor]
+            ) { _, samples, error in
+                let resultText = Self.processWorkoutSamples(
+                    error: error, maxDayRange: maxDayRange, samples ?? []
+                )
                 continuation.resume(returning: resultText)
             }
             HealthDataFetcher.shared.healthStore.execute(query)
         }
     }
     
+    private static func processWorkoutSamples(error: (any Error)?, maxDayRange: Int, _ samples: [HKSample] = []) -> String {
+        var resultText = ""
+
+        guard let workouts = samples as? [HKWorkout], error == nil, !workouts.isEmpty else {
+            return ""
+        }
+
+        resultText += "Last \(workouts.count) workouts (past \(maxDayRange) days):\n"
+
+        for (index, workout) in workouts.enumerated() {
+            let workoutType = workout.workoutActivityType.name ?? "Unknown Workout"
+            let duration = Int(workout.duration / 60)
+            let calories = workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()) ?? 0
+            let distance = workout.totalDistance?.doubleValue(for: .meter()) ?? 0
+            let date = workout.endDate
+
+            resultText += "\(index + 1). \(workoutType) - \(date.formatted(.iso8601))\n"
+            resultText += "   Duration: \(duration) min, Calories: \(Int(calories)) kcal"
+
+            if distance > 0 {
+                if distance >= 1000 {
+                    resultText += ", Distance: \(String(format: "%.2f", distance / 1000)) km"
+                } else {
+                    resultText += ", Distance: \(Int(distance)) m"
+                }
+            }
+            resultText += "\n"
+
+            if let heartRateData = workout.metadata?[HKPredicateKeyPathAverageHeartRate] as? Double {
+                resultText += "   Avg HR: \(Int(heartRateData)) bpm\n"
+            }
+        }
+
+        let workoutCounts = Dictionary(grouping: workouts, by: { $0.workoutActivityType })
+            .mapValues { $0.count }
+            .sorted { $0.value > $1.value }
+
+        resultText += "\nWorkout breakdown (\(maxDayRange) days):\n"
+        for (type, count) in workoutCounts {
+            resultText += "- \(type.name ?? "Unknown Workout"): \(count) sessions\n"
+        }
+
+        let totalWorkoutTime = workouts.reduce(0) { $0 + $1.duration }
+        resultText += "Total workout time: \(Int(totalWorkoutTime / 60)) minutes\n"
+
+        return resultText
+    }
+
     private static func getSleepData() async throws -> String {
         let calendar = Calendar.current
         let startDate = calendar.date(byAdding: .day, value: -14, to: Date())!
@@ -424,7 +545,12 @@ class ContextWindowHandler {
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
         
         return try await withCheckedThrowingContinuation { continuation in
-            let query = HKSampleQuery(sampleType: HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: [sortDescriptor]) { _, samples, error in
+            let query = HKSampleQuery(
+                sampleType: HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!,
+                predicate: predicate,
+                limit: HKObjectQueryNoLimit,
+                sortDescriptors: [sortDescriptor]
+            ) { _, samples, error in
                 guard let sleepSamples = samples as? [HKCategorySample], error == nil else {
                     continuation.resume(returning: "No sleep data available.")
                     return
@@ -452,7 +578,8 @@ class ContextWindowHandler {
                         if sample.endDate > sample.startDate {
                             let sampleDuration = sample.endDate.timeIntervalSince(sample.startDate)
                             
-                            guard sleepType != HKCategoryValueSleepAnalysis.awake.rawValue && sleepType != HKCategoryValueSleepAnalysis.inBed.rawValue else {
+                            guard sleepType != HKCategoryValueSleepAnalysis.awake.rawValue,
+                                  sleepType != HKCategoryValueSleepAnalysis.inBed.rawValue else {
                                 continue
                             }
                             totalSleepTime += sampleDuration
@@ -492,7 +619,9 @@ class ContextWindowHandler {
                         let nightSamples = sleepNights[night]!
                         var nightSleepTime: TimeInterval = 0
                         
-                        for sample in nightSamples where sample.value != HKCategoryValueSleepAnalysis.awake.rawValue && sample.value != HKCategoryValueSleepAnalysis.inBed.rawValue {
+                        for sample in nightSamples
+                            where sample.value != HKCategoryValueSleepAnalysis.awake.rawValue
+                                && sample.value != HKCategoryValueSleepAnalysis.inBed.rawValue {
                             if sample.endDate > sample.startDate {
                                 nightSleepTime += sample.endDate.timeIntervalSince(sample.startDate)
                             }
@@ -533,31 +662,51 @@ class ContextWindowHandler {
         var resultText = ""
         
         // Calories
-        let calories = try await HealthDataFetcher.shared.getAverageQuantity(for: .dietaryEnergyConsumed, startDate: startDate, endDate: endDate)
+        let calories = try await HealthDataFetcher.shared.getAverageQuantity(
+            for: .dietaryEnergyConsumed,
+            startDate: startDate,
+            endDate: endDate
+        )
         if let value = calories.0 {
             resultText += "- Calories: \(Int(value)) kcal/day\n"
         }
         
         // Protein
-        let protein = try await HealthDataFetcher.shared.getAverageQuantity(for: .dietaryProtein, startDate: startDate, endDate: endDate)
+        let protein = try await HealthDataFetcher.shared.getAverageQuantity(
+            for: .dietaryProtein,
+            startDate: startDate,
+            endDate: endDate
+        )
         if let value = protein.0 {
             resultText += "- Protein: \(Int(value)) g/day\n"
         }
         
         // Carbohydrates
-        let carbs = try await HealthDataFetcher.shared.getAverageQuantity(for: .dietaryCarbohydrates, startDate: startDate, endDate: endDate)
+        let carbs = try await HealthDataFetcher.shared.getAverageQuantity(
+            for: .dietaryCarbohydrates,
+            startDate: startDate,
+            endDate: endDate
+        )
         if let value = carbs.0 {
             resultText += "- Carbohydrates: \(Int(value)) g/day\n"
         }
         
         // Fat
-        let fat = try await HealthDataFetcher.shared.getAverageQuantity(for: .dietaryFatTotal, startDate: startDate, endDate: endDate)
+        let fat = try await HealthDataFetcher.shared.getAverageQuantity(
+            for: .dietaryFatTotal,
+            startDate: startDate,
+            endDate: endDate
+        )
         if let value = fat.0 {
             resultText += "- Fat: \(Int(value)) g/day\n"
         }
         
         // Water
-        let water = try await HealthDataFetcher.shared.getAverageQuantity(for: .dietaryWater, startDate: startDate, endDate: endDate)
+        let water = try await HealthDataFetcher.shared.getAverageQuantity(
+            for: .dietaryWater,
+            startDate: startDate,
+            endDate: endDate
+        )
         if let value = water.0 {
             let waterInLiters = value / 1000
             resultText += "- Water: \(String(format: "%.1f", waterInLiters)) L/day\n"

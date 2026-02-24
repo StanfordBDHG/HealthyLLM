@@ -10,7 +10,8 @@ import Testing
 
 
 struct HealthyLLMStudyTests {
-    @Test func example() async throws {
+    @Test
+    func example() async throws {
         #expect(true)
     }
 }

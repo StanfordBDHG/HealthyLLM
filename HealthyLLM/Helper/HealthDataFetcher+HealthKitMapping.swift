@@ -1,7 +1,7 @@
 //
 // This source file is part of the HealthyLLM based on the Stanford Spezi Template Application project
 //
-// SPDX-FileCopyrightText: 2024 Stanford University
+// SPDX-FileCopyrightText: 2026 Stanford University
 //
 // SPDX-License-Identifier: MIT
 //
@@ -11,7 +11,9 @@ import HealthKit
 
 extension HealthDataFetcher {
     static func workoutDataToCSV(_ data: [WorkoutData]) -> String {
-        guard let first = data.first else { return "" }
+        guard let first = data.first else {
+            return ""
+        }
         let statisticKeys = Array(first.statistics.keys)
         
         let header = "name,date,duration,\(statisticKeys.joined(separator: ","))"
@@ -158,11 +160,11 @@ extension HealthDataFetcher {
     }
     
     func hkStringToHKQuantityTypeIdentifier(_ hkString: String) -> (HKQuantityTypeIdentifier, HKUnit)? {
-        let _hkString = hkString
+        let normalizedString = hkString
             .replacingOccurrences(of: "HKQuantityTypeIdentifier", with: "")
             .lowercased()
-        
-        switch _hkString {
+
+        switch normalizedString {
         case "bodyMassIndex".lowercased():
             return (HKQuantityTypeIdentifier.bodyMassIndex, HKUnit.count())
         case "stairDescentSpeed".lowercased():
@@ -232,7 +234,10 @@ extension HealthDataFetcher {
         case "runningGroundContactTime".lowercased():
             return (HKQuantityTypeIdentifier.runningGroundContactTime, HKUnit.second())
         case "vo2Max".lowercased():
-            return (HKQuantityTypeIdentifier.vo2Max, HKUnit.literUnit(with: .milli).unitDivided(by: .gramUnit(with: .kilo)).unitMultiplied(by: .minute()))
+            let vo2Unit = HKUnit.literUnit(with: .milli)
+                .unitDivided(by: .gramUnit(with: .kilo))
+                .unitMultiplied(by: .minute())
+            return (HKQuantityTypeIdentifier.vo2Max, vo2Unit)
         case "stairAscentSpeed".lowercased():
             return (HKQuantityTypeIdentifier.stairAscentSpeed, HKUnit.meter().unitDivided(by: HKUnit.second()))
         case "respiratoryRate".lowercased():

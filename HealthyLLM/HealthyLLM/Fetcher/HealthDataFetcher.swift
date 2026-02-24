@@ -52,7 +52,6 @@ class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
         let bmi = bmiSample?.quantity.doubleValue(for: .count()) ?? 0
 
         return .init(
-            name: nil,
             dateOfBirth: dateOfBirth,
             sex: sex,
             height: "\(height)cm",

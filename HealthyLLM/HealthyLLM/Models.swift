@@ -9,18 +9,17 @@
 import Foundation
 
 struct UserInfo: Encodable {
-    let name: String? // periphery:ignore
-    let dateOfBirth: Date? // periphery:ignore
-    let sex: String? // periphery:ignore
-    let height: String? // periphery:ignore
-    let weight: String? // periphery:ignore
-    let bmi: String? // periphery:ignore
+    let dateOfBirth: Date?
+    let sex: String?
+    let height: String?
+    let weight: String?
+    let bmi: String?
 }
 
 struct HealthData: Encodable {
-    let name: String // periphery:ignore
-    let unit: String // periphery:ignore
-    let values: [String: [Double]] // periphery:ignore
+    let name: String
+    let unit: String
+    let values: [String: [Double]]
 }
 
 struct WorkoutData: Encodable {

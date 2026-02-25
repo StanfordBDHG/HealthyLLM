@@ -67,16 +67,18 @@ class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
             return nil
         }
 
+        let quantityType = HKQuantityType(identifier)
+
         struct TimeRangeConfig {
             let description: String
             let timeRange: HealthKitQueryTimeRange
-            let interval: DateComponents
+            let interval: HealthKit.AggregationInterval
         }
 
         let timeRanges: [TimeRangeConfig] = [
-            .init(description: "day", timeRange: .today, interval: DateComponents(hour: 1)),
-            .init(description: "week", timeRange: .currentWeek, interval: DateComponents(day: 1)),
-            .init(description: "month", timeRange: .currentMonth, interval: DateComponents(day: 1))
+            .init(description: "day", timeRange: .today, interval: .hour),
+            .init(description: "week", timeRange: .currentWeek, interval: .day),
+            .init(description: "month", timeRange: .currentMonth, interval: .day)
         ]
 
         var result: [String: [Double]] = [:]
@@ -86,32 +88,32 @@ class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
                 let timeRange = config.timeRange
                 let interval = config.interval
                 group.addTask {
-                    var bucketValues: [Double] = []
-                    let startDate = timeRange.range.lowerBound
-                    let endDate = timeRange.range.upperBound
+                    let statistics: [HKStatistics]
+                    switch quantityType.aggregationStyle {
+                    case .cumulative:
+                        statistics = try await healthKit.statisticsQuery(
+                            sampleType,
+                            aggregatedBy: [.sum],
+                            over: interval,
+                            timeRange: timeRange
+                        )
+                    case .discreteArithmetic, .discreteTemporallyWeighted:
+                        statistics = try await healthKit.statisticsQuery(
+                            sampleType,
+                            aggregatedBy: [.average],
+                            over: interval,
+                            timeRange: timeRange
+                        )
+                    default:
+                        throw HealthDataFetcherError.unsupportedAggregationStyle
+                    }
 
-                    let collection = try await healthKit.statisticsQuery(
-                        sampleType,
-                        timeRange: timeRange,
-                        interval: interval
-                    )
-
-                    collection.enumerateStatistics(from: startDate, to: endDate) { stats, _ in
-                        switch sampleType.hkSampleType.aggregationStyle {
+                    let bucketValues = statistics.map { stats -> Double in
+                        switch quantityType.aggregationStyle {
                         case .cumulative:
-                            if let sum = stats.sumQuantity() {
-                                bucketValues.append(sum.doubleValue(for: unit).rounded())
-                            } else {
-                                bucketValues.append(0.0)
-                            }
-                        case .discreteArithmetic, .discreteTemporallyWeighted:
-                            if let avg = stats.averageQuantity() {
-                                bucketValues.append(avg.doubleValue(for: unit).rounded())
-                            } else {
-                                bucketValues.append(0.0)
-                            }
+                            return stats.sumQuantity()?.doubleValue(for: unit).rounded() ?? 0.0
                         default:
-                            break
+                            return stats.averageQuantity()?.doubleValue(for: unit).rounded() ?? 0.0
                         }
                     }
 
@@ -185,42 +187,3 @@ class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
     }
 }
 
-// One-off query for aggregating health data
-extension HealthKit {
-    public func statisticsQuery<Sample>(
-        _ sampleType: SampleType<Sample>,
-        timeRange: HealthKitQueryTimeRange,
-        interval: DateComponents,
-        limit _: Int? = nil,  // swiftlint:disable:this unused_parameter
-        sortedBy _: [SortDescriptor<Sample>] = [SortDescriptor<Sample>(\.startDate, order: .forward)],  // swiftlint:disable:this unused_parameter
-        predicate filterPredicate: NSPredicate? = nil
-    ) async throws -> HKStatisticsCollection {
-        let startDate = timeRange.range.lowerBound
-        let basePredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [timeRange.predicate, filterPredicate].compactMap(\.self))
-        guard let quantityType = sampleType.hkSampleType as? HKQuantityType else {
-            throw HealthDataFetcherError.unsupportedAggregationStyle
-        }
-        var statisticsOptions: HKStatisticsOptions = []
-
-        switch quantityType.aggregationStyle {
-        case .cumulative:
-            statisticsOptions.insert(.cumulativeSum)
-        case .discreteArithmetic, .discreteTemporallyWeighted:
-            statisticsOptions.insert(.discreteAverage)
-        default:
-            throw HealthDataFetcherError.unsupportedAggregationStyle
-        }
-
-        let predicate = HKSamplePredicate<HKQuantitySample>
-            .quantitySample(type: quantityType, predicate: basePredicate)
-
-        let queryDescriptor = HKStatisticsCollectionQueryDescriptor(
-            predicate: predicate,
-            options: statisticsOptions,
-            anchorDate: startDate,
-            intervalComponents: interval
-        )
-
-        return try await queryDescriptor.result(for: healthStore)
-    }
-}

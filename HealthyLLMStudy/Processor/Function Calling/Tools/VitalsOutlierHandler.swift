@@ -10,7 +10,7 @@ import HealthKit
 
 
 class VitalsOutlierHandler: ToolHandler {
-    static var name: String = "VitalsOutlier" // periphery:ignore
+    static var name: String = "VitalsOutlier"
     
     func execute(parameters: [String: String]) async throws -> String {
         guard let maxDaysString = parameters["maxDays"],

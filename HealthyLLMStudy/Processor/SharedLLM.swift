@@ -1,8 +1,9 @@
 //
-//  SharedLLM.swift
-//  HealthyLLM
+// This source file is part of the HealthyLLM based on the Stanford Spezi Template Application project
 //
-//  Created by Leon Nissen on 1/9/25.
+// SPDX-FileCopyrightText: 2026 Stanford University
+//
+// SPDX-License-Identifier: MIT
 //
 
 import Foundation
@@ -56,7 +57,7 @@ class SharedLocalLLM: DefaultInitializable, Module, EnvironmentAccessible {
         customContext: [[String: String]],
         parameters: LLMLocalParameters,
         samplingParameters: LLMLocalSamplingParameters,
-        tools: [LLMLocalSchema.LLMTool]? = nil
+        tools: [LLMLocalSchema.LLMTool] = []
     ) async throws -> String? {
         defer {
             GPU.clearCache()

@@ -1,16 +1,18 @@
 //
 // This source file is part of the HealthyLLM based on the Stanford Spezi Template Application project
 //
-// SPDX-FileCopyrightText: 2024 Stanford University
+// SPDX-FileCopyrightText: 2026 Stanford University
 //
 // SPDX-License-Identifier: MIT
 //
 
 import SpeziChat
+import SpeziHealthKit
 import SwiftUI
 
 struct HealthyLLMChatView: View {
     @Environment(HealthDataInterpreter.self) private var healthDataInterpreter
+    @Environment(HealthKit.self) private var healthKit
     @Environment(\.dismiss) private var dismiss
     @AppStorage(StorageKeys.advancedMode) private var advancedMode = false
     
@@ -33,7 +35,7 @@ struct HealthyLLMChatView: View {
             } set: { newValue in
                 Task {
                     do {
-                        try await healthDataInterpreter.queryLLM(with: newValue)
+                        try await healthDataInterpreter.queryLLM(with: newValue, healthKit: healthKit)
                     } catch {
                         showErrorAlert = true
                         errorMessage = "Error querying LLM: \(error.localizedDescription)"
@@ -42,7 +44,8 @@ struct HealthyLLMChatView: View {
             }
             ChatView(
                 contextBinding,
-                exportFormat: .text
+                exportFormat: .text,
+                hideMessages: .custom(hiddenMessageTypes: [.assistantToolCall])
             )
             .navigationTitle("HealthyLLM")
             .toolbar {

@@ -1,15 +1,18 @@
 //
 // This source file is part of the HealthyLLM based on the Stanford Spezi Template Application project
 //
-// SPDX-FileCopyrightText: 2024 Stanford University
+// SPDX-FileCopyrightText: 2026 Stanford University
 //
 // SPDX-License-Identifier: MIT
 //
 
 import Foundation
+import HealthKit
 import OSLog
 import Spezi
 import SpeziChat
+import SpeziHealthKit
+import SpeziHealthKitUI
 import SpeziLLM
 import SpeziLLMLocal
 
@@ -47,7 +50,9 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
             maxOutputLength: 1024,
             chatTemplate: Constants.llmModelChatTemplate
         )
-        guard let defaultParameters else { return }
+        guard let defaultParameters else {
+            return
+        }
         
         let schema = LLMLocalSchema(
             model: .custom(id: Constants.llmModelName),
@@ -56,13 +61,15 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
         )
         
         sharedSession = llmRunner.callAsFunction(with: schema)
-        guard let sharedSession else { return }
-        
+        guard let sharedSession else {
+            return
+        }
+
         try await sharedSession.setup()
         loaded = true
     }
     
-    func queryLLM(with context: Chat) async throws {
+    func queryLLM(with context: Chat, healthKit: HealthKit) async throws {
         if !loaded {
             throw HealthDataInterpreterError.modelNotLoaded
         }
@@ -77,8 +84,8 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
         self.context.append(.init(.user, content: userPrompt.content))
         self.advancedContext.append(.init(.user, content: userPrompt.content))
         
-        try await checkForFunctionCall(prompt: userPrompt.content)
-        try await defaultResponse()
+        try await checkForFunctionCall(prompt: userPrompt.content, healthKit: healthKit)
+        try await defaultResponse(healthKit)
     }
     
     func resetChat() async {
@@ -86,7 +93,7 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
         advancedContext = []
     }
     
-    private func checkForFunctionCall(prompt: String) async throws {
+    private func checkForFunctionCall(prompt: String, healthKit: HealthKit) async throws {
         guard let functionCallParameters = functionCallParameters,
               let functionCallSamplingParameters = functionCallSamplingParameters,
               let sharedSession else {
@@ -117,14 +124,14 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
         
         if functionCallLLMOutput.contains("tool_call") || functionCallLLMOutput.contains("name") && functionCallLLMOutput.contains("arguments") {
             logger.info("Found function call")
-            await executeFunctionCall(output: functionCallLLMOutput)
+            await executeFunctionCall(output: functionCallLLMOutput, healthKit: healthKit)
         } else {
             advancedContext.append(.init(.assistant, content: functionCallLLMOutput))
         }
     }
     
     
-    private func defaultResponse() async throws {
+    private func defaultResponse(_ healthKit: HealthKit) async throws {
         guard let sharedSession else {
             logger.error("defaultResponse: Not initialized throwing")
             throw HealthDataInterpreterError.modelNotLoaded
@@ -136,7 +143,7 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
         )
         
         if !context.map(\.content).contains(PromptGenerator.systemPrompt) {
-            let userInfo = await healthDataFetcher.fetchUser()
+            let userInfo = await healthDataFetcher.fetchUser(healthKit)
             context.append(PromptGenerator.buildSystemPrompt(for: .default, userInfo: userInfo))
             advancedContext.append(PromptGenerator.buildSystemPrompt(for: .default, userInfo: userInfo))
         }
@@ -174,7 +181,7 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
     
     /// Returns a bool representing if a function call has been made
     @discardableResult
-    private func executeFunctionCall(output: String) async -> Bool {
+    private func executeFunctionCall(output: String, healthKit: HealthKit) async -> Bool {
         struct ToolCall: Codable {
             let name: String
             let arguments: [String: String]
@@ -194,22 +201,26 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
             guard let sampleType = toolCall.arguments["sample_type"] else {
                 return false
             }
+            print(sampleType)
             context.append(.init(.toolCall, content: output))
             advancedContext.append(.init(.toolCall, content: output))
-            let healthData = await healthDataFetcher.fetchHealth(type: sampleType)
-            context.append(PromptGenerator.buildToolResponse(of: healthData))
-            advancedContext.append(PromptGenerator.buildToolResponse(of: healthData))
-            return true
+
+            if let healthData = try? await healthDataFetcher.fetchHealth(healthKit, type: sampleType) {
+                context.append(PromptGenerator.buildToolResponse(of: healthData))
+                advancedContext.append(PromptGenerator.buildToolResponse(of: healthData))
+                return true
+            }
+
+            return false
         case "get_workout_info":
             guard let workoutType = toolCall.arguments["workout_type"] else {
                 return false
             }
             context.append(.init(.toolCall, content: output))
             advancedContext.append(.init(.toolCall, content: output))
-            let workoutData = await healthDataFetcher.fetchWorkout(type: workoutType)
-            
-            if let workoutData,
-               workoutData.count > Constants.workoutLimitJsonRepresentation {
+            let workoutData = await healthDataFetcher.fetchWorkout(healthKit, type: workoutType)
+
+            if workoutData.count > Constants.workoutLimitJsonRepresentation {
                 let csvString = HealthDataFetcher.workoutDataToCSV(workoutData)
                 context.append(PromptGenerator.buildToolResponse(of: csvString))
                 advancedContext.append(PromptGenerator.buildToolResponse(of: csvString))

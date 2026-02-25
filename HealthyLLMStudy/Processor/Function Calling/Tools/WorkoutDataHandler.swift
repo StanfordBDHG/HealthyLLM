@@ -1,8 +1,9 @@
 //
-//  WorkoutDataHandler.swift
-//  HealthyLLM
+// This source file is part of the HealthyLLM based on the Stanford Spezi Template Application project
 //
-//  Created by Leon Nissen on 3/1/25.
+// SPDX-FileCopyrightText: 2026 Stanford University
+//
+// SPDX-License-Identifier: MIT
 //
 
 import HealthKit
@@ -33,7 +34,12 @@ class WorkoutDataHandler: ToolHandler {
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
         
         return try await withCheckedThrowingContinuation { continuation in
-            let query = HKSampleQuery(sampleType: HKObjectType.workoutType(), predicate: predicate, limit: 10, sortDescriptors: [sortDescriptor]) { _, samples, error in
+            let query = HKSampleQuery(
+                sampleType: HKObjectType.workoutType(),
+                predicate: predicate,
+                limit: 10,
+                sortDescriptors: [sortDescriptor]
+            ) { _, samples, error in
                 var resultText = ""
                 
                 guard let workouts = samples as? [HKWorkout], error == nil, !workouts.isEmpty else {

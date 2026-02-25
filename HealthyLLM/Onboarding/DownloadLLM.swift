@@ -1,7 +1,7 @@
 //
 // This source file is part of the HealthyLLM based on the Stanford Spezi Template Application project
 //
-// SPDX-FileCopyrightText: 2024 Stanford University
+// SPDX-FileCopyrightText: 2026 Stanford University
 //
 // SPDX-License-Identifier: MIT
 //
@@ -16,8 +16,9 @@ struct DownloadLLM: View {
     var body: some View {
         LLMLocalDownloadView(
             model: .custom(id: Constants.llmModelName),
-            downloadDescription: "DOWNLOAD_MODEL_DESCRIPTION `\(Constants.llmModelName)`") {
-                onboardingNavigationPath.nextStep()
+            downloadDescription: "DOWNLOAD_MODEL_DESCRIPTION `\(Constants.llmModelName)`"
+        ) {
+            onboardingNavigationPath.nextStep()
         }
     }
 }

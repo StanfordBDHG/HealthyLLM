@@ -1,8 +1,9 @@
 //
-//  DebugView.swift
-//  HealthyLLM
+// This source file is part of the HealthyLLM based on the Stanford Spezi Template Application project
 //
-//  Created by Leon Nissen on 1/15/25.
+// SPDX-FileCopyrightText: 2026 Stanford University
+//
+// SPDX-License-Identifier: MIT
 //
 
 import Hub
@@ -46,7 +47,9 @@ struct DebugView: View {
                             var string = ""
                             
                             for (key, value) in values {
-                                let shortKey = key.replacingOccurrences(of: "HKCategoryTypeIdentifier", with: "").replacingOccurrences(of: "HKQuantityTypeIdentifier", with: "")
+                                let shortKey = key
+                                    .replacingOccurrences(of: "HKCategoryTypeIdentifier", with: "")
+                                    .replacingOccurrences(of: "HKQuantityTypeIdentifier", with: "")
                                 string += "\(shortKey): \(value)\n"
                             }
                             path.append(string)

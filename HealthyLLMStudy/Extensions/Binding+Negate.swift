@@ -1,8 +1,9 @@
 //
-//  Binding+negate.swift
-//  HealthyLLM
+// This source file is part of the HealthyLLM based on the Stanford Spezi Template Application project
 //
-//  Created by Leon Nissen on 1/7/25.
+// SPDX-FileCopyrightText: 2026 Stanford University
+//
+// SPDX-License-Identifier: MIT
 //
 
 import SwiftUI

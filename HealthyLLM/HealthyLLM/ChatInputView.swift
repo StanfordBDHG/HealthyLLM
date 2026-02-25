@@ -1,7 +1,7 @@
 //
 // This source file is part of the HealthyLLM based on the Stanford Spezi Template Application project
 //
-// SPDX-FileCopyrightText: 2024 Stanford University
+// SPDX-FileCopyrightText: 2026 Stanford University
 //
 // SPDX-License-Identifier: MIT
 //
@@ -61,32 +61,6 @@ struct ChatInputView: View {
                 }
                 self.promptExamples = promptExamples.shuffled()
             }
-        }
-    }
-    
-    
-    private func gridBackground<Content: View>(
-        @ViewBuilder content: () -> Content
-    ) -> some View {
-        ZStack {
-            Image(.rasterB)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .opacity(0.025)
-                .frame(maxWidth: .infinity)
-            
-            Ellipse()
-                .fill(
-                    RadialGradient(
-                        gradient: Gradient(colors: [.clear, .init(UIColor.systemBackground)]),
-                        center: .center,
-                        startRadius: 300,
-                        endRadius: 700
-                    )
-                )
-                .frame(width: 2000, height: 2000)
-                
-            content()
         }
     }
 }

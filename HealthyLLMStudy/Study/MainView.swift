@@ -1,10 +1,10 @@
 //
-//  ContentView.swift
-//  HealthyLLMStudy
+// This source file is part of the HealthyLLM based on the Stanford Spezi Template Application project
 //
-//  Created by Leon Nissen on 1/6/25.
+// SPDX-FileCopyrightText: 2026 Stanford University
 //
-
+// SPDX-License-Identifier: MIT
+//
 
 import SpeziAccessGuard
 import SpeziChat
@@ -33,6 +33,7 @@ struct MainView: View {
                     .padding(.horizontal)
                 
                 taskCell(number: 1, header: "Download the LLM", disabled: false) {
+                    // swiftlint:disable:next line_length
                     Text("To use the model we first need to download it. This will take a few minutes. Make sure you have a stable internet connection.")
                     
                     switch model.downloadManager.state {
@@ -90,7 +91,11 @@ struct MainView: View {
                 taskCell(
                     number: 2,
                     header: "Answer Questionnaire",
-                    disabled: !(model.downloadManager.state == .downloaded || model.downloadManager.state.isDownloading || model.downloadManager.state.hasError)
+                    disabled: !(
+                        model.downloadManager.state == .downloaded
+                        || model.downloadManager.state.isDownloading
+                        || model.downloadManager.state.hasError
+                    )
                 ) {
                     Text("Complete the preliminary questionnaire with basic questions before beginning the study.")
                         .frame(maxWidth: .infinity)
@@ -231,7 +236,7 @@ struct MainView: View {
     private func taskCell(
         number: Int,
         header: String,
-        disabled _disabled: Bool,
+        disabled isDisabled: Bool,
         @ViewBuilder content: () -> some View
     ) -> some View {
         GroupBox {
@@ -243,17 +248,17 @@ struct MainView: View {
                     .foregroundStyle(.white)
                     .background {
                         Circle()
-                            .foregroundStyle(_disabled ? Color(.gray) : Color(.systemBlue))
+                            .foregroundStyle(isDisabled ? Color(.gray) : Color(.systemBlue))
                             .frame(width: 30, height: 30)
                     }
                     .padding()
                 Text(header)
                     .font(.title3)
                     .bold()
-                    .foregroundStyle(_disabled ? .gray : .primary)
+                    .foregroundStyle(isDisabled ? .gray : .primary)
             }
         }
-        .disabled(_disabled)
+        .disabled(isDisabled)
         .backgroundStyle(Color(.secondarySystemGroupedBackground))
         .padding()
     }

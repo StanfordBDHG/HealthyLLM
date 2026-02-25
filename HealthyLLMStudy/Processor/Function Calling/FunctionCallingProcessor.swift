@@ -1,8 +1,9 @@
 //
-//  FunctionCallProcessor.swift
-//  HealthyLLM
+// This source file is part of the HealthyLLM based on the Stanford Spezi Template Application project
 //
-//  Created by Leon Nissen on 1/9/25.
+// SPDX-FileCopyrightText: 2026 Stanford University
+//
+// SPDX-License-Identifier: MIT
 //
 
 import Foundation
@@ -20,7 +21,7 @@ class FunctionCallingProcessor: EnvironmentAccessible, DefaultInitializable, Mod
     
     private(set) var chat: Chat = []
     var sufficientUsage: Bool {
-        chat.filter { $0.role == .user }.isEmpty
+        !chat.contains { $0.role == .user }
     }
     
     required init() {
@@ -126,7 +127,8 @@ class FunctionCallingProcessor: EnvironmentAccessible, DefaultInitializable, Mod
         User: "What's my current BMI?"
         Response: getGeneralHealthMetrics with type="bmi"
         
-        Remember: Keep your decision process simple and focused only on determining the appropriate function call. A separate process will handle the actual data retrieval and response generation.
+        Remember: Keep your decision process simple and focused only on determining the appropriate \
+        function call. A separate process will handle the actual data retrieval and response generation.
         """
         
         let tools = loadTools()
@@ -209,8 +211,10 @@ class FunctionCallingProcessor: EnvironmentAccessible, DefaultInitializable, Mod
                 continue
             }
             
-            guard let last = chat.last else { return }
-            
+            guard let last = chat.last else {
+                return
+            }
+
             chat[chat.count - 1] = .init(
                 role: last.role,
                 content: last.content + stringPiece,
@@ -219,8 +223,10 @@ class FunctionCallingProcessor: EnvironmentAccessible, DefaultInitializable, Mod
                 date: last.date
             )
         }
-        
-        guard let last = chat.last else { return }
+
+        guard let last = chat.last else {
+            return
+        }
         
         chat[chat.count - 1] = .init(
             role: last.role,

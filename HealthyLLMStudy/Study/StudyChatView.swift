@@ -1,8 +1,9 @@
 //
-//  ChatView.swift
-//  HealthyLLM
+// This source file is part of the HealthyLLM based on the Stanford Spezi Template Application project
 //
-//  Created by Leon Nissen on 1/9/25.
+// SPDX-FileCopyrightText: 2026 Stanford University
+//
+// SPDX-License-Identifier: MIT
 //
 
 import SpeziChat
@@ -34,7 +35,7 @@ struct StudyChatView: View, Identifiable {
             }
         }
         
-        ChatView(context, hideMessages: .custom(hiddenMessageTypes: []))
+        ChatView(context, hideMessages: .custom(hiddenMessageTypes: [.assistantToolCall]))
             .navigationTitle("CHAT_TITLE")
             .if(condition: { studyNavigationPath != nil }) { view in
                 view.navigationBarBackButtonHidden()

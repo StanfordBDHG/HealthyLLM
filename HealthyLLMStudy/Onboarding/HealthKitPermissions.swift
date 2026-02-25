@@ -1,0 +1,54 @@
+//
+// This source file is part of the HealthyLLM based on the Stanford Spezi Template Application project
+//
+// SPDX-FileCopyrightText: 2026 Stanford University
+//
+// SPDX-License-Identifier: MIT
+//
+
+import HealthKit
+import SpeziOnboarding
+import SwiftUI
+
+struct HealthKitPermissions: View {
+    @Environment(OnboardingNavigationPath.self) private var onboardingNavigationPath
+    
+    @State var healthKitProcessing = false
+    
+    var body: some View {
+        OnboardingView(
+            contentView: {
+                VStack {
+                    OnboardingTitleView(
+                        title: "HEALTHKIT_PERMISSIONS_TITLE",
+                        subtitle: "HEALTHKIT_PERMISSIONS_SUBTITLE"
+                    )
+                    Spacer()
+                    Image(systemName: "heart.text.square.fill")
+                        .accessibilityHidden(true)
+                        .font(.system(size: 150))
+                        .foregroundColor(.accentColor)
+                    Text("HEALTHKIT_PERMISSIONS_DESCRIPTION")
+                        .multilineTextAlignment(.center)
+                        .padding(.vertical, 16)
+                    Spacer()
+                }
+            }, actionView: {
+                OnboardingActionsView(
+                    "HEALTHKIT_PERMISSIONS_BUTTON",
+                    action: {
+                        do {
+                            healthKitProcessing = true
+                            try await HealthDataFetcher.shared.askForAuthorization()
+                        } catch {
+                            print("Could not request HealthKit permissions: \(error.localizedDescription)")
+                        }
+                        onboardingNavigationPath.nextStep()
+                        healthKitProcessing = false
+                    }
+                )
+            }
+        )
+            .navigationBarBackButtonHidden(healthKitProcessing)
+    }
+}

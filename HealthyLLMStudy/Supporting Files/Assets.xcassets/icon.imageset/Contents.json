@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "custom.chart.bar.xaxis.bubble.left@10x.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

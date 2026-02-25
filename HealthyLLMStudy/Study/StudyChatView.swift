@@ -1,0 +1,69 @@
+//
+// This source file is part of the HealthyLLM based on the Stanford Spezi Template Application project
+//
+// SPDX-FileCopyrightText: 2026 Stanford University
+//
+// SPDX-License-Identifier: MIT
+//
+
+import SpeziChat
+import SpeziOnboarding
+import SpeziViews
+import SwiftUI
+
+struct StudyChatView: View, Identifiable {
+    let id: String
+    @State var processor: any ChatProcessor
+    
+    @Environment(OnboardingNavigationPath.self) private var studyNavigationPath: OnboardingNavigationPath?
+    @State private var showError = false
+    @State private var error: String = ""
+    
+    var body: some View {
+        let context = Binding<Chat> {
+            processor.chat
+        } set: { newValue in
+            Task {
+                do {
+                    try await processor.query(with: newValue)
+                } catch is CancellationError {
+                    return
+                } catch {
+                    self.error = error.localizedDescription
+                    showError = true
+                }
+            }
+        }
+        
+        ChatView(context, hideMessages: .custom(hiddenMessageTypes: [.assistantToolCall]))
+            .navigationTitle("CHAT_TITLE")
+            .if(condition: { studyNavigationPath != nil }) { view in
+                view.navigationBarBackButtonHidden()
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(action: { processor.reset() }) {
+                        Image(systemName: "arrow.counterclockwise")
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("NEXT", action: continueButtonAction)
+                    .disabled(!processor.sufficientUsage)
+                }
+            }
+            .alert("ERROR", isPresented: $showError) {
+                Button(role: .cancel, action: { }) {
+                    Text("OK")
+                }
+            } message: {
+                Text(error)
+            }
+    }
+    
+    private func continueButtonAction() {
+        processor.stop()
+        studyNavigationPath?.nextStep()
+    }
+}
+
+extension ChatEntity: @retroactive @unchecked Sendable { }

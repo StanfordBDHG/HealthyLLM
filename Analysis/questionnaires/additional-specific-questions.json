@@ -1,0 +1,192 @@
+{
+  "resourceType": "Questionnaire",
+  "language": "en-US",
+  "title": "Additional Specific Questions",
+  "status": "draft",
+  "meta": {
+    "profile": [
+      "http://spezi.health/fhir/StructureDefinition/sdf-Questionnaire"
+    ],
+    "tag": [
+      {
+        "system": "urn:ietf:bcp:47",
+        "code": "en-US",
+        "display": "English"
+      }
+    ]
+  },
+  "useContext": [
+    {
+      "code": {
+        "system": "http://hl7.org/fhir/ValueSet/usage-context-type",
+        "code": "focus",
+        "display": "Clinical Focus"
+      },
+      "valueCodeableConcept": {
+        "coding": [
+          {
+            "system": "urn:oid:2.16.578.1.12.4.1.1.8655",
+            "display": "Additional Specific Questions"
+          }
+        ]
+      }
+    }
+  ],
+  "subjectType": [
+    "Patient"
+  ],
+  "item": [
+    {
+      "linkId": "4c8a3e00-303a-4bd5-8806-dc1a51b5507f",
+      "type": "display",
+      "text": "Now, we’d like to ask questions on a specific topic. Please think of a question you would ask a large language model related to this topic.",
+      "required": false,
+      "_text": {
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/rendering-markdown",
+            "valueMarkdown": "Now, we’d like to ask questions on a specific topic. Please think of a question you would ask a large language model related to this topic."
+          }
+        ]
+      }
+    },
+    {
+      "linkId": "f039913e-9e30-4292-c464-b18415f2f0f1",
+      "type": "text",
+      "text": "What is a cardio-related question you would like to ask a language model? - Question 1",
+      "required": true
+    },
+    {
+      "linkId": "df550e81-2f3b-4762-8a6d-0b0dfd6db527",
+      "type": "text",
+      "text": "What is a cardio-related question you would like to ask a language model? - Question 2",
+      "required": false,
+      "extension": [
+        {
+          "url": "http://helsenorge.no/fhir/StructureDefinition/sdf-sublabel",
+          "valueMarkdown": "What is a **cardio**\\-related question you would like to ask a language model?"
+        }
+      ]
+    },
+    {
+      "linkId": "4ab518fb-173f-415b-cf8e-ac31eecd08e8",
+      "type": "text",
+      "text": "What is a cardio-related question you would like to ask a language model? - Question 3",
+      "required": false,
+      "extension": [
+        {
+          "url": "http://helsenorge.no/fhir/StructureDefinition/sdf-sublabel",
+          "valueMarkdown": "What is a **cardio**\\-related question you would like to ask a language model?"
+        }
+      ]
+    },
+    {
+      "linkId": "b8d501f4-5b44-423a-8511-c261bcccbcb2",
+      "type": "text",
+      "text": "What is a stress-related question you would like to ask a language model? - Question 1",
+      "required": true,
+      "extension": [
+        {
+          "url": "http://helsenorge.no/fhir/StructureDefinition/sdf-sublabel",
+          "valueMarkdown": "What is a **stress**\\-related question you would like to ask a language model?"
+        }
+      ]
+    },
+    {
+      "linkId": "8a60d0d8-2c4e-4185-e812-97c749b993f5",
+      "type": "text",
+      "text": "What is a stress-related question you would like to ask a language model? - Question 2",
+      "required": false,
+      "extension": [
+        {
+          "url": "http://helsenorge.no/fhir/StructureDefinition/sdf-sublabel",
+          "valueMarkdown": "What is a **stress**\\-related question you would like to ask a language model?"
+        }
+      ]
+    },
+    {
+      "linkId": "b26eaa27-80c4-40dd-cf96-b8994e638dca",
+      "type": "text",
+      "text": "What is a stress-related question you would like to ask a language model? - Question 3",
+      "required": false,
+      "extension": [
+        {
+          "url": "http://helsenorge.no/fhir/StructureDefinition/sdf-sublabel",
+          "valueMarkdown": "What is a **stress**\\-related question you would like to ask a language model?"
+        }
+      ]
+    },
+    {
+      "linkId": "c2937fdc-15e9-4106-cd97-d5bfcc148e83",
+      "type": "text",
+      "text": "What is a sleep-related question you would like to ask a language model? - Question 1",
+      "required": true,
+      "extension": [
+        {
+          "url": "http://helsenorge.no/fhir/StructureDefinition/sdf-sublabel",
+          "valueMarkdown": "What is a **sleep**\\-related question you would like to ask a language model?"
+        }
+      ]
+    },
+    {
+      "linkId": "f6d1a5fc-5225-4aa6-9ca7-9736d6c246ef",
+      "type": "text",
+      "text": "What is a sleep-related question you would like to ask a language model? - Question 2",
+      "required": false,
+      "extension": [
+        {
+          "url": "http://helsenorge.no/fhir/StructureDefinition/sdf-sublabel",
+          "valueMarkdown": "What is a **sleep**\\-related question you would like to ask a language model?"
+        }
+      ]
+    },
+    {
+      "linkId": "a3364b54-d255-4659-f723-d02886661301",
+      "type": "text",
+      "text": "What is a sleep-related question you would like to ask a language model? - Question 3",
+      "required": false,
+      "extension": [
+        {
+          "url": "http://helsenorge.no/fhir/StructureDefinition/sdf-sublabel",
+          "valueMarkdown": "What is a **sleep**\\-related question you would like to ask a language model?"
+        }
+      ]
+    },
+    {
+      "linkId": "8b1f069c-aa11-4fba-9e5a-8b6d285ec4c4",
+      "type": "text",
+      "text": "What is a heart-related question you would like to ask a language model? - Question 1",
+      "required": true,
+      "extension": [
+        {
+          "url": "http://helsenorge.no/fhir/StructureDefinition/sdf-sublabel",
+          "valueMarkdown": "What is a **heart**\\-related question you would like to ask a language model?"
+        }
+      ]
+    },
+    {
+      "linkId": "69ae2da8-ba99-49d3-84e2-0c5f39d18211",
+      "type": "text",
+      "text": "What is a heart-related question you would like to ask a language model? - Question 2",
+      "required": false,
+      "extension": [
+        {
+          "url": "http://helsenorge.no/fhir/StructureDefinition/sdf-sublabel",
+          "valueMarkdown": "What is a **heart**\\-related question you would like to ask a language model?"
+        }
+      ]
+    },
+    {
+      "linkId": "d2313cfa-b26a-4973-a88a-a046d4cb0ab4",
+      "type": "text",
+      "text": "What is a heart-related question you would like to ask a language model? - Question 3",
+      "required": false,
+      "extension": [
+        {
+          "url": "http://helsenorge.no/fhir/StructureDefinition/sdf-sublabel",
+          "valueMarkdown": "What is a **heart**\\-related question you would like to ask a language model?"
+        }
+      ]
+    }
+  ]
+}

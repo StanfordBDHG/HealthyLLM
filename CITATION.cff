@@ -9,9 +9,9 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 authors:
-- family-names: "Schmiedmayer"
-  given-names: "Paul"
-  orcid: "https://orcid.org/0000-0002-8607-9148"
-title: "TemplateApplication"
-doi: 10.5281/zenodo.7633671
-url: "https://github.com/StanfordBDHG/TemplateApplication"
+- family-names: "Nissen"
+  given-names: "Leon"
+  orcid: "https://orcid.org/0009-0009-3884-0850"
+title: "HealthyLLM"
+doi: N/A
+url: "https://github.com/StanfordBDHG/HealthyLLM"

@@ -1,0 +1,134 @@
+[
+    {
+        "type": "function",
+        "function": {
+            "name": "getVitalSigns",
+            "description": "Retrieves average vital sign measurements from health monitoring devices over a specified time period. Useful for monitoring cardiovascular health and respiratory function.",
+            "parameters": {
+                "title": "Vital Signs Parameters",
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": ["heartRate", "restingHeartRate", "bloodPressure", "respiratoryRate", "oxygenSaturation"],
+                        "description": "The specific vital sign measurement to retrieve data for. Options include heartRate (beats per minute), restingHeartRate (BPM at rest), bloodPressure (systolic/diastolic), respiratoryRate (breaths per minute), and oxygenSaturation (SpO2 percentage)."
+                    },
+                    "weeksToAverage": {
+                        "type": "string",
+                        "description": "Number of weeks of data to include in the average calculation. Use '1' for one week, '4' for one month, etc. Maximum allowed is '52' for one year."
+                    }
+                },
+                "required": ["type", "weeksToAverage"],
+                "additionalProperties": false
+            },
+            "strict": true
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "getGeneralHealthMetrics",
+            "description": "Provides the most recent measurements for fundamental body composition metrics. These values represent the latest recorded measurements rather than averages.",
+            "parameters": {
+                "title": "General Health Metrics Parameters",
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": ["weight", "bmi", "bodyFat", "height"],
+                        "description": "The specific health metric to retrieve. Weight (in kg/lbs), BMI (Body Mass Index), bodyFat (percentage), or height (in cm/inches)."
+                    }
+                },
+                "required": ["type"],
+                "additionalProperties": false
+            },
+            "strict": true
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "getActivity",
+            "description": "Calculates daily averages for physical activity metrics over a specified time period. Useful for assessing overall activity levels and energy expenditure.",
+            "parameters": {
+                "title": "Activity Data Parameters",
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": ["steps", "distance", "flightsClimbed", "activeEnergy", "basalEnergy", "standHours", "exerciseMinutes"],
+                        "description": "The specific activity metric to retrieve. Options include steps (count), distance (km/miles), flightsClimbed (count), activeEnergy (calories burned during activity), basalEnergy (resting calories burned), standHours (hours spent standing), and exerciseMinutes (time spent exercising)."
+                    },
+                    "maxDays": {
+                        "type": "string",
+                        "description": "The number of past days to include when calculating the daily average. Use '7' for one week, '30' for one month, etc. Maximum allowed is '30' for one month."
+                    }
+                },
+                "required": ["type", "maxDays"],
+                "additionalProperties": false
+            },
+            "strict": true
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "getActivityOverview",
+            "description": "Provides a comprehensive year-long overview of a single activity metric, showing monthly trends and patterns over the past 12 months.",
+            "parameters": {
+                "title": "Activity Overview Parameters",
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": ["steps", "distance", "flightsClimbed", "activeEnergy", "basalEnergy", "standHours", "exerciseMinutes"],
+                        "description": "The specific activity metric to analyze over a one-year period. Returns monthly aggregated data for the selected metric."
+                    }
+                },
+                "required": ["type"],
+                "additionalProperties": false
+            },
+            "strict": true
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "getRecentWorkouts",
+            "description": "Retrieves detailed information about individual workout sessions completed within a specified time period, including duration, type, calories burned and other workout-specific metrics.",
+            "parameters": {
+                "title": "Recent Workouts Parameters",
+                "type": "object",
+                "properties": {
+                    "maxDays": {
+                        "type": "string",
+                        "description": "The number of past days to retrieve workout data for. Each workout session will be returned as a separate entry with complete metrics. Use '7' for one week, '30' for one month, etc."
+                    }
+                },
+                "required": ["maxDays"],
+                "additionalProperties": false
+            },
+            "strict": true
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "getSleep",
+            "description": "Analyzes sleep patterns over a specified time period, providing data on duration, quality, and sleep stages (deep, REM, light sleep).",
+            "parameters": {
+                "title": "Sleep Data Parameters",
+                "type": "object",
+                "properties": {
+                    "maxDays": {
+                        "type": "string",
+                        "description": "The number of past days to include in the sleep analysis. Returns both individual nightly data and aggregated averages. Use '7' for one week, '30' for one month, max value is '30'."
+                    }
+                },
+                "required": ["maxDays"],
+                "additionalProperties": false
+            },
+            "strict": true
+        }
+    }
+]

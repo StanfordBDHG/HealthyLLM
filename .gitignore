@@ -7,11 +7,9 @@
 #
 
 # Swift Package Manager
-*.xcodeproj
 .swiftpm
 .derivedData
 .build
-!TemplateApplication.xcodeproj
 
 # IDE related folders
 .idea

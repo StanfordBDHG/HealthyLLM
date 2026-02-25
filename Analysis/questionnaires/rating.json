@@ -1,0 +1,302 @@
+{
+  "resourceType": "Questionnaire",
+  "language": "en-US",
+  "title": "Rating",
+  "status": "active",
+  "meta": {
+    "profile": [
+      "http://spezi.health/fhir/StructureDefinition/sdf-Questionnaire"
+    ],
+    "tag": [
+      {
+        "system": "urn:ietf:bcp:47",
+        "code": "en-US",
+        "display": "English"
+      }
+    ]
+  },
+  "useContext": [
+    {
+      "code": {
+        "system": "http://hl7.org/fhir/ValueSet/usage-context-type",
+        "code": "focus",
+        "display": "Clinical Focus"
+      },
+      "valueCodeableConcept": {
+        "coding": [
+          {
+            "system": "urn:oid:2.16.578.1.12.4.1.1.8655",
+            "display": "Rating"
+          }
+        ]
+      }
+    }
+  ],
+  "subjectType": [
+    "Patient"
+  ],
+  "item": [
+    {
+      "linkId": "38db91a3-98a0-43da-800b-77c713ec2940",
+      "type": "group",
+      "text": "Rating Please answer if you agree with the following statements.",
+      "required": false,
+      "_text": {
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/rendering-markdown",
+            "valueMarkdown": "### Rating\n\nPlease answer if you agree with the following statements."
+          }
+        ]
+      },
+      "item": [
+        {
+          "linkId": "43f4b1a7-3eca-4652-8efb-684551b91336",
+          "type": "choice",
+          "text": "The model responded fast and in a timely manner.",
+          "required": true,
+          "answerOption": [
+            {
+              "valueCoding": {
+                "id": "e3bdcbcd-13ab-4ba1-85da-631339b5f598",
+                "code": "strongly-disagree",
+                "system": "urn:uuid:afc40182-477e-4e9e-8bea-459daf92965f",
+                "display": "Strongly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "2deca408-947d-4560-c1c2-8cd891286bec",
+                "code": "slightly-disagree",
+                "system": "urn:uuid:afc40182-477e-4e9e-8bea-459daf92965f",
+                "display": "Slightly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "909a7576-1b3d-4389-9977-1fdaa2a3bb33",
+                "code": "neutral",
+                "system": "urn:uuid:afc40182-477e-4e9e-8bea-459daf92965f",
+                "display": "Neutral"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "d2503799-ca44-44d8-8c9d-3e21f77ec3ed",
+                "code": "slightly-agree",
+                "system": "urn:uuid:afc40182-477e-4e9e-8bea-459daf92965f",
+                "display": "Slightly Agree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "9857ee14-b390-44e4-c9fe-d545c30954e8",
+                "code": "strongly-agree",
+                "system": "urn:uuid:afc40182-477e-4e9e-8bea-459daf92965f",
+                "display": "Strongly Agree"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "252f4ed3-2603-4116-ac35-bd37907ddd0b",
+          "type": "choice",
+          "text": "The model adequately addressed my questions.",
+          "required": true,
+          "answerOption": [
+            {
+              "valueCoding": {
+                "id": "e3bdcbcd-13ab-4ba1-85da-631339b5f598",
+                "code": "strongly-disagree",
+                "system": "urn:uuid:afc40182-477e-4e9e-8bea-459daf92965f",
+                "display": "Strongly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "2deca408-947d-4560-c1c2-8cd891286bec",
+                "code": "slightly-disagree",
+                "system": "urn:uuid:afc40182-477e-4e9e-8bea-459daf92965f",
+                "display": "Slightly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "909a7576-1b3d-4389-9977-1fdaa2a3bb33",
+                "code": "neutral",
+                "system": "urn:uuid:afc40182-477e-4e9e-8bea-459daf92965f",
+                "display": "Neutral"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "d2503799-ca44-44d8-8c9d-3e21f77ec3ed",
+                "code": "slightly-agree",
+                "system": "urn:uuid:afc40182-477e-4e9e-8bea-459daf92965f",
+                "display": "Slightly Agree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "9857ee14-b390-44e4-c9fe-d545c30954e8",
+                "code": "strongly-agree",
+                "system": "urn:uuid:afc40182-477e-4e9e-8bea-459daf92965f",
+                "display": "Strongly Agree"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "37b92b4b-f1ad-434a-828e-e1646be222ff",
+          "type": "choice",
+          "text": "The model’s responses accurately reflect my health metrics.",
+          "required": true,
+          "answerOption": [
+            {
+              "valueCoding": {
+                "id": "e3bdcbcd-13ab-4ba1-85da-631339b5f598",
+                "code": "strongly-disagree",
+                "system": "urn:uuid:afc40182-477e-4e9e-8bea-459daf92965f",
+                "display": "Strongly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "2deca408-947d-4560-c1c2-8cd891286bec",
+                "code": "slightly-disagree",
+                "system": "urn:uuid:afc40182-477e-4e9e-8bea-459daf92965f",
+                "display": "Slightly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "909a7576-1b3d-4389-9977-1fdaa2a3bb33",
+                "code": "neutral",
+                "system": "urn:uuid:afc40182-477e-4e9e-8bea-459daf92965f",
+                "display": "Neutral"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "d2503799-ca44-44d8-8c9d-3e21f77ec3ed",
+                "code": "slightly-agree",
+                "system": "urn:uuid:afc40182-477e-4e9e-8bea-459daf92965f",
+                "display": "Slightly Agree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "9857ee14-b390-44e4-c9fe-d545c30954e8",
+                "code": "strongly-agree",
+                "system": "urn:uuid:afc40182-477e-4e9e-8bea-459daf92965f",
+                "display": "Strongly Agree"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "a7ddcb5c-19be-4a75-836e-7cfec0ad896f",
+          "type": "choice",
+          "text": "The model’s answers were clear and easy to understand.",
+          "required": true,
+          "answerOption": [
+            {
+              "valueCoding": {
+                "id": "e3bdcbcd-13ab-4ba1-85da-631339b5f598",
+                "code": "strongly-disagree",
+                "system": "urn:uuid:afc40182-477e-4e9e-8bea-459daf92965f",
+                "display": "Strongly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "2deca408-947d-4560-c1c2-8cd891286bec",
+                "code": "slightly-disagree",
+                "system": "urn:uuid:afc40182-477e-4e9e-8bea-459daf92965f",
+                "display": "Slightly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "909a7576-1b3d-4389-9977-1fdaa2a3bb33",
+                "code": "neutral",
+                "system": "urn:uuid:afc40182-477e-4e9e-8bea-459daf92965f",
+                "display": "Neutral"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "d2503799-ca44-44d8-8c9d-3e21f77ec3ed",
+                "code": "slightly-agree",
+                "system": "urn:uuid:afc40182-477e-4e9e-8bea-459daf92965f",
+                "display": "Slightly Agree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "9857ee14-b390-44e4-c9fe-d545c30954e8",
+                "code": "strongly-agree",
+                "system": "urn:uuid:afc40182-477e-4e9e-8bea-459daf92965f",
+                "display": "Strongly Agree"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "b03a1513-48de-4ae3-8671-e9c92484682f",
+          "type": "choice",
+          "text": "How do you rate the local LLM compared to ChatGPT in terms of performance and response quality?",
+          "required": true,
+          "answerOption": [
+            {
+              "valueCoding": {
+                "id": "e3bdcbcd-13ab-4ba1-85da-631339b5f598",
+                "code": "significantly-worse",
+                "system": "urn:uuid:afc40182-477e-4e9e-8bea-459daf92965f",
+                "display": "Significantly Worse"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "2deca408-947d-4560-c1c2-8cd891286bec",
+                "code": "slightly-worse",
+                "system": "urn:uuid:afc40182-477e-4e9e-8bea-459daf92965f",
+                "display": "Slightly Worse"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "909a7576-1b3d-4389-9977-1fdaa2a3bb33",
+                "code": "same",
+                "system": "urn:uuid:afc40182-477e-4e9e-8bea-459daf92965f",
+                "display": "Same"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "d2503799-ca44-44d8-8c9d-3e21f77ec3ed",
+                "code": "slightly-better",
+                "system": "urn:uuid:afc40182-477e-4e9e-8bea-459daf92965f",
+                "display": "Slightly Better"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "9857ee14-b390-44e4-c9fe-d545c30954e8",
+                "code": "significantly-better",
+                "system": "urn:uuid:afc40182-477e-4e9e-8bea-459daf92965f",
+                "display": "Significantly Better"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "5a722080-c316-4724-9736-de9e96d9ad58",
+      "type": "text",
+      "text": "Additional comments",
+      "required": false
+    }
+  ]
+}

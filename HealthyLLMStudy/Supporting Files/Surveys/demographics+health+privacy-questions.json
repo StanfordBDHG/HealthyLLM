@@ -1,0 +1,590 @@
+{
+  "resourceType": "Questionnaire",
+  "language": "en-US",
+  "title": "Usability and User Experience",
+  "status": "draft",
+  "meta": {
+    "profile": [
+      "http://spezi.health/fhir/StructureDefinition/sdf-Questionnaire"
+    ],
+    "tag": [
+      {
+        "system": "urn:ietf:bcp:47",
+        "code": "en-US",
+        "display": "English"
+      }
+    ]
+  },
+  "useContext": [
+    {
+      "code": {
+        "system": "http://hl7.org/fhir/ValueSet/usage-context-type",
+        "code": "focus",
+        "display": "Clinical Focus"
+      },
+      "valueCodeableConcept": {
+        "coding": [
+          {
+            "system": "urn:oid:2.16.578.1.12.4.1.1.8655",
+            "display": "System Usability Scale"
+          }
+        ]
+      }
+    }
+  ],
+  "subjectType": [
+    "Patient"
+  ],
+  "item": [
+    {
+      "linkId": "91873d61-bfe5-4a25-833e-901dba02986e",
+      "type": "group",
+      "text": "Demographic Information",
+      "required": false,
+      "item": [
+        {
+          "linkId": "a27d9859-3c9e-490a-aeca-1e6cb6f951eb",
+          "type": "choice",
+          "text": "Primary Device Used",
+          "required": true,
+          "answerOption": [
+            {
+              "valueCoding": {
+                "id": "edd49891-3853-4ef4-85f7-7ca76c75c75e",
+                "code": "smartphone",
+                "system": "urn:uuid:3442e1d2-8738-43c3-df97-471e2237c8b6",
+                "display": "Smartphone"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "78e6db2e-71d6-4d8a-a0a1-2062510cf299",
+                "code": "tablet",
+                "system": "urn:uuid:3442e1d2-8738-43c3-df97-471e2237c8b6",
+                "display": "Tablet"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "de8a301e-3ffc-43b4-8dfd-59f13c7a29ea",
+                "code": "laptop",
+                "system": "urn:uuid:3442e1d2-8738-43c3-df97-471e2237c8b6",
+                "display": "Laptop"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "92994503-094e-442b-801f-b710b3b68cd4",
+                "code": "desktop",
+                "system": "urn:uuid:3442e1d2-8738-43c3-df97-471e2237c8b6",
+                "display": "Desktop"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "a727b382-96d8-4305-e843-fe040930b1ec",
+          "type": "boolean",
+          "text": "Use Apple Watch",
+          "required": true
+        },
+        {
+          "linkId": "849122b3-5e73-44b1-8ed5-ed143df90a9d",
+          "type": "choice",
+          "text": "How often do you use ChatGPT?",
+          "required": true,
+          "answerOption": [
+            {
+              "valueCoding": {
+                "id": "955a3ca4-0c14-4fcb-ce55-22ef8f0dfacc",
+                "code": "multiple-times-a-day",
+                "system": "urn:uuid:c5a454c9-9526-496c-8979-49bbbc459454",
+                "display": "Multiple times a day"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "bb540dcf-501a-4853-86d9-927a8ddf76f9",
+                "code": "once-a-day",
+                "system": "urn:uuid:c5a454c9-9526-496c-8979-49bbbc459454",
+                "display": "Once a day"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "7950358f-bacf-4827-8c5e-10e9238551ab",
+                "code": "a-few-times-a-week",
+                "system": "urn:uuid:c5a454c9-9526-496c-8979-49bbbc459454",
+                "display": "A few times a week"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "ed444d39-de59-4beb-8d0e-2127cbdcee01",
+                "code": "once-a-week",
+                "system": "urn:uuid:c5a454c9-9526-496c-8979-49bbbc459454",
+                "display": "Once a week"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "fbfebb02-55ce-4fb0-8e04-a57b3ff07378",
+                "code": "less-than-once-a-week",
+                "system": "urn:uuid:c5a454c9-9526-496c-8979-49bbbc459454",
+                "display": "Less than once a week"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "fbccd584-8a91-4116-fd71-fd096b1db53c",
+                "code": "rarely-or-never",
+                "system": "urn:uuid:c5a454c9-9526-496c-8979-49bbbc459454",
+                "display": "Rarely or never"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "2bf5f69a-a1e2-463e-c5d7-fa498b35c100",
+      "type": "group",
+      "text": "Health Data",
+      "required": false,
+      "item": [
+        {
+          "linkId": "ae542329-9996-4bad-8108-6ff3a6ba45cc",
+          "type": "choice",
+          "text": "I am using the Apple Health (& Fitness) app often",
+          "required": true,
+          "answerOption": [
+            {
+              "valueCoding": {
+                "id": "58f471bb-fc89-4206-b475-25efea1c19ca",
+                "code": "multiple-times-a-day",
+                "system": "urn:uuid:f47000a7-3cac-47a2-84ad-ff158e06733a",
+                "display": "Multiple times a day"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "9da3d13e-1a7c-4478-ce43-507ed3e17aa7",
+                "code": "once-a-day",
+                "system": "urn:uuid:f47000a7-3cac-47a2-84ad-ff158e06733a",
+                "display": "Once a day"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "3ba960d0-e84c-4183-ba2b-7bf15a7e4094",
+                "code": "a-few-times-a-week",
+                "system": "urn:uuid:f47000a7-3cac-47a2-84ad-ff158e06733a",
+                "display": "A few times a week"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "0cc41089-8353-46c2-a22f-ceacdbc6d0cc",
+                "code": "once-a-week",
+                "system": "urn:uuid:f47000a7-3cac-47a2-84ad-ff158e06733a",
+                "display": "Once a week"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "69f2d345-8035-445e-e529-8d6fb304797a",
+                "code": "less-than-once-a-week",
+                "system": "urn:uuid:f47000a7-3cac-47a2-84ad-ff158e06733a",
+                "display": "Less than once a week"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "cea64902-1e99-48b4-f582-60b5b0186976",
+                "code": "rarely-or-never",
+                "system": "urn:uuid:f47000a7-3cac-47a2-84ad-ff158e06733a",
+                "display": "Rarely or never"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "273ca073-a0b9-4e15-8803-c94c41990937",
+          "type": "choice",
+          "text": "How often do you track your health metrics such as workouts, sleep, steps, etc.",
+          "required": true,
+          "answerOption": [
+            {
+              "valueCoding": {
+                "id": "58f471bb-fc89-4206-b475-25efea1c19ca",
+                "code": "multiple-times-a-day",
+                "system": "urn:uuid:f47000a7-3cac-47a2-84ad-ff158e06733a",
+                "display": "Multiple times a day"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "9da3d13e-1a7c-4478-ce43-507ed3e17aa7",
+                "code": "once-a-day",
+                "system": "urn:uuid:f47000a7-3cac-47a2-84ad-ff158e06733a",
+                "display": "Once a day"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "3ba960d0-e84c-4183-ba2b-7bf15a7e4094",
+                "code": "a-few-times-a-week",
+                "system": "urn:uuid:f47000a7-3cac-47a2-84ad-ff158e06733a",
+                "display": "A few times a week"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "0cc41089-8353-46c2-a22f-ceacdbc6d0cc",
+                "code": "once-a-week",
+                "system": "urn:uuid:f47000a7-3cac-47a2-84ad-ff158e06733a",
+                "display": "Once a week"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "69f2d345-8035-445e-e529-8d6fb304797a",
+                "code": "less-than-once-a-week",
+                "system": "urn:uuid:f47000a7-3cac-47a2-84ad-ff158e06733a",
+                "display": "Less than once a week"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "cea64902-1e99-48b4-f582-60b5b0186976",
+                "code": "rarely-or-never",
+                "system": "urn:uuid:f47000a7-3cac-47a2-84ad-ff158e06733a",
+                "display": "Rarely or never"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "24ab9f37-7359-44f8-85b9-ffad02c85d19",
+          "type": "choice",
+          "text": "How confident are you in your understanding of the health metrics in the Apple Health app?",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "id": "6ed933b2-abb1-4827-c3f0-f090a4d7e6d9",
+                "code": "not-at-all-confident",
+                "system": "urn:uuid:79519a67-f741-4579-8761-3f9a53e6bdd9",
+                "display": "Not at all confident"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "54e53921-845e-4e3a-8618-0383bd0af531",
+                "code": "slightly-confident",
+                "system": "urn:uuid:79519a67-f741-4579-8761-3f9a53e6bdd9",
+                "display": "Slightly confident"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "0bff03e6-c39e-4656-86d7-434997a642b9",
+                "code": "moderately-confident",
+                "system": "urn:uuid:79519a67-f741-4579-8761-3f9a53e6bdd9",
+                "display": "Moderately confident"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "2c39f1e0-d124-4229-8edd-e043fd6a567e",
+                "code": "fairly-confident",
+                "system": "urn:uuid:79519a67-f741-4579-8761-3f9a53e6bdd9",
+                "display": "Fairly confident"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "7f94ff77-e5ef-4db4-843e-4fb01cc71acc",
+                "code": "extremely-confident",
+                "system": "urn:uuid:79519a67-f741-4579-8761-3f9a53e6bdd9",
+                "display": "Extremely confident"
+              }
+            }
+          ],
+          "required": true
+        },
+        {
+          "linkId": "99d7869c-7345-44e6-87ac-d2d679e59019",
+          "type": "choice",
+          "text": "I would use a system that explains my Apple Health data to me in more detail and can answer follow-up questions.",
+          "required": true,
+          "answerOption": [
+            {
+              "valueCoding": {
+                "id": "3d5e5499-8926-43e0-ac31-6733827600d8",
+                "code": "strongly-disagree",
+                "system": "urn:uuid:aacdca48-1868-4380-8d40-35b448df88f6",
+                "display": "Strongly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "4ab233bb-93d9-496f-f8d1-7ce85a551118",
+                "code": "slightly-disagree",
+                "system": "urn:uuid:aacdca48-1868-4380-8d40-35b448df88f6",
+                "display": "Slightly Disagree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "e2d72c15-ec25-419b-974d-7745f27e9ce7",
+                "code": "neutral",
+                "system": "urn:uuid:aacdca48-1868-4380-8d40-35b448df88f6",
+                "display": "Neutral"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "49991c87-01fb-4968-8a57-cc608cf6a375",
+                "code": "slightly-agree",
+                "system": "urn:uuid:aacdca48-1868-4380-8d40-35b448df88f6",
+                "display": "Slightly Agree"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "a9517e1f-33cf-4ca0-e5b6-f53f94cc8fd5",
+                "code": "strongly-agree",
+                "system": "urn:uuid:aacdca48-1868-4380-8d40-35b448df88f6",
+                "display": "Strongly Agree"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "61c8022c-3cbe-49dd-c73d-5899235a092f",
+          "type": "choice",
+          "text": "How important is your health to you?",
+          "required": true,
+          "answerOption": [
+            {
+              "valueCoding": {
+                "id": "f0ac048d-7c9a-4b67-ef8c-37739448cd7e",
+                "code": "not-very-important",
+                "system": "urn:uuid:1c7ba84b-13bb-4359-8325-ebfb1779653b",
+                "display": "Not Very important"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "56cc0ed0-a5da-486f-8461-300f7453afb6",
+                "code": "slightly-unimportant",
+                "system": "urn:uuid:1c7ba84b-13bb-4359-8325-ebfb1779653b",
+                "display": "Slightly Unimportant"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "28432e29-5b77-4fb4-eb94-818ad0bca7a5",
+                "code": "neutral",
+                "system": "urn:uuid:1c7ba84b-13bb-4359-8325-ebfb1779653b",
+                "display": "Neutral"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "006f438b-bfbf-4b6d-8a02-c134d7ced9da",
+                "code": "slightly-important",
+                "system": "urn:uuid:1c7ba84b-13bb-4359-8325-ebfb1779653b",
+                "display": "Slightly Important"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "13ea94a3-7c5e-4abe-a684-a44d252f6167",
+                "code": "very-important",
+                "system": "urn:uuid:1c7ba84b-13bb-4359-8325-ebfb1779653b",
+                "display": "Very Important"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "adbcd52d-cdda-4107-8c64-e48b497a9a0d",
+      "type": "text",
+      "text": "If a system could explain your health data, what features or insights would you find most valuable?",
+      "required": true
+    },
+    {
+      "linkId": "b91cac83-4c22-4ba0-81ad-d285e08bab8c",
+      "type": "group",
+      "text": "Privacy",
+      "required": false,
+      "item": [
+        {
+          "linkId": "ff8deb57-7331-4044-80dd-a7166620a924",
+          "type": "choice",
+          "text": "When considering new technologies, what do you value more, privacy or performance?",
+          "required": true,
+          "answerOption": [
+            {
+              "valueCoding": {
+                "id": "25fc9943-4fb3-460f-c419-651458da4666",
+                "code": "strongly-prefer-privacy",
+                "system": "urn:uuid:ad9472c6-6d57-4524-9138-c98be0048a92",
+                "display": "Strongly prefer privacy"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "d2f1a345-e9cc-4688-b390-dd96114741a8",
+                "code": "slightly-prefer-privacy",
+                "system": "urn:uuid:ad9472c6-6d57-4524-9138-c98be0048a92",
+                "display": "Slightly prefer privacy"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "629bd8a3-4ff7-44b5-b5d6-175ff8d50071",
+                "code": "neutral",
+                "system": "urn:uuid:ad9472c6-6d57-4524-9138-c98be0048a92",
+                "display": "Neutral"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "3b6341ef-8005-49d5-d241-ab521a01f022",
+                "code": "slightly-prefer-performance",
+                "system": "urn:uuid:ad9472c6-6d57-4524-9138-c98be0048a92",
+                "display": "Slightly prefer performance"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "8fa0e9f4-8aaa-48e1-8f76-60d8a714f3f2",
+                "code": "strongly-prefer-performance",
+                "system": "urn:uuid:ad9472c6-6d57-4524-9138-c98be0048a92",
+                "display": "Strongly prefer performance"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "4e1ef7e0-4247-4710-8e18-2c4866557f4f",
+          "type": "choice",
+          "text": "Does it matter to you if your health data is processed on online servers?",
+          "required": true,
+          "answerOption": [
+            {
+              "valueCoding": {
+                "id": "d7dc21ef-aba4-4aaf-a8cb-8dbbe04295a1",
+                "code": "yes,-i-don’t-want-this-to-happen",
+                "system": "urn:uuid:2db85b6e-5797-43cd-8f9a-d4ae28d27adc",
+                "display": "Yes, I don’t want this to happen"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "7aaa5ca2-0fb4-4a98-81a8-d47595067085",
+                "code": "yes,-depending-on-the-situation",
+                "system": "urn:uuid:2db85b6e-5797-43cd-8f9a-d4ae28d27adc",
+                "display": "Yes, depending on the situation"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "7218bf74-6f70-4b06-aa8c-68f4bdb3c65b",
+                "code": "neutral",
+                "system": "urn:uuid:2db85b6e-5797-43cd-8f9a-d4ae28d27adc",
+                "display": "Neutral"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "683d41f1-1fca-4fe3-8288-3b869855dad7",
+                "code": "i-don’t-care",
+                "system": "urn:uuid:2db85b6e-5797-43cd-8f9a-d4ae28d27adc",
+                "display": "I don’t care"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "763ef71f-fe57-49df-838e-a2b1d5ca7c4b",
+                "code": "i-don’t-understand",
+                "system": "urn:uuid:2db85b6e-5797-43cd-8f9a-d4ae28d27adc",
+                "display": "I don’t understand"
+              }
+            }
+          ],
+          "item": [
+            {
+              "linkId": "94193b4f-49be-4beb-f012-7eaab9352586",
+              "type": "text",
+              "required": true,
+              "enableWhen": [
+                {
+                  "question": "4e1ef7e0-4247-4710-8e18-2c4866557f4f",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "urn:uuid:2db85b6e-5797-43cd-8f9a-d4ae28d27adc",
+                    "code": "yes,-depending-on-the-situation"
+                  }
+                }
+              ],
+              "text": "Please elaborate in which situations it does matter if your health data is processed on online servers."
+            }
+          ]
+        },
+        {
+          "linkId": "0fd4a2ae-2a66-41d4-d4f0-b3c00787d751",
+          "type": "choice",
+          "text": "How concerned are you about your data privacy in general?",
+          "required": true,
+          "answerOption": [
+            {
+              "valueCoding": {
+                "id": "738009bb-cba8-49f3-803c-721768210b0f",
+                "code": "not-at-all-concerned",
+                "system": "urn:uuid:5e8ede51-8505-46ab-ac7a-72f6ed6aed60",
+                "display": "Not at all concerned"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "2021870e-cce2-4086-91c8-adc382f2f1b9",
+                "code": "not-very-concerned",
+                "system": "urn:uuid:5e8ede51-8505-46ab-ac7a-72f6ed6aed60",
+                "display": "Not very concerned"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "ac512a8c-88bf-4b73-a6a5-47d6ac41db4d",
+                "code": "neutral",
+                "system": "urn:uuid:5e8ede51-8505-46ab-ac7a-72f6ed6aed60",
+                "display": "Neutral"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "846a2b0e-15af-4bd0-8d0c-015df5106776",
+                "code": "slightly-concerned",
+                "system": "urn:uuid:5e8ede51-8505-46ab-ac7a-72f6ed6aed60",
+                "display": "Slightly concerned"
+              }
+            },
+            {
+              "valueCoding": {
+                "id": "b071b0f6-437e-4a5b-9a2d-350d36d5c7fd",
+                "code": "very-concerned",
+                "system": "urn:uuid:5e8ede51-8505-46ab-ac7a-72f6ed6aed60",
+                "display": "Very concerned"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

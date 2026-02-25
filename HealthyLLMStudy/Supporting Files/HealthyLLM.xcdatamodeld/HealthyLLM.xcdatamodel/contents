@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23605" systemVersion="24B91" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Answer" representedClassName=".Answer" syncable="YES" codeGenerationType="category">
+        <attribute name="answer" attributeType="String"/>
+        <attribute name="id" attributeType="String"/>
+        <attribute name="timestamp" attributeType="Date" usesScalarValueType="NO"/>
+    </entity>
+    <entity name="ChatMessage" representedClassName=".ChatMessage" syncable="YES" codeGenerationType="category">
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="message" attributeType="String"/>
+        <attribute name="role" attributeType="String"/>
+        <attribute name="timestamp" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="type" optional="YES" attributeType="String"/>
+    </entity>
+    <entity name="Metadata" representedClassName=".Metadata" syncable="YES" codeGenerationType="category">
+        <attribute name="age" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="device" attributeType="String"/>
+        <attribute name="freeStorage" attributeType="String"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="os" attributeType="String"/>
+        <attribute name="participantId" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="sex" attributeType="String"/>
+        <attribute name="timestamp" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="totalMemory" attributeType="String"/>
+        <attribute name="totalStorage" attributeType="String"/>
+    </entity>
+    <entity name="Performance" representedClassName=".Performance" syncable="YES" codeGenerationType="category">
+        <attribute name="batteryLevel" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="batteryState" attributeType="String"/>
+        <attribute name="cpu" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="memory" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="thermalState" attributeType="String"/>
+        <attribute name="timestamp" attributeType="Date" usesScalarValueType="NO"/>
+    </entity>
+</model>

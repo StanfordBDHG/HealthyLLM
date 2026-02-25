@@ -1,0 +1,539 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    "%lld" : {
+
+    },
+    "`countAllHealthKitData`" : {
+
+    },
+    "`createDateIntervalsString`" : {
+
+    },
+    "`extractHealthDataForLLM`" : {
+
+    },
+    "`fetchOldestOverallSample`" : {
+
+    },
+    "Age" : {
+
+    },
+    "Already Downloaded" : {
+
+    },
+    "Answer Questions" : {
+
+    },
+    "CHAT_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chat"
+          }
+        }
+      }
+    },
+    "CLARIFICATION_BUTTON" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Understood"
+          }
+        }
+      }
+    },
+    "CLARIFICATION_ITEM1_DESCIPTION" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All data, including model inputs and outputs, will be securely stored and utilized exclusively for this study. The primary identified risk is the potential for a data breach; however, this risk will be mitigated through the implementation of robust security measures."
+          }
+        }
+      }
+    },
+    "CLARIFICATION_ITEM1_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Risk"
+          }
+        }
+      }
+    },
+    "CLARIFICATION_ITEM2_DESCIPTION" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Participation is voluntary; you can leave the study and delete the app if uncomfortable with the application or survey at any time."
+          }
+        }
+      }
+    },
+    "CLARIFICATION_ITEM2_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voluntary Participation"
+          }
+        }
+      }
+    },
+    "CLARIFICATION_ITEM3_DESCIPTION" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The findings will aid in creating user-friendly digital health tools, enhancing patient education, and providing guidance for healthcare providers and policymakers on implementing AI-driven technologies."
+          }
+        }
+      }
+    },
+    "CLARIFICATION_ITEM3_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Research Contributions"
+          }
+        }
+      }
+    },
+    "CLARIFICATION_ITEM4_DESCIPTION" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Participants may gain better insight into their medical information. However, participation does not promise any direct personal advantages"
+          }
+        }
+      }
+    },
+    "CLARIFICATION_ITEM4_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disclaimer"
+          }
+        }
+      }
+    },
+    "CLARIFICATION_SUBTITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The following items summarize the study’s consent form. Please review each one carefully."
+          }
+        }
+      }
+    },
+    "CLARIFICATION_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Important"
+          }
+        }
+      }
+    },
+    "Clear GPU Cache" : {
+
+    },
+    "Complete the preliminary questionnaire with basic questions before beginning the study." : {
+
+    },
+    "Context Window LLM" : {
+
+    },
+    "DEBUG" : {
+
+    },
+    "Debug 🐛" : {
+
+    },
+    "Delete Data" : {
+
+    },
+    "Delete Model" : {
+
+    },
+    "Destructive" : {
+
+    },
+    "Details" : {
+
+    },
+    "DEVICE_UNAVAILBLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Device Unavailable"
+          }
+        }
+      }
+    },
+    "DEVICE_UNAVAILBLE_DESCRIPTION" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This device is unavailable due to limited memory (RAM) constraints. Please contact the study personnel to check for possible alternatives."
+          }
+        }
+      }
+    },
+    "DONE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        }
+      }
+    },
+    "ERROR" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error"
+          }
+        }
+      }
+    },
+    "Error: %@" : {
+
+    },
+    "Explore the on-device capabilities of LLMs for health research." : {
+
+    },
+    "Export" : {
+
+    },
+    "Export the data from the study. Please note that this only works if you have completed the study." : {
+
+    },
+    "Female" : {
+
+    },
+    "Function Call LLM" : {
+
+    },
+    "getVitalsOverview" : {
+
+    },
+    "Health Data" : {
+
+    },
+    "HEALTHKIT_NOT_AVAILABLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Data"
+          }
+        }
+      }
+    },
+    "HEALTHKIT_NOT_AVAILABLE_DESCRIPTION" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unfortunately, HealthKit is not available on your device."
+          }
+        }
+      }
+    },
+    "HEALTHKIT_PERMISSIONS_BUTTON" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grant Access"
+          }
+        }
+      }
+    },
+    "HEALTHKIT_PERMISSIONS_DESCRIPTION" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Most of the data types you can find in the Health App are supported.\n\nAll data will stay on device and is used by a local language model."
+          }
+        }
+      }
+    },
+    "HEALTHKIT_PERMISSIONS_SUBTITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HealthyLLM can access data from HealthKit to use in conversations."
+          }
+        }
+      }
+    },
+    "HEALTHKIT_PERMISSIONS_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HealthKit Access"
+          }
+        }
+      }
+    },
+    "HealthyLLM" : {
+
+    },
+    "Interpretation System Prompt" : {
+
+    },
+    "INTERPRETATION_SYSTEM_PROMPT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You are a medical explanation assistant. Your primary goal is to help users understand health-related data by providing clear, accurate, and user-friendly explanations. You must avoid providing direct medical diagnoses, treatments, or personalized medical advice. Instead, your role is to break down, interpret, and clarify concepts, so users can have a better understanding of the information they have. Always prioritize safety, transparency, and encourage users to consult qualified healthcare professionals for personalized medical advice."
+          }
+        }
+      }
+    },
+    "Intersex" : {
+
+    },
+    "Join the Study" : {
+
+    },
+    "LLM" : {
+
+    },
+    "LLM_DOWNLOADING_PROGRESS_TEXT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download the Language Model"
+          }
+        }
+      }
+    },
+    "Male" : {
+
+    },
+    "NEXT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next"
+          }
+        }
+      }
+    },
+    "Offload LLM" : {
+
+    },
+    "OK" : {
+
+    },
+    "Participant ID" : {
+
+    },
+    "PARTICIPANT_ID" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Participant ID"
+          }
+        }
+      }
+    },
+    "Performance" : {
+
+    },
+    "Prefer not to say" : {
+
+    },
+    "Prepare LLM" : {
+
+    },
+    "Prompt" : {
+
+    },
+    "Questions" : {
+
+    },
+    "required" : {
+
+    },
+    "Reset User Defauls" : {
+
+    },
+    "Retake Questionnaire" : {
+
+    },
+    "Retry Download" : {
+
+    },
+    "Sex" : {
+
+    },
+    "Start" : {
+
+    },
+    "Start Download" : {
+
+    },
+    "Start Questionnaire" : {
+
+    },
+    "Start Study" : {
+
+    },
+    "Start the study with the study coordinator, please do not start it yourself." : {
+
+    },
+    "Steps" : {
+
+    },
+    "Stop" : {
+
+    },
+    "STUDY_INFORMATION_BODY" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In the next step, a chat window will appear where you can ask questions about your health. Once you have asked at least three questions, you can proceed to the next step to rate the chat interaction.\n\nYou will complete two iterations in total, each featuring different types of chat experiences.\n\nFinally, you will be asked to complete a final questionnaire."
+          }
+        }
+      }
+    },
+    "STUDY_INFORMATION_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Study Information"
+          }
+        }
+      }
+    },
+    "To use the model we first need to download it. This will take a few minutes. Make sure you have a stable internet connection." : {
+
+    },
+    "Unlock" : {
+
+    },
+    "WELCOME_AREA1_DESCRIPTION" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This study examines the usability, performance, and acceptance of on-device LLMs in healthcare applications."
+          }
+        }
+      }
+    },
+    "WELCOME_AREA1_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Study"
+          }
+        }
+      }
+    },
+    "WELCOME_AREA2_DESCRIPTION" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HealthyLLM can surface data from Apple Health to use in conversations with a local LLM."
+          }
+        }
+      }
+    },
+    "WELCOME_AREA2_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Health integration"
+          }
+        }
+      }
+    },
+    "WELCOME_AREA3_DESCRIPTION" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Explore three different models designed to explain your health data, all applied to the same use case for clear comparison and insights."
+          }
+        }
+      }
+    },
+    "WELCOME_AREA3_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Models"
+          }
+        }
+      }
+    },
+    "WELCOME_BUTTON" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        }
+      }
+    },
+    "WELCOME_SUBTITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enhancing Usability: A Local LLM Study Powered by Spezi"
+          }
+        }
+      }
+    },
+    "WELCOME_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HealthyLLM Study"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

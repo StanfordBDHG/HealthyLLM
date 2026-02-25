@@ -8,7 +8,7 @@ SPDX-License-Identifier: MIT
 
 -->
 
-# Template Application
+# HealthyLLM
 
 [![Build and Test](https://github.com/StanfordBDHG/TemplateApplication/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/StanfordBDHG/TemplateApplication/actions/workflows/build-and-test.yml)
 [![codecov](https://codecov.io/gh/StanfordBDHG/TemplateApplication/graph/badge.svg?token=ezY7o5Trsk)](https://codecov.io/gh/StanfordBDHG/TemplateApplication)
@@ -74,4 +74,4 @@ Removing the `token` input in the GitHub action workflow results in using the de
 
 ### Contributors
 
-This project is based on [ContinousDelivery Example by Paul Schmiedmayer](https://github.com/PSchmiedmayer/ContinousDelivery). You can find a list of contributors in the `CONTRIBUTORS.md` file.
+You can find a list of contributors in the `CONTRIBUTORS.md` file.

@@ -8,6 +8,7 @@
 
 import Foundation
 import HealthKit
+import Hub
 import OSLog
 import Spezi
 import SpeziChat
@@ -24,11 +25,20 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
     
     @ObservationIgnored @Dependency(LLMRunner.self) private var llmRunner: LLMRunner
     @ObservationIgnored @Dependency(HealthDataFetcher.self) private var healthDataFetcher: HealthDataFetcher
+    @ObservationIgnored @Dependency(HealthContextGenerator.self) private var healthContextGenerator: HealthContextGenerator
+    @ObservationIgnored @Dependency(OpenTSLMInferenceService.self) private var openTSLMInferenceService: OpenTSLMInferenceService
     
     @ObservationIgnored private var functionCallParameters: LLMLocalParameters?
     @ObservationIgnored private var functionCallSamplingParameters: LLMLocalSamplingParameters?
     @ObservationIgnored private var defaultParameters: LLMLocalParameters?
     @ObservationIgnored private var sharedSession: LLMLocalSession?
+    @ObservationIgnored private let requiredModelFiles = [
+        "config.json",
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "special_tokens_map.json",
+        "model.safetensors"
+    ]
     
     private(set) var context: HealthyLLMContext = []
     private(set) var advancedContext: HealthyLLMContext = []
@@ -36,6 +46,8 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
     required init() { }
     
     func setup() async throws {
+        await stageLocalModelIfNeeded()
+
         functionCallParameters = .init(
             maxOutputLength: 32,
             chatTemplate: Constants.llmModelChatTemplate
@@ -68,6 +80,188 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
         try await sharedSession.setup()
         loaded = true
     }
+
+    private func stageLocalModelIfNeeded() async {
+        let fileManager = FileManager.default
+        let destinationURL = HubApi().localRepoLocation(.init(id: Constants.llmModelName))
+
+        do {
+            try fileManager.createDirectory(at: destinationURL, withIntermediateDirectories: true)
+        } catch {
+            logger.error("Failed creating local model destination directory: \(error.localizedDescription)")
+            return
+        }
+
+        if hasRequiredModelFiles(in: destinationURL, fileManager: fileManager) {
+            logger.info("Local model cache already has required files at destination: \(destinationURL.path)")
+            return
+        }
+
+        guard let sourceURL = resolveLocalModelSourceDirectory() else {
+            logger.warning("No local model source directory found. Falling back to download flow.")
+            return
+        }
+
+        do {
+            try copyDirectoryContents(from: sourceURL, to: destinationURL)
+
+            if hasRequiredModelFiles(in: destinationURL, fileManager: fileManager) {
+                logger.info("Staged local model from \(sourceURL.path) to \(destinationURL.path)")
+            } else {
+                logger.error("Model staging finished but required files are still missing in \(destinationURL.path)")
+            }
+        } catch {
+            logger.error("Failed to stage local model: \(error.localizedDescription)")
+        }
+    }
+
+    private func hasRequiredModelFiles(in directoryURL: URL, fileManager: FileManager) -> Bool {
+        requiredModelFiles.allSatisfy { fileName in
+            fileManager.fileExists(atPath: directoryURL.appendingPathComponent(fileName).path)
+        }
+    }
+
+    private func resolveLocalModelSourceDirectory() -> URL? {
+        let fileManager = FileManager.default
+
+        if let overridePath = Constants.localModelSourcePathOverride,
+           let overrideURL = existingDirectoryURL(at: overridePath, fileManager: fileManager) {
+            return overrideURL
+        }
+
+        if let bundledLocalModelURL = Bundle.main.resourceURL {
+            let bundledDirectory = bundledLocalModelURL.appendingPathComponent(Constants.localModelBundleSubdirectory, isDirectory: true)
+            if fileManager.fileExists(atPath: bundledDirectory.path) {
+                return bundledDirectory
+            }
+
+            let bundledRootFiles = requiredModelFiles.allSatisfy { fileName in
+                fileManager.fileExists(atPath: bundledLocalModelURL.appendingPathComponent(fileName).path)
+            }
+
+            if bundledRootFiles {
+                return bundledLocalModelURL
+            }
+        }
+
+        // Fallback: detect a downloaded model snapshot from Hugging Face cache.
+        let sanitizedRepoID = Constants.llmModelName.replacingOccurrences(of: "/", with: "--")
+        let hostSnapshotsPath = "\(Constants.hostHuggingFaceCacheRoot)/models--\(sanitizedRepoID)/snapshots"
+        let hostSnapshotsURL = URL(fileURLWithPath: hostSnapshotsPath, isDirectory: true)
+
+        if let hostSnapshot = newestSnapshotDirectory(in: hostSnapshotsURL, fileManager: fileManager) {
+            return hostSnapshot
+        }
+
+        let snapshotsPath = "~/.cache/huggingface/hub/models--\(sanitizedRepoID)/snapshots"
+        let snapshotsURL = URL(fileURLWithPath: NSString(string: snapshotsPath).expandingTildeInPath, isDirectory: true)
+        return newestSnapshotDirectory(in: snapshotsURL, fileManager: fileManager)
+    }
+
+    private func newestSnapshotDirectory(in snapshotsURL: URL, fileManager: FileManager) -> URL? {
+        guard fileManager.fileExists(atPath: snapshotsURL.path) else {
+            return nil
+        }
+
+        let directoryContents = try? fileManager.contentsOfDirectory(
+            at: snapshotsURL,
+            includingPropertiesForKeys: [.contentModificationDateKey],
+            options: [.skipsHiddenFiles]
+        )
+
+        return directoryContents?
+            .filter { url in
+                var isDirectory: ObjCBool = false
+                return fileManager.fileExists(atPath: url.path, isDirectory: &isDirectory) && isDirectory.boolValue
+            }
+            .sorted(by: { lhs, rhs in
+                let lhsDate = (try? lhs.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
+                let rhsDate = (try? rhs.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
+                return lhsDate > rhsDate
+            })
+            .first
+    }
+
+    private func existingDirectoryURL(at rawPath: String, fileManager: FileManager) -> URL? {
+        let expandedPath = NSString(string: rawPath).expandingTildeInPath
+        let url = URL(fileURLWithPath: expandedPath, isDirectory: true)
+        var isDirectory: ObjCBool = false
+
+        guard fileManager.fileExists(atPath: url.path, isDirectory: &isDirectory), isDirectory.boolValue else {
+            return nil
+        }
+
+        return url
+    }
+
+    private func copyDirectoryContents(from sourceURL: URL, to destinationURL: URL) throws {
+        let fileManager = FileManager.default
+        let items = try fileManager.contentsOfDirectory(at: sourceURL, includingPropertiesForKeys: nil)
+
+        for item in items {
+            let destinationItem = destinationURL.appendingPathComponent(item.lastPathComponent)
+            var isDirectory: ObjCBool = false
+            let exists = fileManager.fileExists(atPath: item.path, isDirectory: &isDirectory)
+
+            guard exists else {
+                continue
+            }
+
+            if isDirectory.boolValue {
+                try fileManager.createDirectory(at: destinationItem, withIntermediateDirectories: true)
+                try copyDirectoryContents(from: item, to: destinationItem)
+            } else if !fileManager.fileExists(atPath: destinationItem.path) {
+                try fileManager.copyItem(at: item, to: destinationItem)
+            }
+        }
+    }
+
+    private func ecgSamplesForPrompt(_ healthKit: HealthKit) async -> [ElectrocardiogramData] {
+        let fetched = (try? await healthDataFetcher.fetchElectrocardiograms(healthKit, limit: 1)) ?? []
+
+        if Constants.includeHardcodedECGSample {
+            var merged = fetched
+            merged.insert(hardcodedECGSample(), at: 0)
+            return merged
+        }
+
+        if fetched.isEmpty {
+            return [hardcodedECGSample()]
+        }
+
+        return fetched
+    }
+
+    private func hardcodedECGSample() -> ElectrocardiogramData {
+        let samplingFrequency = 256.0
+        let sampleCount = Constants.hardcodedECGSampleLength
+        let durationSeconds = Double(sampleCount) / samplingFrequency
+        let endDate = Date()
+        let startDate = endDate.addingTimeInterval(-durationSeconds)
+
+        let voltages: [Double] = (0 ..< sampleCount).map { index in
+            let t = Double(index) / samplingFrequency
+
+            // Synthetic ECG-like waveform with deterministic QRS spikes.
+            let base = 0.025 * sin(2.0 * .pi * 1.2 * t)
+            let pWave = 0.010 * sin(2.0 * .pi * 4.0 * t)
+            let qrsPhase = t.remainder(dividingBy: 0.86)
+            let qrs = qrsPhase < 0.018 ? 0.72 * exp(-pow((qrsPhase - 0.006) * 120.0, 2.0)) : 0.0
+            let tWave = 0.040 * exp(-pow((qrsPhase - 0.24) * 14.0, 2.0))
+            return base + pWave + qrs + tWave
+        }
+
+        return .init(
+            startDate: startDate,
+            endDate: endDate,
+            classification: "sinusRhythm_sample",
+            symptomsStatus: "notSet_sample",
+            averageHeartRate: 70.0,
+            samplingFrequency: samplingFrequency,
+            numberOfVoltageMeasurements: voltages.count,
+            voltages: voltages
+        )
+    }
     
     func queryLLM(with context: Chat, healthKit: HealthKit) async throws {
         if !loaded {
@@ -83,9 +277,63 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
         
         self.context.append(.init(.user, content: userPrompt.content))
         self.advancedContext.append(.init(.user, content: userPrompt.content))
+
+        if shouldRunOpenTSLMSampleInference(for: userPrompt.content) {
+            do {
+                let inferenceResult = try openTSLMInferenceService.runSleepSampleInference()
+                let reply = """
+                I ran the OpenTSLM sample inference directly in the iOS app using your local checkpoints and sleep_cot sample data.
+
+                \(inferenceResult)
+                """
+                self.context.append(.init(.assistant, content: reply, completed: true))
+                self.advancedContext.append(.init(.assistant, content: reply, completed: true))
+            } catch {
+                let failure = "OpenTSLM sample inference failed in-app: \(error.localizedDescription)"
+                self.context.append(.init(.assistant, content: failure, completed: true))
+                self.advancedContext.append(.init(.assistant, content: failure, completed: true))
+            }
+            return
+        }
+
+        if shouldRunOpenTSLMECGSampleInference(for: userPrompt.content) {
+            do {
+                let inferenceResult = try openTSLMInferenceService.runECGSampleInference()
+                let reply = """
+                I ran the OpenTSLM ECG sample path directly in the iOS app using the hardcoded ECG fallback or a JSON sample if configured.
+
+                \(inferenceResult)
+                """
+                self.context.append(.init(.assistant, content: reply, completed: true))
+                self.advancedContext.append(.init(.assistant, content: reply, completed: true))
+            } catch {
+                let failure = "OpenTSLM ECG sample inference failed in-app: \(error.localizedDescription)"
+                self.context.append(.init(.assistant, content: failure, completed: true))
+                self.advancedContext.append(.init(.assistant, content: failure, completed: true))
+            }
+            return
+        }
         
         try await checkForFunctionCall(prompt: userPrompt.content, healthKit: healthKit)
         try await defaultResponse(healthKit)
+    }
+
+    private func shouldRunOpenTSLMSampleInference(for prompt: String) -> Bool {
+        let normalized = prompt
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+
+        // Keep this behind an explicit command so ECG/health prompts are not hijacked
+        // by the sample Sleep-EDF demo path.
+        return normalized == "/opentslm-sleep-sample"
+    }
+
+    private func shouldRunOpenTSLMECGSampleInference(for prompt: String) -> Bool {
+        let normalized = prompt
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+
+        return normalized == "/opentslm-ecg-sample"
     }
     
     func resetChat() async {
@@ -142,10 +390,15 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
             injectIntoContext: true
         )
         
-        if !context.map(\.content).contains(PromptGenerator.systemPrompt) {
+        if !context.contains(where: { $0.role == .system }) {
             let userInfo = await healthDataFetcher.fetchUser(healthKit)
-            context.append(PromptGenerator.buildSystemPrompt(for: .default, userInfo: userInfo))
-            advancedContext.append(PromptGenerator.buildSystemPrompt(for: .default, userInfo: userInfo))
+            let electrocardiograms = await ecgSamplesForPrompt(healthKit)
+            let systemPrompt = healthContextGenerator.buildSystemPrompt(
+                userInfo: userInfo,
+                electrocardiograms: electrocardiograms
+            )
+            context.append(systemPrompt)
+            advancedContext.append(systemPrompt)
         }
             
         await MainActor.run {
@@ -153,30 +406,16 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
         }
         
         logger.debug("defaultResponse: Started with context")
-        
+
+        var assistantOutput = ""
         for try await stringPiece in try await sharedSession.generate() {
             logger.debug("defaultResponse: Received string piece: \(stringPiece)")
-            
-            guard let lastContextEntity = context.last,
-                  lastContextEntity.role == .assistant else {
-                context.append(.init(.assistant, content: stringPiece, completed: false))
-                advancedContext.append(.init(.assistant, content: stringPiece, completed: false))
-                continue
-            }
-
-            context[context.count - 1] = .init(
-                .assistant,
-                content: lastContextEntity.content + stringPiece,
-                completed: false,
-                id: lastContextEntity.id
-            )
-            advancedContext[advancedContext.count - 1] = .init(
-                .assistant,
-                content: lastContextEntity.content + stringPiece,
-                completed: false,
-                id: advancedContext.last!.id
-            )
+            assistantOutput += stringPiece
         }
+
+        let assistantMessage = HealthyLLMContextEntity(.assistant, content: assistantOutput, completed: true)
+        context.append(assistantMessage)
+        advancedContext.append(assistantMessage)
     }
     
     /// Returns a bool representing if a function call has been made

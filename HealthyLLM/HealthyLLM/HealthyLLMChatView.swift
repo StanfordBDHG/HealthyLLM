@@ -19,6 +19,9 @@ struct HealthyLLMChatView: View {
     let firstPrompt: String
     @State private var showErrorAlert = false
     @State private var errorMessage = ""
+    @State private var lastSubmittedUserMessageID: UUID?
+    @State private var isSubmittingPrompt = false
+    @State private var didSendInitialPrompt = false
     
     var body: some View {
         NavigationStack {
@@ -33,12 +36,31 @@ struct HealthyLLMChatView: View {
                     )
                 }
             } set: { newValue in
+                guard let userPrompt = newValue.last,
+                      userPrompt.role == .user,
+                      userPrompt.complete,
+                      userPrompt.id != lastSubmittedUserMessageID,
+                      !isSubmittingPrompt else {
+                    return
+                }
+
+                lastSubmittedUserMessageID = userPrompt.id
+                isSubmittingPrompt = true
+
                 Task {
+                    defer {
+                        Task { @MainActor in
+                            isSubmittingPrompt = false
+                        }
+                    }
+
                     do {
                         try await healthDataInterpreter.queryLLM(with: newValue, healthKit: healthKit)
                     } catch {
-                        showErrorAlert = true
-                        errorMessage = "Error querying LLM: \(error.localizedDescription)"
+                        await MainActor.run {
+                            showErrorAlert = true
+                            errorMessage = "Error querying LLM: \(error.localizedDescription)"
+                        }
                     }
                 }
             }
@@ -57,8 +79,20 @@ struct HealthyLLMChatView: View {
                 }
             }
             .task {
+                guard !didSendInitialPrompt else {
+                    return
+                }
+
+                didSendInitialPrompt = true
                 await healthDataInterpreter.resetChat()
-                contextBinding.wrappedValue.append(.init(role: .user, content: firstPrompt))
+
+                do {
+                    let initialContext: Chat = [.init(role: .user, content: firstPrompt)]
+                    try await healthDataInterpreter.queryLLM(with: initialContext, healthKit: healthKit)
+                } catch {
+                    showErrorAlert = true
+                    errorMessage = "Error querying LLM: \(error.localizedDescription)"
+                }
             }
         }
         .alert("ERROR_ALERT_TITLE", isPresented: $showErrorAlert) {

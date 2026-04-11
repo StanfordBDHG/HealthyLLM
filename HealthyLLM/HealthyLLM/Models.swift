@@ -22,6 +22,17 @@ struct HealthData: Encodable {
     let values: [String: [Double]]
 }
 
+struct ElectrocardiogramData: Encodable {
+    let startDate: Date
+    let endDate: Date
+    let classification: String
+    let symptomsStatus: String
+    let averageHeartRate: Double?
+    let samplingFrequency: Double?
+    let numberOfVoltageMeasurements: Int
+    let voltages: [Double]
+}
+
 struct WorkoutData: Encodable {
     let name: String
     let date: String

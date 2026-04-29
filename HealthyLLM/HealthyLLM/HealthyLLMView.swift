@@ -113,7 +113,7 @@ struct HealthyLLMView: View {
     }
 
     private func localModelExists() -> Bool {
-        let repoURL = HubApi().localRepoLocation(.init(id: Constants.llmModelName))
+        let repoURL = Constants.llmLocalModelDirectory
         let modelFileURL = repoURL.appendingPathComponent("model.safetensors")
         return FileManager.default.fileExists(atPath: modelFileURL.path)
     }

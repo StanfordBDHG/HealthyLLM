@@ -46,7 +46,7 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
     required init() { }
     
     func setup() async throws {
-        await stageLocalModelIfNeeded()
+        try await stageLocalModelIfNeeded()
 
         functionCallParameters = .init(
             maxOutputLength: 32,
@@ -81,9 +81,9 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
         loaded = true
     }
 
-    private func stageLocalModelIfNeeded() async {
+    private func stageLocalModelIfNeeded() async throws {
         let fileManager = FileManager.default
-        let destinationURL = HubApi().localRepoLocation(.init(id: Constants.llmModelName))
+        let destinationURL = Constants.llmLocalModelDirectory
 
         do {
             try fileManager.createDirectory(at: destinationURL, withIntermediateDirectories: true)
@@ -104,6 +104,7 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
 
         do {
             try copyDirectoryContents(from: sourceURL, to: destinationURL)
+            try stageLoRACheckpointIfAvailable(sourceURL: sourceURL, destinationURL: destinationURL)
 
             if hasRequiredModelFiles(in: destinationURL, fileManager: fileManager) {
                 logger.info("Staged local model from \(sourceURL.path) to \(destinationURL.path)")
@@ -112,6 +113,40 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
             }
         } catch {
             logger.error("Failed to stage local model: \(error.localizedDescription)")
+            throw error
+        }
+    }
+
+    private func stageLoRACheckpointIfAvailable(sourceURL: URL, destinationURL: URL) throws {
+        let fileManager = FileManager.default
+        var checkpointCandidates: [URL] = []
+
+        if !Constants.openTSLMLoRACheckpointPath.isEmpty {
+            checkpointCandidates.append(URL(fileURLWithPath: Constants.openTSLMLoRACheckpointPath))
+        }
+
+        checkpointCandidates.append(sourceURL.appendingPathComponent("\(Constants.openTSLMLoRACheckpointName).safetensors"))
+        checkpointCandidates.append(sourceURL.appendingPathComponent("adapter_model.safetensors"))
+
+        let existingCandidates = checkpointCandidates.filter { candidate in
+            fileManager.fileExists(atPath: candidate.path)
+        }
+
+        if let selectedLoRA = existingCandidates.first {
+            let destinationLoRA = destinationURL.appendingPathComponent(selectedLoRA.lastPathComponent)
+            if !fileManager.fileExists(atPath: destinationLoRA.path) {
+                try fileManager.copyItem(at: selectedLoRA, to: destinationLoRA)
+            }
+            logger.info("LoRA checkpoint staged at \(destinationLoRA.path)")
+            return
+        }
+
+        if Constants.requireLoRACheckpoint {
+            throw NSError(
+                domain: "HealthDataInterpreter",
+                code: 10,
+                userInfo: [NSLocalizedDescriptionKey: "HEALTHYLLM_REQUIRE_LORA=1 but no LoRA checkpoint was found. Set HEALTHYLLM_OPEN_TSLM_LORA_CHECKPOINT or include \(Constants.openTSLMLoRACheckpointName).safetensors in LocalLLM."]
+            )
         }
     }
 
@@ -280,7 +315,10 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
 
         if shouldRunOpenTSLMSampleInference(for: userPrompt.content) {
             do {
-                let inferenceResult = try openTSLMInferenceService.runSleepSampleInference()
+                let inferenceResult = try await openTSLMInferenceService.runSleepSampleInference(
+                    llmRunner: llmRunner,
+                    llmSession: sharedSession
+                )
                 let reply = """
                 I ran the OpenTSLM sample inference directly in the iOS app using your local checkpoints and sleep_cot sample data.
 
@@ -298,7 +336,10 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
 
         if shouldRunOpenTSLMECGSampleInference(for: userPrompt.content) {
             do {
-                let inferenceResult = try openTSLMInferenceService.runECGSampleInference()
+                let inferenceResult = try await openTSLMInferenceService.runECGSampleInference(
+                    llmRunner: llmRunner,
+                    llmSession: sharedSession
+                )
                 let reply = """
                 I ran the OpenTSLM ECG sample path directly in the iOS app using the hardcoded ECG fallback or a JSON sample if configured.
 

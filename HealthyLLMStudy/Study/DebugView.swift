@@ -149,15 +149,12 @@ struct DebugView: View {
                     Button("Delete Model") {
                         Task {
                             do {
-                                let url = HubApi().localRepoLocation(.init(id: Constants.llmModelName))
-                                let files = try await HubApi().getFilenames(from: Constants.llmModelName)
-                                print(files)
-                                
-                                for file in files {
-                                    let fileURL = url.appending(path: file)
-                                    guard let _ = try? FileManager.default.removeItem(at: fileURL) else {
-                                        continue
-                                    }
+                                let fileManager = FileManager.default
+                                let url = Constants.llmLocalModelDirectory
+                                let files = try fileManager.contentsOfDirectory(at: url, includingPropertiesForKeys: nil)
+
+                                for fileURL in files {
+                                    _ = try? fileManager.removeItem(at: fileURL)
                                 }
                             } catch {
                                 viewState = .error(AnyLocalizedError(error: error))

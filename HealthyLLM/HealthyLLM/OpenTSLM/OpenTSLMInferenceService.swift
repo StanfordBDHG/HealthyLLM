@@ -10,6 +10,8 @@ import Foundation
 import MLX
 import OSLog
 import Spezi
+import SpeziLLM
+import SpeziLLMLocal
 
 @Observable
 class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessible {
@@ -17,7 +19,12 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
 
     required init() { }
 
-    func runSleepSampleInference(split: SleepEDFDataset.Split = .test, sampleIndex: Int = 0) throws -> String {
+    func runSleepSampleInference(
+        split: SleepEDFDataset.Split = .test,
+        sampleIndex: Int = 0,
+        llmRunner: LLMRunner? = nil,
+        llmSession: LLMLocalSession? = nil
+    ) async throws -> String {
         guard let csvURL = resolveAssetURL(
             overridePath: Constants.openTSLMSleepCSVPath,
             bundledName: Constants.openTSLMSleepCSVName,
@@ -63,45 +70,187 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
         eval(first)
         logger.info("OpenTSLM sample inference complete: split=\(split.rawValue), sample=\(safeIndex)")
 
-        let outputText: String
-        if !sample.answer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            outputText = sample.answer
-        } else {
-            outputText = "Generated encoder/projector embeddings for the sample."
-        }
+        // Use provided LLM session or fall back to embedding description
+        if let llmRunner = llmRunner, let llmSession = llmSession {
+            let openTSLMLLM = OpenTSLMLLM(llmRunner: llmRunner, session: llmSession)
 
-        return formatSampleReport(
-            title: "Sleep-EDF sample inference",
-            prePrompt: sample.prePrompt,
-            timeSeriesText: sample.timeSeriesText,
-            postPrompt: sample.postPrompt,
-            label: sample.label,
-            answer: outputText,
-            extraLines: [
-                "split: \(split.rawValue)",
-                "sample_index: \(safeIndex)",
-                "series_count: \(sample.timeSeries.count)",
-            ]
-        )
+            // Create SoftPromptSample
+            let softPromptSample = try createSoftPromptSample(from: sample, with: projected, tokenizer: openTSLMLLM)
+
+            // Interleave text and embeddings
+            let batch = SoftPromptInterleaver.padAndInterleaveBatch([softPromptSample])
+
+            // Generate text using the LLM with embeddings
+            let generatedText = try await openTSLMLLM.generateWithEmbeddings(
+                inputsEmbeds: batch.inputsEmbeds,
+                prompt: createLLMPrompt(from: sample)
+            )
+
+            let outputText = """
+            **LLM-Generated Analysis:**
+
+            \(generatedText)
+
+            ---
+            Ground-truth label: \(sample.label)
+            Ground-truth answer: \(sample.answer)
+            """
+
+            return formatSampleReport(
+                title: "Sleep-EDF sample inference with LLM generation",
+                prePrompt: sample.prePrompt,
+                timeSeriesText: sample.timeSeriesText,
+                postPrompt: sample.postPrompt,
+                label: sample.label,
+                answer: outputText,
+                extraLines: [
+                    "split: \(split.rawValue)",
+                    "sample_index: \(safeIndex)",
+                    "series_count: \(sample.timeSeries.count)",
+                    "embeddings_shape: \(first.shape)",
+                    "llm_model: \(Constants.llmModelName)",
+                    "llm_integration: yes",
+                ]
+            )
+        } else {
+            // Fallback: just describe the embeddings
+            let outputText = """
+            **Embeddings Computed Successfully**
+
+            The time series embeddings were computed (\(first.shape)) but no LLM session was provided for generation.
+
+            To enable LLM generation with embeddings:
+            1. Ensure the HealthDataInterpreter is initialized with a valid LLM session
+            2. Pass the llmRunner and llmSession parameters to this method
+
+            Ground-truth label: \(sample.label)
+            Ground-truth answer: \(sample.answer)
+            """
+
+            return formatSampleReport(
+                title: "Sleep-EDF sample inference (embeddings only)",
+                prePrompt: sample.prePrompt,
+                timeSeriesText: sample.timeSeriesText,
+                postPrompt: sample.postPrompt,
+                label: sample.label,
+                answer: outputText,
+                extraLines: [
+                    "split: \(split.rawValue)",
+                    "sample_index: \(safeIndex)",
+                    "series_count: \(sample.timeSeries.count)",
+                    "embeddings_shape: \(first.shape)",
+                    "llm_integration: no",
+                ]
+            )
+        }
     }
 
-    func runECGSampleInference() throws -> String {
+    func runECGSampleInference(
+        llmRunner: LLMRunner? = nil,
+        llmSession: LLMLocalSession? = nil
+    ) async throws -> String {
         let ecg = try loadECGSample()
         let sample = makeOpenTSLMSample(from: ecg)
 
-        return formatSampleReport(
-            title: "ECG sample inference",
-            prePrompt: sample.prePrompt,
-            timeSeriesText: sample.timeSeriesText,
-            postPrompt: sample.postPrompt,
-            label: sample.label,
-            answer: sample.answer,
-            extraLines: [
-                "sampling_frequency_hz: \(String(format: "%.1f", ecg.samplingFrequency))",
-                "voltage_count: \(ecg.voltages.count)",
-                "source: \(ecg.sourceDescription)",
-            ]
-        )
+        // Load encoder and projector for ECG embeddings
+        guard let encoderURL = resolveAssetURL(
+            overridePath: Constants.openTSLMEncoderCheckpointPath,
+            bundledName: Constants.openTSLMEncoderCheckpointName,
+            fileExtension: "safetensors"
+        ) else {
+            throw NSError(domain: "OpenTSLMInferenceService", code: 2, userInfo: [NSLocalizedDescriptionKey: "Missing encoder checkpoint in bundle/OpenTSLM or override path"])
+        }
+
+        guard let projectorURL = resolveAssetURL(
+            overridePath: Constants.openTSLMProjectorCheckpointPath,
+            bundledName: Constants.openTSLMProjectorCheckpointName,
+            fileExtension: "safetensors"
+        ) else {
+            throw NSError(domain: "OpenTSLMInferenceService", code: 3, userInfo: [NSLocalizedDescriptionKey: "Missing projector checkpoint in bundle/OpenTSLM or override path"])
+        }
+
+        let pipeline = OpenTSLMSPPipeline(hiddenSize: 2048)
+        try pipeline.loadWeights(encoderURL: encoderURL, projectorURL: projectorURL)
+
+        // Project ECG time series to embeddings
+        let projected = pipeline.projectSample(sample)
+        guard let first = projected.first else {
+            throw NSError(domain: "OpenTSLMInferenceService", code: 5, userInfo: [NSLocalizedDescriptionKey: "Projection returned no tensors"])
+        }
+
+        eval(first)
+
+        // Use provided LLM session or fall back to embedding description
+        if let llmRunner = llmRunner, let llmSession = llmSession {
+            let openTSLMLLM = OpenTSLMLLM(llmRunner: llmRunner, session: llmSession)
+
+            // Create SoftPromptSample
+            let softPromptSample = try createSoftPromptSample(from: sample, with: projected, tokenizer: openTSLMLLM)
+
+            // Interleave text and embeddings
+            let batch = SoftPromptInterleaver.padAndInterleaveBatch([softPromptSample])
+
+            // Generate text using the LLM with embeddings
+            let generatedText = try await openTSLMLLM.generateWithEmbeddings(
+                inputsEmbeds: batch.inputsEmbeds,
+                prompt: createLLMPrompt(from: sample)
+            )
+
+            let outputText = """
+            **LLM-Generated ECG Analysis:**
+
+            \(generatedText)
+
+            ---
+            Pre-defined summary: \(sample.answer)
+            """
+
+            return formatSampleReport(
+                title: "ECG sample inference with LLM generation",
+                prePrompt: sample.prePrompt,
+                timeSeriesText: sample.timeSeriesText,
+                postPrompt: sample.postPrompt,
+                label: sample.label,
+                answer: outputText,
+                extraLines: [
+                    "sampling_frequency_hz: \(String(format: "%.1f", ecg.samplingFrequency))",
+                    "voltage_count: \(ecg.voltages.count)",
+                    "source: \(ecg.sourceDescription)",
+                    "embeddings_shape: \(first.shape)",
+                    "llm_model: \(Constants.llmModelName)",
+                    "llm_integration: yes",
+                ]
+            )
+        } else {
+            // Fallback: just describe the embeddings
+            let outputText = """
+            **Embeddings Computed Successfully**
+
+            The ECG time series embeddings were computed (\(first.shape)) but no LLM session was provided for generation.
+
+            To enable LLM generation with embeddings:
+            1. Ensure the HealthDataInterpreter is initialized with a valid LLM session
+            2. Pass the llmRunner and llmSession parameters to this method
+
+            Pre-defined summary: \(sample.answer)
+            """
+
+            return formatSampleReport(
+                title: "ECG sample inference (embeddings only)",
+                prePrompt: sample.prePrompt,
+                timeSeriesText: sample.timeSeriesText,
+                postPrompt: sample.postPrompt,
+                label: sample.label,
+                answer: outputText,
+                extraLines: [
+                    "sampling_frequency_hz: \(String(format: "%.1f", ecg.samplingFrequency))",
+                    "voltage_count: \(ecg.voltages.count)",
+                    "source: \(ecg.sourceDescription)",
+                    "embeddings_shape: \(first.shape)",
+                    "llm_integration: no",
+                ]
+            )
+        }
     }
 
     private func resolveAssetURL(overridePath: String, bundledName: String, fileExtension: String) -> URL? {
@@ -123,6 +272,126 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
         }
 
         return Bundle.main.url(forResource: bundledName, withExtension: fileExtension)
+    }
+
+    private func resolveLocalModelDirectory() -> URL? {
+        let fileManager = FileManager.default
+
+        // Check for override path
+        if let overridePath = Constants.localModelSourcePathOverride,
+           let overrideURL = existingDirectoryURL(at: overridePath, fileManager: fileManager) {
+            return overrideURL
+        }
+
+        // Check bundled model directory
+        if let bundledLocalModelURL = Bundle.main.resourceURL {
+            let bundledDirectory = bundledLocalModelURL.appendingPathComponent(Constants.localModelBundleSubdirectory, isDirectory: true)
+            if fileManager.fileExists(atPath: bundledDirectory.path) {
+                return bundledDirectory
+            }
+
+            // Check if model files are directly in bundle root
+            let requiredModelFiles = ["config.json", "tokenizer.json", "model.safetensors"]
+            let bundledRootFiles = requiredModelFiles.allSatisfy { fileName in
+                fileManager.fileExists(atPath: bundledLocalModelURL.appendingPathComponent(fileName).path)
+            }
+
+            if bundledRootFiles {
+                return bundledLocalModelURL
+            }
+        }
+
+        // Fallback: detect a downloaded model snapshot from Hugging Face cache
+        let sanitizedRepoID = Constants.llmModelName.replacingOccurrences(of: "/", with: "--")
+        let hostSnapshotsPath = "\(Constants.hostHuggingFaceCacheRoot)/models--\(sanitizedRepoID)/snapshots"
+        let hostSnapshotsURL = URL(fileURLWithPath: hostSnapshotsPath, isDirectory: true)
+
+        if let hostSnapshot = newestSnapshotDirectory(in: hostSnapshotsURL, fileManager: fileManager) {
+            return hostSnapshot
+        }
+
+        let snapshotsPath = "~/.cache/huggingface/hub/models--\(sanitizedRepoID)/snapshots"
+        let snapshotsURL = URL(fileURLWithPath: NSString(string: snapshotsPath).expandingTildeInPath, isDirectory: true)
+        return newestSnapshotDirectory(in: snapshotsURL, fileManager: fileManager)
+    }
+
+    private func newestSnapshotDirectory(in snapshotsURL: URL, fileManager: FileManager) -> URL? {
+        guard fileManager.fileExists(atPath: snapshotsURL.path) else {
+            return nil
+        }
+
+        let directoryContents = try? fileManager.contentsOfDirectory(
+            at: snapshotsURL,
+            includingPropertiesForKeys: [.contentModificationDateKey],
+            options: [.skipsHiddenFiles]
+        )
+
+        return directoryContents?
+            .filter { url in
+                var isDirectory: ObjCBool = false
+                return fileManager.fileExists(atPath: url.path, isDirectory: &isDirectory) && isDirectory.boolValue
+            }
+            .sorted(by: { lhs, rhs in
+                let lhsDate = (try? lhs.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
+                let rhsDate = (try? rhs.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
+                return lhsDate > rhsDate
+            })
+            .first
+    }
+
+    private func existingDirectoryURL(at rawPath: String, fileManager: FileManager) -> URL? {
+        let expandedPath = NSString(string: rawPath).expandingTildeInPath
+        let url = URL(fileURLWithPath: expandedPath, isDirectory: true)
+        var isDirectory: ObjCBool = false
+
+        guard fileManager.fileExists(atPath: url.path, isDirectory: &isDirectory), isDirectory.boolValue else {
+            return nil
+        }
+
+        return url
+    }
+
+    private func createSoftPromptSample(from sample: OpenTSLMSPSample, with projectedEmbeddings: [MLXArray], tokenizer: OpenTSLMLLM) throws -> SoftPromptSample {
+        // For now, create simplified embeddings based on text length
+        // In a full implementation, this would use proper tokenization and model embeddings
+        let hiddenSize = 2048 // Llama 3.2 1B hidden size
+
+        // Create embeddings for text segments (simplified approximation)
+        let prePromptEmbeddings = MLXArray.zeros([sample.prePrompt.count / 4 + 1, hiddenSize]) // Rough token approximation
+        let postPromptEmbeddings = MLXArray.zeros([sample.postPrompt.count / 4 + 1, hiddenSize])
+
+        let prePromptMask = MLXArray.ones([Int(prePromptEmbeddings.dim(0))])
+        let postPromptMask = MLXArray.ones([Int(postPromptEmbeddings.dim(0))])
+
+        let prePromptSegment = SoftPromptSegment(embeddings: prePromptEmbeddings, attentionMask: prePromptMask)
+        let postPromptSegment = SoftPromptSegment(embeddings: postPromptEmbeddings, attentionMask: postPromptMask)
+
+        // Create text segments for time series descriptions
+        var timeSeriesTextSegments: [SoftPromptSegment] = []
+        for text in sample.timeSeriesText {
+            let approxTokens = text.count / 4 + 1 // Rough approximation
+            let embeddings = MLXArray.zeros([approxTokens, hiddenSize])
+            let mask = MLXArray.ones([approxTokens])
+            timeSeriesTextSegments.append(SoftPromptSegment(embeddings: embeddings, attentionMask: mask))
+        }
+
+        return SoftPromptSample(
+            prePrompt: prePromptSegment,
+            timeSeriesText: timeSeriesTextSegments,
+            timeSeriesEmbeddings: projectedEmbeddings,
+            postPrompt: postPromptSegment
+        )
+    }
+
+    private func createLLMPrompt(from sample: OpenTSLMSPSample) -> String {
+        """
+        \(sample.prePrompt)
+
+        Time series descriptions:
+        \(sample.timeSeriesText.enumerated().map { "Series \($0.offset + 1): \($0.element)" }.joined(separator: "\n"))
+
+        \(sample.postPrompt)
+        """
     }
 
     private func loadECGSample() throws -> ECGSample {

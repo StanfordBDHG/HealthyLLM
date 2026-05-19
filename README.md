@@ -33,6 +33,10 @@ The Build and Test workflow builds and tests the iOS application, shared Swift p
 
 The HealthyLLM app now auto-loads a prompt for the latest available Apple Watch ECG reading and passes the resulting ECG context into the local inference path. If no ECG sample is available, the app still opens normally and falls back to the regular health prompt flow.
 
+### Hugging Face Token
+
+The default model (`meta-llama/Llama-3.2-1B`) is gated. Accept its license on Hugging Face, then add `HF_TOKEN=<your-token>` as an environment variable in your *user-specific* (unshared) Xcode Run scheme so it stays out of version control.
+
 ### SwiftLint
 
 The Swiftlint workflow is triggered by every pull request (PR) and checks if the files found in the diff contain any [SwiftLint](https://github.com/realm/SwiftLint) violations.

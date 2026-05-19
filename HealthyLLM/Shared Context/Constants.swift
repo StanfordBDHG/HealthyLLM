@@ -20,10 +20,15 @@ enum Constants {
     static let localModelBundleSubdirectory = "LocalLLM"
     static let hostHuggingFaceCacheRoot = ProcessInfo.processInfo.environment["HEALTHYLLM_HOST_HF_CACHE_ROOT"]
         ?? "~/.cache/huggingface/hub"
-    static let llmLocalModelDirectory = {
-        let sanitizedRepoID = llmModelName.replacingOccurrences(of: "/", with: "--")
-        let cacheRoot = NSString(string: hostHuggingFaceCacheRoot).expandingTildeInPath
-        return URL(fileURLWithPath: "\(cacheRoot)/models--\(sanitizedRepoID)", isDirectory: true)
+    // Where SpeziLLMLocal / HubApi actually reads and writes the model:
+    // <Documents>/huggingface/models/<modelID>  (matches HubApi.shared.localRepoLocation)
+    static let llmLocalModelDirectory: URL = {
+        let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+            ?? URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent("Documents", isDirectory: true)
+        return documents
+            .appendingPathComponent("huggingface", isDirectory: true)
+            .appendingPathComponent("models", isDirectory: true)
+            .appendingPathComponent(llmModelName, isDirectory: true)
     }()
 
     static let includeHardcodedECGSample = (ProcessInfo.processInfo.environment["HEALTHYLLM_INCLUDE_HARDCODED_ECG"] ?? "1") == "1"
@@ -54,4 +59,9 @@ enum Constants {
     static let llmModelChatTemplate = "{% set loop_messages = messages %}{% if not messages[0]['role'] == 'system' %}{% set dummy = loop_messages.insert(0, {'role': 'system', 'content': 'You are a helpful assistant'}) %}{% endif %}{% for message in loop_messages %}{% if message['role'] == 'system' %}{{ '<|start_header_id|>system<|end_header_id|>\n\n' + message['content'] + '<|eot_id|>' }}{% elif message['role'] == 'user' %}{{ '<|start_header_id|>user<|end_header_id|>\n\n' + message['content'] + '<|eot_id|>' }}{% elif message['role'] == 'assistant' %}{{ '<|start_header_id|>assistant<|end_header_id|>\n\n' + message['content'] + '<|eot_id|>' }}{% endif %}{% endfor %}{% if add_generation_prompt %}{{ '<|start_header_id|>assistant<|end_header_id|>\n\n' }}{% endif %}"
     
     static let workoutLimitJsonRepresentation = 3
+
+    /// If "1" (default), pass `Constants.llmModelChatTemplate` as the chat template to LLMLocalParameters.
+    /// If "0", pass nil and let MLX use the tokenizer's built-in chat template from `tokenizer_config.json`.
+    /// Use this to isolate whether the custom Jinja template is the source of `LLMLocalError.illegalContext`.
+    static let useCustomChatTemplate = (ProcessInfo.processInfo.environment["HEALTHYLLM_USE_CUSTOM_CHAT_TEMPLATE"] ?? "1") == "1"
 }

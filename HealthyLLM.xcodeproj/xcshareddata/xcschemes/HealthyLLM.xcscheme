@@ -79,6 +79,13 @@
             ReferencedContainer = "container:HealthyLLM.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "HEALTHYLLM_USE_CUSTOM_CHAT_TEMPLATE"
+            value = "0"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

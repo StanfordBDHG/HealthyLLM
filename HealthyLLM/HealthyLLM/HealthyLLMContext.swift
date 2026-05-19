@@ -21,8 +21,8 @@ struct HealthyLLMContextEntity: Identifiable {
         
         var inChatName: String {
             switch self {
-            case .assistant: return "assisstant"
-            case .toolCall: return "assisstant"
+            case .assistant: return "assistant"
+            case .toolCall: return "assistant"
             case .toolResponse: return "tool"
             case .user: return "user"
             case .system: return "system"

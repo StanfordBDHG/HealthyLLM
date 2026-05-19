@@ -246,6 +246,12 @@
         }
       }
     },
+    "Model not found on this device" : {
+
+    },
+    "Open download" : {
+
+    },
     "OPEN_SETTINGS" : {
       "localizations" : {
         "en" : {
@@ -255,6 +261,9 @@
           }
         }
       }
+    },
+    "Repo: %@" : {
+
     },
     "RESET" : {
       "localizations" : {
@@ -275,6 +284,9 @@
           }
         }
       }
+    },
+    "Tap below to download. The model is gated — make sure you have accepted its license on Hugging Face and have HF_TOKEN set." : {
+
     },
     "WELCOME_AREA1_DESCRIPTION" : {
       "localizations" : {

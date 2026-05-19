@@ -20,8 +20,20 @@ import SpeziLLMLocal
 @Observable
 class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible {
     @ObservationIgnored private let logger = Logger(subsystem: "HealthyLLM", category: "HealthDataInterpreter")
-    
+
+    enum LoadingStage: String {
+        case idle = "Idle"
+        case stagingModel = "Staging local model files"
+        case configuringParameters = "Configuring LLM parameters"
+        case creatingSession = "Creating LLM session"
+        case openingSession = "Opening LLM session (loading weights)"
+        case ready = "Ready"
+        case failed = "Failed"
+    }
+
     private(set) var loaded = false
+    private(set) var loadingStage: LoadingStage = .idle
+    private(set) var loadingDetail: String = ""
     
     @ObservationIgnored @Dependency(LLMRunner.self) private var llmRunner: LLMRunner
     @ObservationIgnored @Dependency(HealthDataFetcher.self) private var healthDataFetcher: HealthDataFetcher
@@ -46,73 +58,144 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
     required init() { }
     
     func setup() async throws {
-        try await stageLocalModelIfNeeded()
+        logger.info("setup(): starting. modelID=\(Constants.llmModelName, privacy: .public) destination=\(Constants.llmLocalModelDirectory.path, privacy: .public)")
+        await MainActor.run {
+            loadingStage = .stagingModel
+            loadingDetail = Constants.llmModelName
+        }
+
+        do {
+            try await stageLocalModelIfNeeded()
+        } catch {
+            logger.error("setup(): stageLocalModelIfNeeded threw: \(error.localizedDescription, privacy: .public)")
+            await MainActor.run {
+                loadingStage = .failed
+                loadingDetail = "Staging failed: \(error.localizedDescription)"
+            }
+            throw error
+        }
+
+        await MainActor.run {
+            loadingStage = .configuringParameters
+        }
+        logger.info("setup(): staging complete; configuring parameters")
+
+        let chatTemplate: String? = Constants.useCustomChatTemplate ? Constants.llmModelChatTemplate : nil
+        logger.info("setup(): chatTemplate=\(chatTemplate == nil ? "tokenizer-default" : "custom-jinja", privacy: .public)")
 
         functionCallParameters = .init(
             maxOutputLength: 32,
-            chatTemplate: Constants.llmModelChatTemplate
+            chatTemplate: chatTemplate
         )
         functionCallSamplingParameters = .init(
             topP: 1.0,
             temperature: 0.001,
             penaltyRepeat: 1.3
         )
-        
+
         defaultParameters = .init(
             maxOutputLength: 1024,
-            chatTemplate: Constants.llmModelChatTemplate
+            chatTemplate: chatTemplate
         )
         guard let defaultParameters else {
+            logger.error("setup(): defaultParameters unexpectedly nil after assignment")
+            await MainActor.run {
+                loadingStage = .failed
+                loadingDetail = "defaultParameters nil"
+            }
             return
         }
-        
+
+        await MainActor.run {
+            loadingStage = .creatingSession
+        }
+        logger.info("setup(): creating LLMLocalSchema and session")
+
         let schema = LLMLocalSchema(
             model: .custom(id: Constants.llmModelName),
             parameters: defaultParameters,
             injectIntoContext: true
         )
-        
+
         sharedSession = llmRunner.callAsFunction(with: schema)
         guard let sharedSession else {
+            logger.error("setup(): llmRunner.callAsFunction returned nil session")
+            await MainActor.run {
+                loadingStage = .failed
+                loadingDetail = "llmRunner returned nil session"
+            }
             return
         }
 
-        try await sharedSession.setup()
-        loaded = true
+        await MainActor.run {
+            loadingStage = .openingSession
+            loadingDetail = "Loading weights — this can take a while on first launch"
+        }
+        logger.info("setup(): calling sharedSession.setup() — this loads weights and may be the long-running step")
+
+        let setupStart = Date()
+        do {
+            try await sharedSession.setup()
+        } catch {
+            logger.error("setup(): sharedSession.setup() threw after \(Date().timeIntervalSince(setupStart), privacy: .public)s: \(error.localizedDescription, privacy: .public)")
+            await MainActor.run {
+                loadingStage = .failed
+                loadingDetail = "Session setup failed: \(error.localizedDescription)"
+            }
+            throw error
+        }
+
+        let setupDuration = Date().timeIntervalSince(setupStart)
+        logger.info("setup(): sharedSession.setup() completed in \(setupDuration, privacy: .public)s; marking loaded=true")
+        await MainActor.run {
+            loaded = true
+            loadingStage = .ready
+            loadingDetail = String(format: "Loaded in %.1fs", setupDuration)
+        }
     }
 
     private func stageLocalModelIfNeeded() async throws {
         let fileManager = FileManager.default
         let destinationURL = Constants.llmLocalModelDirectory
+        logger.info("stageLocalModelIfNeeded: destination=\(destinationURL.path, privacy: .public)")
 
         do {
             try fileManager.createDirectory(at: destinationURL, withIntermediateDirectories: true)
         } catch {
-            logger.error("Failed creating local model destination directory: \(error.localizedDescription)")
+            logger.error("Failed creating local model destination directory: \(error.localizedDescription, privacy: .public)")
             return
         }
 
         if hasRequiredModelFiles(in: destinationURL, fileManager: fileManager) {
-            logger.info("Local model cache already has required files at destination: \(destinationURL.path)")
+            logger.info("stageLocalModelIfNeeded: destination already has all required files (\(self.requiredModelFiles.joined(separator: ", "), privacy: .public)) — skipping copy")
             return
         }
 
+        let missing = requiredModelFiles.filter { fileName in
+            !fileManager.fileExists(atPath: destinationURL.appendingPathComponent(fileName).path)
+        }
+        logger.info("stageLocalModelIfNeeded: destination is missing files: \(missing.joined(separator: ", "), privacy: .public)")
+
         guard let sourceURL = resolveLocalModelSourceDirectory() else {
-            logger.warning("No local model source directory found. Falling back to download flow.")
+            logger.warning("stageLocalModelIfNeeded: no local model source directory found. The app will rely on the download flow / Hub cache. Required files still missing at destination.")
             return
         }
+        logger.info("stageLocalModelIfNeeded: copying from \(sourceURL.path, privacy: .public)")
 
         do {
             try copyDirectoryContents(from: sourceURL, to: destinationURL)
             try stageLoRACheckpointIfAvailable(sourceURL: sourceURL, destinationURL: destinationURL)
 
             if hasRequiredModelFiles(in: destinationURL, fileManager: fileManager) {
-                logger.info("Staged local model from \(sourceURL.path) to \(destinationURL.path)")
+                logger.info("stageLocalModelIfNeeded: staged local model from \(sourceURL.path, privacy: .public) to \(destinationURL.path, privacy: .public)")
             } else {
-                logger.error("Model staging finished but required files are still missing in \(destinationURL.path)")
+                let stillMissing = requiredModelFiles.filter { fileName in
+                    !fileManager.fileExists(atPath: destinationURL.appendingPathComponent(fileName).path)
+                }
+                logger.error("stageLocalModelIfNeeded: staging finished but required files still missing: \(stillMissing.joined(separator: ", "), privacy: .public)")
             }
         } catch {
-            logger.error("Failed to stage local model: \(error.localizedDescription)")
+            logger.error("stageLocalModelIfNeeded: failed: \(error.localizedDescription, privacy: .public)")
             throw error
         }
     }
@@ -355,8 +438,19 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
             return
         }
         
-        try await checkForFunctionCall(prompt: userPrompt.content, healthKit: healthKit)
-        try await defaultResponse(healthKit)
+        do {
+            try await checkForFunctionCall(prompt: userPrompt.content, healthKit: healthKit)
+        } catch {
+            logger.error("queryLLM: checkForFunctionCall threw \(String(reflecting: error), privacy: .public) — localizedDescription=\(error.localizedDescription, privacy: .public)")
+            throw error
+        }
+
+        do {
+            try await defaultResponse(healthKit)
+        } catch {
+            logger.error("queryLLM: defaultResponse threw \(String(reflecting: error), privacy: .public) — localizedDescription=\(error.localizedDescription, privacy: .public)")
+            throw error
+        }
     }
 
     private func shouldRunOpenTSLMSampleInference(for prompt: String) -> Bool {
@@ -403,11 +497,20 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
             .init(.user, content: prompt)
         ]
         advancedContext.append(contentsOf: context)
-        
-        let functionCallLLMOutput = try await llmRunner.oneShot(
-            on: sharedSession,
-            customContext: context.map(\.asDictionary)
-        )
+
+        let dictContext = context.map(\.asDictionary)
+        logger.info("checkForFunctionCall: sending \(dictContext.count) messages to LLM. roles=\(dictContext.map { $0["role"] ?? "?" }.joined(separator: ","), privacy: .public)")
+
+        let functionCallLLMOutput: String
+        do {
+            functionCallLLMOutput = try await llmRunner.oneShot(
+                on: sharedSession,
+                customContext: dictContext
+            )
+        } catch {
+            logger.error("checkForFunctionCall: oneShot threw \(String(reflecting: error), privacy: .public)")
+            throw error
+        }
         
         logger.debug("Function Call LLM Finished with: \(functionCallLLMOutput)")
         
@@ -446,12 +549,17 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
             sharedSession.customContext = context.map(\.asDictionary)
         }
         
-        logger.debug("defaultResponse: Started with context")
+        logger.debug("defaultResponse: Started with context (\(self.context.count, privacy: .public) messages, roles=\(self.context.map { String(describing: $0.role) }.joined(separator: ","), privacy: .public))")
 
         var assistantOutput = ""
-        for try await stringPiece in try await sharedSession.generate() {
-            logger.debug("defaultResponse: Received string piece: \(stringPiece)")
-            assistantOutput += stringPiece
+        do {
+            for try await stringPiece in try await sharedSession.generate() {
+                logger.debug("defaultResponse: Received string piece: \(stringPiece, privacy: .public)")
+                assistantOutput += stringPiece
+            }
+        } catch {
+            logger.error("defaultResponse: generate threw \(String(reflecting: error), privacy: .public)")
+            throw error
         }
 
         let assistantMessage = HealthyLLMContextEntity(.assistant, content: assistantOutput, completed: true)

@@ -31,6 +31,13 @@ enum Constants {
             .appendingPathComponent(llmModelName, isDirectory: true)
     }()
 
+    /// OpenTSLM assets (LoRA, etc.) — never mix into the HF Llama model directory.
+    static let openTSLMDocumentsDirectory: URL = {
+        let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+            ?? URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent("Documents", isDirectory: true)
+        return documents.appendingPathComponent(openTSLMBundleSubdirectory, isDirectory: true)
+    }()
+
     static let includeHardcodedECGSample = (ProcessInfo.processInfo.environment["HEALTHYLLM_INCLUDE_HARDCODED_ECG"] ?? "1") == "1"
     static let hardcodedECGSampleLength = 1024
 
@@ -52,6 +59,19 @@ enum Constants {
     static let openTSLMLoRACheckpointName = "mlx-checkpoint.lora"
     static let openTSLMSleepCSVName = "sleep_cot"
     static let requireLoRACheckpoint = (ProcessInfo.processInfo.environment["HEALTHYLLM_REQUIRE_LORA"] ?? "0") == "1"
+
+    /// Cap main chat generation length (avoids long repetition loops in console and UI).
+    static let llmDefaultMaxOutputLength = Int(
+        ProcessInfo.processInfo.environment["HEALTHYLLM_LLM_MAX_OUTPUT"] ?? "256"
+    ) ?? 256
+
+    /// Cap EEG samples before encoder (1500 raw samples → ~375 patches).
+    static let openTSLMMaxTimeSeriesLength = Int(
+        ProcessInfo.processInfo.environment["HEALTHYLLM_OPEN_TSLM_MAX_SERIES_LENGTH"] ?? "480"
+    ) ?? 480
+
+    /// If "1", run a second on-device LLM decode during OpenTSLM samples (high memory; default off).
+    static let openTSLMRunSampleLLMGeneration = (ProcessInfo.processInfo.environment["HEALTHYLLM_OPEN_TSLM_RUN_LLM"] ?? "0") == "1"
 
     static let ecgAutoPrompt = "Analyze my latest ECG reading and summarize the rhythm, signal quality, and any notable concerns."
 

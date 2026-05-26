@@ -24,8 +24,8 @@ public final class SleepEDFDataset {
 
     private let samples: [OpenTSLMSPSample]
 
-    public init(csvURL: URL, split: Split = .test, seed: UInt64 = 42) throws {
-        let rows = try Self.readRows(from: csvURL)
+    public init(csvURL: URL, split: Split = .test, seed: UInt64 = 42, maxRows: Int = 5000) throws {
+        let rows = try Self.readRows(from: csvURL, maxRows: maxRows)
         let splitRows = Self.stratifiedSplit(rows: rows, split: split, seed: seed)
         self.samples = try splitRows.map(Self.convertRow)
     }
@@ -46,9 +46,14 @@ private extension SleepEDFDataset {
         let rationale: String
     }
 
-    static func readRows(from csvURL: URL) throws -> [Row] {
-        let csv = try String(contentsOf: csvURL, encoding: .utf8)
-        let records = parseCSV(csv)
+    static func readRows(from csvURL: URL, maxRows: Int) throws -> [Row] {
+        // Bundled sleep_cot.csv is ~300MB — read only a prefix on device.
+        let handle = try FileHandle(forReadingFrom: csvURL)
+        let prefix = try handle.read(upToCount: 20 * 1024 * 1024) ?? Data()
+        let csvPrefix = String(decoding: prefix, as: UTF8.self)
+        let safePrefix = csvPrefix.prefix(upTo: csvPrefix.lastIndex(of: "\n") ?? csvPrefix.endIndex)
+
+        let records = parseCSV(String(safePrefix))
         guard let header = records.first else {
             throw NSError(domain: "SleepEDFDataset", code: 1, userInfo: [NSLocalizedDescriptionKey: "CSV has no header"])
         }
@@ -63,9 +68,10 @@ private extension SleepEDFDataset {
         let rationaleIdx = columnIndex["rationale"]
 
         var rows: [Row] = []
-        rows.reserveCapacity(max(records.count - 1, 0))
+        rows.reserveCapacity(maxRows)
 
-        for record in records.dropFirst() where !record.isEmpty {
+        for record in records.dropFirst() where rows.count < maxRows {
+            guard !record.isEmpty else { continue }
             guard timeSeriesIdx < record.count, labelIdx < record.count else { continue }
             let rationale = (rationaleIdx != nil && rationaleIdx! < record.count) ? record[rationaleIdx!] : ""
             rows.append(Row(timeSeries: record[timeSeriesIdx], label: record[labelIdx], rationale: rationale))

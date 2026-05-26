@@ -57,60 +57,96 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
         }
 
         let safeIndex = min(max(sampleIndex, 0), dataset.count - 1)
-        let sample = dataset.sample(at: safeIndex)
+        let sample = cappedSample(dataset.sample(at: safeIndex))
 
-        let pipeline = OpenTSLMSPPipeline(hiddenSize: 2048)
-        try pipeline.loadWeights(encoderURL: encoderURL, projectorURL: projectorURL)
+        let projected: [MLXArray]
+        do {
+            let pipeline = OpenTSLMSPPipeline(hiddenSize: 2048)
+            try pipeline.loadWeights(encoderURL: encoderURL, projectorURL: projectorURL)
+            projected = pipeline.projectSample(sample)
+        }
 
-        let projected = pipeline.projectSample(sample)
         guard let first = projected.first else {
             throw NSError(domain: "OpenTSLMInferenceService", code: 5, userInfo: [NSLocalizedDescriptionKey: "Projection returned no tensors"])
         }
 
         eval(first)
-        logger.info("OpenTSLM sample inference complete: split=\(split.rawValue), sample=\(safeIndex)")
+        GPU.clearCache()
+        logger.info("OpenTSLM encoder projection done: split=\(split.rawValue), sample=\(safeIndex)")
 
-        // Use provided LLM session or fall back to embedding description
         if let llmRunner = llmRunner, let llmSession = llmSession {
-            let openTSLMLLM = OpenTSLMLLM(llmRunner: llmRunner, session: llmSession)
+            var loraApplied = false
+            do {
+                try await OpenTSLMLoRA.applyIfNeeded(on: llmSession)
+                loraApplied = true
+            } catch {
+                logger.warning("OpenTSLM LoRA apply failed: \(error.localizedDescription, privacy: .public)")
+            }
 
-            // Create SoftPromptSample
-            let softPromptSample = try createSoftPromptSample(from: sample, with: projected, tokenizer: openTSLMLLM)
+            GPU.clearCache()
 
-            // Interleave text and embeddings
-            let batch = SoftPromptInterleaver.padAndInterleaveBatch([softPromptSample])
+            if Constants.openTSLMRunSampleLLMGeneration {
+                let openTSLMLLM = OpenTSLMLLM(llmRunner: llmRunner, session: llmSession)
+                let softPromptSample = try createSoftPromptSample(from: sample, with: projected, tokenizer: openTSLMLLM)
+                let batch = SoftPromptInterleaver.padAndInterleaveBatch([softPromptSample])
+                let generatedText = try await openTSLMLLM.generateWithEmbeddings(
+                    inputsEmbeds: batch.inputsEmbeds,
+                    prompt: createLLMPrompt(from: sample),
+                    maxTokens: 32
+                )
 
-            // Generate text using the LLM with embeddings
-            let generatedText = try await openTSLMLLM.generateWithEmbeddings(
-                inputsEmbeds: batch.inputsEmbeds,
-                prompt: createLLMPrompt(from: sample)
-            )
+                let outputText = """
+                **LLM-Generated Analysis:**
+
+                \(generatedText)
+
+                ---
+                Ground-truth label: \(sample.label)
+                Ground-truth answer: \(sample.answer)
+                """
+
+                return formatSampleReport(
+                    title: "Sleep-EDF sample inference with LLM generation",
+                    prePrompt: sample.prePrompt,
+                    timeSeriesText: sample.timeSeriesText,
+                    postPrompt: sample.postPrompt,
+                    label: sample.label,
+                    answer: outputText,
+                    extraLines: openTSLMSampleExtraLines(
+                        split: split,
+                        sampleIndex: safeIndex,
+                        sample: sample,
+                        embeddingsShape: first.shape,
+                        loraApplied: loraApplied
+                    )
+                )
+            }
 
             let outputText = """
-            **LLM-Generated Analysis:**
+            **OpenTSLM encoder + LoRA (on-device decode skipped to avoid OOM)**
 
-            \(generatedText)
-
-            ---
+            Projected time-series embeddings: \(first.shape)
+            LoRA applied to Llama: \(loraApplied ? "yes" : "no")
             Ground-truth label: \(sample.label)
             Ground-truth answer: \(sample.answer)
+
+            Set `HEALTHYLLM_OPEN_TSLM_RUN_LLM=1` in the scheme to attempt a short LLM decode (may exceed device memory).
             """
 
             return formatSampleReport(
-                title: "Sleep-EDF sample inference with LLM generation",
+                title: "Sleep-EDF sample inference (encoder + LoRA)",
                 prePrompt: sample.prePrompt,
                 timeSeriesText: sample.timeSeriesText,
                 postPrompt: sample.postPrompt,
                 label: sample.label,
                 answer: outputText,
-                extraLines: [
-                    "split: \(split.rawValue)",
-                    "sample_index: \(safeIndex)",
-                    "series_count: \(sample.timeSeries.count)",
-                    "embeddings_shape: \(first.shape)",
-                    "llm_model: \(Constants.llmModelName)",
-                    "llm_integration: yes",
-                ]
+                extraLines: openTSLMSampleExtraLines(
+                    split: split,
+                    sampleIndex: safeIndex,
+                    sample: sample,
+                    embeddingsShape: first.shape,
+                    loraApplied: loraApplied
+                )
             )
         } else {
             // Fallback: just describe the embeddings
@@ -150,7 +186,7 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
         llmSession: LLMLocalSession? = nil
     ) async throws -> String {
         let ecg = try loadECGSample()
-        let sample = makeOpenTSLMSample(from: ecg)
+        let sample = cappedSample(makeOpenTSLMSample(from: ecg))
 
         // Load encoder and projector for ECG embeddings
         guard let encoderURL = resolveAssetURL(
@@ -179,22 +215,22 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
         }
 
         eval(first)
+        GPU.clearCache()
 
         // Use provided LLM session or fall back to embedding description
         if let llmRunner = llmRunner, let llmSession = llmSession {
-            let openTSLMLLM = OpenTSLMLLM(llmRunner: llmRunner, session: llmSession)
+            if Constants.openTSLMRunSampleLLMGeneration {
+                try await OpenTSLMLoRA.applyIfNeeded(on: llmSession)
+                GPU.clearCache()
 
-            // Create SoftPromptSample
-            let softPromptSample = try createSoftPromptSample(from: sample, with: projected, tokenizer: openTSLMLLM)
-
-            // Interleave text and embeddings
-            let batch = SoftPromptInterleaver.padAndInterleaveBatch([softPromptSample])
-
-            // Generate text using the LLM with embeddings
-            let generatedText = try await openTSLMLLM.generateWithEmbeddings(
-                inputsEmbeds: batch.inputsEmbeds,
-                prompt: createLLMPrompt(from: sample)
-            )
+                let openTSLMLLM = OpenTSLMLLM(llmRunner: llmRunner, session: llmSession)
+                let softPromptSample = try createSoftPromptSample(from: sample, with: projected, tokenizer: openTSLMLLM)
+                let batch = SoftPromptInterleaver.padAndInterleaveBatch([softPromptSample])
+                let generatedText = try await openTSLMLLM.generateWithEmbeddings(
+                    inputsEmbeds: batch.inputsEmbeds,
+                    prompt: createLLMPrompt(from: sample),
+                    maxTokens: 32
+                )
 
             let outputText = """
             **LLM-Generated ECG Analysis:**
@@ -218,7 +254,33 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
                     "source: \(ecg.sourceDescription)",
                     "embeddings_shape: \(first.shape)",
                     "llm_model: \(Constants.llmModelName)",
-                    "llm_integration: yes",
+                    "llm_integration: generate",
+                ]
+            )
+            }
+
+            try await OpenTSLMLoRA.applyIfNeeded(on: llmSession)
+            let outputText = """
+            **OpenTSLM ECG encoder + LoRA (decode skipped — set HEALTHYLLM_OPEN_TSLM_RUN_LLM=1 to generate)**
+
+            Embeddings shape: \(first.shape)
+            Pre-defined summary: \(sample.answer)
+            """
+
+            return formatSampleReport(
+                title: "ECG sample inference (encoder + LoRA)",
+                prePrompt: sample.prePrompt,
+                timeSeriesText: sample.timeSeriesText,
+                postPrompt: sample.postPrompt,
+                label: sample.label,
+                answer: outputText,
+                extraLines: [
+                    "sampling_frequency_hz: \(String(format: "%.1f", ecg.samplingFrequency))",
+                    "voltage_count: \(ecg.voltages.count)",
+                    "source: \(ecg.sourceDescription)",
+                    "embeddings_shape: \(first.shape)",
+                    "llm_model: \(Constants.llmModelName)",
+                    "llm_integration: encoder+lora-only",
                 ]
             )
         } else {
@@ -381,6 +443,45 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
             timeSeriesEmbeddings: projectedEmbeddings,
             postPrompt: postPromptSegment
         )
+    }
+
+    private func cappedSample(_ sample: OpenTSLMSPSample) -> OpenTSLMSPSample {
+        let cap = Constants.openTSLMMaxTimeSeriesLength
+        guard cap > 0 else { return sample }
+
+        let cappedSeries = sample.timeSeries.map { series in
+            series.count > cap ? Array(series.prefix(cap)) : series
+        }
+        guard cappedSeries != sample.timeSeries else { return sample }
+
+        return OpenTSLMSPSample(
+            prePrompt: sample.prePrompt,
+            timeSeriesText: sample.timeSeriesText,
+            timeSeries: cappedSeries,
+            postPrompt: sample.postPrompt,
+            label: sample.label,
+            answer: sample.answer
+        )
+    }
+
+    private func openTSLMSampleExtraLines(
+        split: SleepEDFDataset.Split,
+        sampleIndex: Int,
+        sample: OpenTSLMSPSample,
+        embeddingsShape: [Int],
+        loraApplied: Bool
+    ) -> [String] {
+        [
+            "split: \(split.rawValue)",
+            "sample_index: \(sampleIndex)",
+            "series_count: \(sample.timeSeries.count)",
+            "max_series_length: \(Constants.openTSLMMaxTimeSeriesLength)",
+            "embeddings_shape: \(embeddingsShape)",
+            "lora_checkpoint_found: \(OpenTSLMLoRA.resolveLoRAURL() != nil)",
+            "lora_applied: \(loraApplied ? "yes" : "no")",
+            "llm_model: \(Constants.llmModelName)",
+            "llm_integration: \(Constants.openTSLMRunSampleLLMGeneration ? "generate" : "encoder+lora-only")",
+        ]
     }
 
     private func createLLMPrompt(from sample: OpenTSLMSPSample) -> String {

@@ -43,7 +43,10 @@ public final class OpenTSLMLLM {
 
         // Use the existing SpeziLLMLocal session to generate
         await MainActor.run {
-            self.session.customContext = [["role": "user", "content": fullPrompt]]
+            self.session.customContext = [
+                ["role": "system", "content": "You are a helpful assistant."],
+                ["role": "user", "content": fullPrompt],
+            ]
         }
 
         var output = ""

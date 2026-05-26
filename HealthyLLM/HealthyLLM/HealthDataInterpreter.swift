@@ -14,6 +14,8 @@ import Spezi
 import SpeziChat
 import SpeziHealthKit
 import SpeziHealthKitUI
+import MLXLLM
+import MLXLMCommon
 import SpeziLLM
 import SpeziLLMLocal
 
@@ -43,6 +45,7 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
     @ObservationIgnored private var functionCallParameters: LLMLocalParameters?
     @ObservationIgnored private var functionCallSamplingParameters: LLMLocalSamplingParameters?
     @ObservationIgnored private var defaultParameters: LLMLocalParameters?
+    @ObservationIgnored private var defaultSamplingParameters: LLMLocalSamplingParameters?
     @ObservationIgnored private var sharedSession: LLMLocalSession?
     @ObservationIgnored private let requiredModelFiles = [
         "config.json",
@@ -66,6 +69,7 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
 
         do {
             try await stageLocalModelIfNeeded()
+            try removeNonBaseWeightSafetensorsFromModelDirectory()
         } catch {
             logger.error("setup(): stageLocalModelIfNeeded threw: \(error.localizedDescription, privacy: .public)")
             await MainActor.run {
@@ -94,8 +98,13 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
         )
 
         defaultParameters = .init(
-            maxOutputLength: 1024,
+            maxOutputLength: Constants.llmDefaultMaxOutputLength,
             chatTemplate: chatTemplate
+        )
+        defaultSamplingParameters = .init(
+            topP: 0.9,
+            temperature: 0.7,
+            penaltyRepeat: 1.15
         )
         guard let defaultParameters else {
             logger.error("setup(): defaultParameters unexpectedly nil after assignment")
@@ -114,6 +123,7 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
         let schema = LLMLocalSchema(
             model: .custom(id: Constants.llmModelName),
             parameters: defaultParameters,
+            samplingParameters: defaultSamplingParameters ?? .init(),
             injectIntoContext: true
         )
 
@@ -131,9 +141,35 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
             loadingStage = .openingSession
             loadingDetail = "Loading weights — this can take a while on first launch"
         }
-        logger.info("setup(): calling sharedSession.setup() — this loads weights and may be the long-running step")
-
         let setupStart = Date()
+        let fileManager = FileManager.default
+        let modelDirectory = Constants.llmLocalModelDirectory
+
+        if hasRequiredModelFiles(in: modelDirectory, fileManager: fileManager) {
+            logger.info("setup(): loading MLX container from local directory (bf16 base weights only)")
+            do {
+                let container = try await LLMModelFactory.shared.loadContainer(
+                    configuration: ModelConfiguration(directory: modelDirectory)
+                )
+                await MainActor.run {
+                    sharedSession.modelContainer = container
+                    sharedSession.state = .ready
+                }
+                let setupDuration = Date().timeIntervalSince(setupStart)
+                logger.info("setup(): direct loadContainer succeeded in \(setupDuration, privacy: .public)s")
+                await MainActor.run {
+                    loaded = true
+                    loadingStage = .ready
+                    loadingDetail = String(format: "Loaded in %.1fs", setupDuration)
+                }
+                return
+            } catch {
+                logger.error("setup(): direct loadContainer failed: \(String(reflecting: error), privacy: .public)")
+            }
+        }
+
+        logger.info("setup(): calling sharedSession.setup() — Hub snapshot fallback")
+
         do {
             try await sharedSession.setup()
         } catch {
@@ -142,11 +178,12 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
                 loadingStage = .failed
                 loadingDetail = "Session setup failed: \(error.localizedDescription)"
             }
-            throw error
+            throw HealthDataInterpreterError.modelNotLoaded
         }
 
         let setupDuration = Date().timeIntervalSince(setupStart)
-        logger.info("setup(): sharedSession.setup() completed in \(setupDuration, privacy: .public)s; marking loaded=true")
+        logger.info("setup(): sharedSession.setup() completed in \(setupDuration, privacy: .public)s")
+
         await MainActor.run {
             loaded = true
             loadingStage = .ready
@@ -166,8 +203,11 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
             return
         }
 
+        try stageOpenTSLMLoRACheckpointIfNeeded()
+
         if hasRequiredModelFiles(in: destinationURL, fileManager: fileManager) {
             logger.info("stageLocalModelIfNeeded: destination already has all required files (\(self.requiredModelFiles.joined(separator: ", "), privacy: .public)) — skipping copy")
+            try removeNonBaseWeightSafetensorsFromModelDirectory()
             return
         }
 
@@ -183,8 +223,8 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
         logger.info("stageLocalModelIfNeeded: copying from \(sourceURL.path, privacy: .public)")
 
         do {
-            try copyDirectoryContents(from: sourceURL, to: destinationURL)
-            try stageLoRACheckpointIfAvailable(sourceURL: sourceURL, destinationURL: destinationURL)
+            try copyRequiredModelFiles(from: sourceURL, to: destinationURL)
+            try removeNonBaseWeightSafetensorsFromModelDirectory()
 
             if hasRequiredModelFiles(in: destinationURL, fileManager: fileManager) {
                 logger.info("stageLocalModelIfNeeded: staged local model from \(sourceURL.path, privacy: .public) to \(destinationURL.path, privacy: .public)")
@@ -200,36 +240,108 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
         }
     }
 
-    private func stageLoRACheckpointIfAvailable(sourceURL: URL, destinationURL: URL) throws {
+    /// Stage LoRA under ``Constants/openTSLMDocumentsDirectory`` — never into the Llama HF folder (MLX would load it as base weights).
+    private func stageOpenTSLMLoRACheckpointIfNeeded() throws {
         let fileManager = FileManager.default
-        var checkpointCandidates: [URL] = []
+        let destinationDirectory = Constants.openTSLMDocumentsDirectory
+        let destinationLoRA = destinationDirectory
+            .appendingPathComponent("\(Constants.openTSLMLoRACheckpointName).safetensors")
 
-        if !Constants.openTSLMLoRACheckpointPath.isEmpty {
-            checkpointCandidates.append(URL(fileURLWithPath: Constants.openTSLMLoRACheckpointPath))
-        }
-
-        checkpointCandidates.append(sourceURL.appendingPathComponent("\(Constants.openTSLMLoRACheckpointName).safetensors"))
-        checkpointCandidates.append(sourceURL.appendingPathComponent("adapter_model.safetensors"))
-
-        let existingCandidates = checkpointCandidates.filter { candidate in
-            fileManager.fileExists(atPath: candidate.path)
-        }
-
-        if let selectedLoRA = existingCandidates.first {
-            let destinationLoRA = destinationURL.appendingPathComponent(selectedLoRA.lastPathComponent)
-            if !fileManager.fileExists(atPath: destinationLoRA.path) {
-                try fileManager.copyItem(at: selectedLoRA, to: destinationLoRA)
-            }
-            logger.info("LoRA checkpoint staged at \(destinationLoRA.path)")
+        if fileManager.fileExists(atPath: destinationLoRA.path) {
             return
         }
 
-        if Constants.requireLoRACheckpoint {
-            throw NSError(
-                domain: "HealthDataInterpreter",
-                code: 10,
-                userInfo: [NSLocalizedDescriptionKey: "HEALTHYLLM_REQUIRE_LORA=1 but no LoRA checkpoint was found. Set HEALTHYLLM_OPEN_TSLM_LORA_CHECKPOINT or include \(Constants.openTSLMLoRACheckpointName).safetensors in LocalLLM."]
+        guard let sourceLoRA = resolveLoRACheckpointSource() else {
+            if Constants.requireLoRACheckpoint {
+                throw NSError(
+                    domain: "HealthDataInterpreter",
+                    code: 10,
+                    userInfo: [NSLocalizedDescriptionKey: "HEALTHYLLM_REQUIRE_LORA=1 but no LoRA checkpoint was found. Set HEALTHYLLM_OPEN_TSLM_LORA_CHECKPOINT or bundle \(Constants.openTSLMLoRACheckpointName).safetensors under OpenTSLM/."]
+                )
+            }
+            return
+        }
+
+        try fileManager.createDirectory(at: destinationDirectory, withIntermediateDirectories: true)
+        try fileManager.copyItem(at: sourceLoRA, to: destinationLoRA)
+        logger.info("LoRA checkpoint staged at \(destinationLoRA.path, privacy: .public)")
+    }
+
+    private func resolveLoRACheckpointSource() -> URL? {
+        let fileManager = FileManager.default
+        var candidates: [URL] = []
+
+        if !Constants.openTSLMLoRACheckpointPath.isEmpty {
+            candidates.append(URL(fileURLWithPath: Constants.openTSLMLoRACheckpointPath))
+        }
+
+        if let bundled = Bundle.main.url(
+            forResource: Constants.openTSLMLoRACheckpointName,
+            withExtension: "safetensors",
+            subdirectory: Constants.openTSLMBundleSubdirectory
+        ) {
+            candidates.append(bundled)
+        }
+
+        if let bundleRoot = Bundle.main.resourceURL {
+            candidates.append(
+                bundleRoot
+                    .appendingPathComponent(Constants.openTSLMBundleSubdirectory, isDirectory: true)
+                    .appendingPathComponent("\(Constants.openTSLMLoRACheckpointName).safetensors")
             )
+        }
+
+        return candidates.first { fileManager.fileExists(atPath: $0.path) }
+    }
+
+    /// Remove adapter / OpenTSLM safetensors from the Llama model directory so ``loadContainer`` only sees base weights.
+    private func removeNonBaseWeightSafetensorsFromModelDirectory() throws {
+        let fileManager = FileManager.default
+        let modelDirectory = Constants.llmLocalModelDirectory
+        guard let items = try? fileManager.contentsOfDirectory(at: modelDirectory, includingPropertiesForKeys: nil) else {
+            return
+        }
+
+        for item in items where item.pathExtension == "safetensors" {
+            let name = item.lastPathComponent
+            let isBaseWeight = name == "model.safetensors"
+                || (name.hasPrefix("model-") && name.hasSuffix(".safetensors"))
+            guard !isBaseWeight else {
+                continue
+            }
+            try fileManager.removeItem(at: item)
+            logger.info("Removed non-base safetensors from model dir: \(name, privacy: .public)")
+        }
+    }
+
+    /// Copy only Llama base checkpoint files — never OpenTSLM encoder/projector/LoRA weights.
+    private func copyRequiredModelFiles(from sourceURL: URL, to destinationURL: URL) throws {
+        let fileManager = FileManager.default
+
+        for fileName in requiredModelFiles {
+            let sourceFile = sourceURL.appendingPathComponent(fileName)
+            let destinationFile = destinationURL.appendingPathComponent(fileName)
+            guard fileManager.fileExists(atPath: sourceFile.path) else {
+                continue
+            }
+            if fileManager.fileExists(atPath: destinationFile.path) {
+                continue
+            }
+            try fileManager.copyItem(at: sourceFile, to: destinationFile)
+        }
+
+        let sourceItems = try fileManager.contentsOfDirectory(at: sourceURL, includingPropertiesForKeys: nil)
+        for item in sourceItems where item.pathExtension == "safetensors" {
+            let name = item.lastPathComponent
+            let isBaseWeight = name == "model.safetensors"
+                || (name.hasPrefix("model-") && name.hasSuffix(".safetensors"))
+            guard isBaseWeight else {
+                continue
+            }
+            let destinationFile = destinationURL.appendingPathComponent(name)
+            if !fileManager.fileExists(atPath: destinationFile.path) {
+                try fileManager.copyItem(at: item, to: destinationFile)
+            }
         }
     }
 
@@ -531,6 +643,7 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
         
         sharedSession.update(
             parameters: defaultParameters,
+            samplingParameters: defaultSamplingParameters,
             injectIntoContext: true
         )
         
@@ -549,18 +662,20 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
             sharedSession.customContext = context.map(\.asDictionary)
         }
         
-        logger.debug("defaultResponse: Started with context (\(self.context.count, privacy: .public) messages, roles=\(self.context.map { String(describing: $0.role) }.joined(separator: ","), privacy: .public))")
+        logger.info("defaultResponse: generating (\(self.context.count, privacy: .public) messages)")
 
-        var assistantOutput = ""
+        let assistantOutput: String
         do {
-            for try await stringPiece in try await sharedSession.generate() {
-                logger.debug("defaultResponse: Received string piece: \(stringPiece, privacy: .public)")
-                assistantOutput += stringPiece
-            }
+            assistantOutput = try await llmRunner.oneShot(
+                on: sharedSession,
+                customContext: context.map(\.asDictionary)
+            )
         } catch {
             logger.error("defaultResponse: generate threw \(String(reflecting: error), privacy: .public)")
             throw error
         }
+
+        logger.info("defaultResponse: finished (\(assistantOutput.count, privacy: .public) chars)")
 
         let assistantMessage = HealthyLLMContextEntity(.assistant, content: assistantOutput, completed: true)
         context.append(assistantMessage)

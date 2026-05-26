@@ -86,8 +86,13 @@
             isEnabled = "YES">
          </EnvironmentVariable>
          <EnvironmentVariable
-            key = "HEALTHYLLM_OPEN_TSLM_RUN_LLM"
+            key = "HEALTHYLLM_INCLUDE_HARDCODED_ECG"
             value = "1"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "HEALTHYLLM_OPEN_TSLM_RUN_LLM"
+            value = "0"
             isEnabled = "YES">
          </EnvironmentVariable>
       </EnvironmentVariables>

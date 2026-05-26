@@ -34,7 +34,8 @@ enum OpenTSLMLoRA {
         var candidates: [URL] = []
 
         if !Constants.openTSLMLoRACheckpointPath.isEmpty {
-            candidates.append(URL(fileURLWithPath: Constants.openTSLMLoRACheckpointPath))
+            let expanded = NSString(string: Constants.openTSLMLoRACheckpointPath).expandingTildeInPath
+            candidates.append(URL(fileURLWithPath: expanded))
         }
 
         let stagedOpenTSLM = Constants.openTSLMDocumentsDirectory

@@ -27,12 +27,13 @@ public final class OpenTSLMLLM {
         prompt: String,
         maxTokens: Int = 200
     ) async throws -> String {
-        // Convert embeddings to a textual representation that can be included in the prompt
+        let mean = inputsEmbeds.mean().item(Float.self)
+        let minValue = inputsEmbeds.min().item(Float.self)
+        let maxValue = inputsEmbeds.max().item(Float.self)
         let embeddingDescription = """
-        [TIME SERIES EMBEDDINGS: shape=\(inputsEmbeds.shape), mean=\(String(format: "%.4f", inputsEmbeds.mean().item(Float.self)))]
+        [TIME SERIES EMBEDDINGS: shape=\(inputsEmbeds.shape), mean=\(String(format: "%.4f", mean)), min=\(String(format: "%.4f", minValue)), max=\(String(format: "%.4f", maxValue))]
         """
 
-        // Create a comprehensive prompt that includes both the text prompt and embedding information
         let fullPrompt = """
         \(prompt)
 
@@ -41,21 +42,39 @@ public final class OpenTSLMLLM {
         Based on the time series embeddings provided above, please analyze and provide insights.
         """
 
-        // Use the existing SpeziLLMLocal session to generate
+        let savedContext = await MainActor.run { session.customContext }
+        let chatTemplate: String? = Constants.useCustomChatTemplate ? Constants.llmModelChatTemplate : nil
+        let restoreParameters = LLMLocalParameters(
+            maxOutputLength: Constants.llmDefaultMaxOutputLength,
+            chatTemplate: chatTemplate
+        )
+
         await MainActor.run {
-            self.session.customContext = [
+            session.customContext = [
                 ["role": "system", "content": "You are a helpful assistant."],
                 ["role": "user", "content": fullPrompt],
             ]
         }
 
-        var output = ""
-        let parameters = LLMLocalParameters(maxOutputLength: maxTokens)
-        session.update(parameters: parameters)
+        session.update(parameters: LLMLocalParameters(maxOutputLength: maxTokens, chatTemplate: chatTemplate))
 
-        for try await stringPiece in try await session.generate() {
-            output.append(stringPiece)
+        var output = ""
+        do {
+            for try await stringPiece in try await session.generate() {
+                output.append(stringPiece)
+            }
+        } catch {
+            await MainActor.run {
+                session.customContext = savedContext
+            }
+            session.update(parameters: restoreParameters)
+            throw error
         }
+
+        await MainActor.run {
+            session.customContext = savedContext
+        }
+        session.update(parameters: restoreParameters)
 
         return output
     }

@@ -15,8 +15,8 @@ import SpeziChat
 import SpeziHealthKit
 import SpeziHealthKitUI
 import MLX
-import MLXLLM
 import MLXLMCommon
+import MLXLLM
 import SpeziLLM
 import SpeziLLMLocal
 
@@ -400,17 +400,26 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
             options: [.skipsHiddenFiles]
         )
 
-        return directoryContents?
-            .filter { url in
-                var isDirectory: ObjCBool = false
-                return fileManager.fileExists(atPath: url.path, isDirectory: &isDirectory) && isDirectory.boolValue
+        guard let directoryContents else {
+            return nil
+        }
+
+        var newestURL: URL?
+        var newestDate = Date.distantPast
+
+        for url in directoryContents {
+            var isDirectory: ObjCBool = false
+            guard fileManager.fileExists(atPath: url.path, isDirectory: &isDirectory), isDirectory.boolValue else {
+                continue
             }
-            .sorted(by: { lhs, rhs in
-                let lhsDate = (try? lhs.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
-                let rhsDate = (try? rhs.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
-                return lhsDate > rhsDate
-            })
-            .first
+            let modified = (try? url.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
+            if modified > newestDate {
+                newestDate = modified
+                newestURL = url
+            }
+        }
+
+        return newestURL
     }
 
     private func existingDirectoryURL(at rawPath: String, fileManager: FileManager) -> URL? {
@@ -452,12 +461,12 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
 
         if Constants.includeHardcodedECGSample {
             var merged = fetched
-            merged.insert(hardcodedECGSample(), at: 0)
+            merged.append(hardcodedECGSample())
             return merged
         }
 
         if fetched.isEmpty {
-            return [hardcodedECGSample()]
+            return []
         }
 
         return fetched
@@ -664,8 +673,8 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
                 userInfo: userInfo,
                 electrocardiograms: electrocardiograms
             )
-            context.append(systemPrompt)
-            advancedContext.append(systemPrompt)
+            context.insert(systemPrompt, at: 0)
+            advancedContext.insert(systemPrompt, at: 0)
         }
             
         await MainActor.run {

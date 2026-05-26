@@ -25,6 +25,13 @@ public final class SleepEDFDataset {
     private let samples: [OpenTSLMSPSample]
 
     public init(csvURL: URL, split: Split = .test, seed: UInt64 = 42, maxRows: Int = 5000) throws {
+        guard maxRows > 0 else {
+            throw NSError(
+                domain: "SleepEDFDataset",
+                code: 7,
+                userInfo: [NSLocalizedDescriptionKey: "maxRows must be > 0"]
+            )
+        }
         let rows = try Self.readRows(from: csvURL, maxRows: maxRows)
         let splitRows = Self.stratifiedSplit(rows: rows, split: split, seed: seed)
         self.samples = try splitRows.map(Self.convertRow)

@@ -75,13 +75,7 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
         logger.info("OpenTSLM encoder projection done: split=\(split.rawValue), sample=\(safeIndex)")
 
         if let llmRunner = llmRunner, let llmSession = llmSession {
-            var loraApplied = false
-            do {
-                try await OpenTSLMLoRA.applyIfNeeded(on: llmSession)
-                loraApplied = true
-            } catch {
-                logger.warning("OpenTSLM LoRA apply failed: \(error.localizedDescription, privacy: .public)")
-            }
+            let loraApplied = await applyLoRAIfAvailable(on: llmSession)
 
             GPU.clearCache()
 
@@ -220,7 +214,7 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
         // Use provided LLM session or fall back to embedding description
         if let llmRunner = llmRunner, let llmSession = llmSession {
             if Constants.openTSLMRunSampleLLMGeneration {
-                try await OpenTSLMLoRA.applyIfNeeded(on: llmSession)
+                _ = await applyLoRAIfAvailable(on: llmSession)
                 GPU.clearCache()
 
                 let openTSLMLLM = OpenTSLMLLM(llmRunner: llmRunner, session: llmSession)
@@ -259,7 +253,7 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
             )
             }
 
-            try await OpenTSLMLoRA.applyIfNeeded(on: llmSession)
+            _ = await applyLoRAIfAvailable(on: llmSession)
             let outputText = """
             **OpenTSLM ECG encoder + LoRA (decode skipped — set HEALTHYLLM_OPEN_TSLM_RUN_LLM=1 to generate)**
 
@@ -315,11 +309,22 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
         }
     }
 
+    private func applyLoRAIfAvailable(on llmSession: LLMLocalSession) async -> Bool {
+        do {
+            try await OpenTSLMLoRA.applyIfNeeded(on: llmSession)
+            return true
+        } catch {
+            logger.warning("OpenTSLM LoRA apply failed: \(error.localizedDescription, privacy: .public)")
+            return false
+        }
+    }
+
     private func resolveAssetURL(overridePath: String, bundledName: String, fileExtension: String) -> URL? {
         let fileManager = FileManager.default
 
         if !overridePath.isEmpty {
-            let overrideURL = URL(fileURLWithPath: overridePath)
+            let expandedPath = NSString(string: overridePath).expandingTildeInPath
+            let overrideURL = URL(fileURLWithPath: expandedPath)
             if fileManager.fileExists(atPath: overrideURL.path) {
                 return overrideURL
             }
@@ -510,7 +515,8 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
         }
 
         let fileManager = FileManager.default
-        let overrideURL = URL(fileURLWithPath: overridePath)
+        let expandedPath = NSString(string: overridePath).expandingTildeInPath
+        let overrideURL = URL(fileURLWithPath: expandedPath)
         guard fileManager.fileExists(atPath: overrideURL.path) else {
             return nil
         }
@@ -597,7 +603,14 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
     }
 }
 
+private enum ECGSampleSource: String {
+    case hardcoded
+    case healthkitJSON = "healthkit_json"
+    case jsonOverride = "json_override"
+}
+
 private struct ECGSample {
+    let source: ECGSampleSource
     let samplingFrequency: Double
     let classification: String?
     let symptomsStatus: String?
@@ -605,10 +618,7 @@ private struct ECGSample {
     let voltages: [Double]
 
     var sourceDescription: String {
-        if classification != nil || symptomsStatus != nil || averageHeartRate != nil {
-            return "healthkit_json"
-        }
-        return "hardcoded"
+        source.rawValue
     }
 
     var summary: String {
@@ -631,6 +641,7 @@ private struct ECGSample {
         }
 
         return ECGSample(
+            source: .hardcoded,
             samplingFrequency: samplingFrequency,
             classification: "sinusRhythm_sample",
             symptomsStatus: "notSet_sample",
@@ -644,7 +655,8 @@ private struct ECGSample {
         let decoded = try JSONSerialization.jsonObject(with: data)
 
         guard let object = decoded as? [String: Any],
-              let voltages = object["voltages"] as? [Double]
+              let voltages = object["voltages"] as? [Double],
+              !voltages.isEmpty
         else {
             throw NSError(
                 domain: "OpenTSLMInferenceService",
@@ -662,7 +674,15 @@ private struct ECGSample {
         let averageHeartRate = object["averageHeartRate"] as? Double
             ?? object["average_heart_rate"] as? Double
 
+        let source: ECGSampleSource
+        if object["source"] as? String == ECGSampleSource.healthkitJSON.rawValue {
+            source = .healthkitJSON
+        } else {
+            source = .jsonOverride
+        }
+
         return ECGSample(
+            source: source,
             samplingFrequency: samplingFrequency,
             classification: classification,
             symptomsStatus: symptomsStatus,

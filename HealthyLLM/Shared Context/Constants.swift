@@ -38,7 +38,7 @@ enum Constants {
         return documents.appendingPathComponent(openTSLMBundleSubdirectory, isDirectory: true)
     }()
 
-    static let includeHardcodedECGSample = (ProcessInfo.processInfo.environment["HEALTHYLLM_INCLUDE_HARDCODED_ECG"] ?? "1") == "1"
+    static let includeHardcodedECGSample = (ProcessInfo.processInfo.environment["HEALTHYLLM_INCLUDE_HARDCODED_ECG"] ?? "0") == "1"
     static let hardcodedECGSampleLength = 1024
 
     static let openTSLMSourcesPath = ProcessInfo.processInfo.environment["HEALTHYLLM_OPEN_TSLM_SOURCES_PATH"]

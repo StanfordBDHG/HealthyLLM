@@ -62,8 +62,8 @@ enum Constants {
 
     /// Cap main chat generation length (avoids long repetition loops in console and UI).
     static let llmDefaultMaxOutputLength = Int(
-        ProcessInfo.processInfo.environment["HEALTHYLLM_LLM_MAX_OUTPUT"] ?? "256"
-    ) ?? 256
+        ProcessInfo.processInfo.environment["HEALTHYLLM_LLM_MAX_OUTPUT"] ?? "128"
+    ) ?? 128
 
     /// Cap EEG samples before encoder (1500 raw samples → ~375 patches).
     static let openTSLMMaxTimeSeriesLength = Int(

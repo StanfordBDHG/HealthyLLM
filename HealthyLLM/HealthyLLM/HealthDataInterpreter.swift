@@ -14,6 +14,7 @@ import Spezi
 import SpeziChat
 import SpeziHealthKit
 import SpeziHealthKitUI
+import MLX
 import MLXLLM
 import MLXLMCommon
 import SpeziLLM
@@ -102,9 +103,9 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
             chatTemplate: chatTemplate
         )
         defaultSamplingParameters = .init(
-            topP: 0.9,
+            topP: 1.0,
             temperature: 0.7,
-            penaltyRepeat: 1.15
+            penaltyRepeat: 1.2
         )
         guard let defaultParameters else {
             logger.error("setup(): defaultParameters unexpectedly nil after assignment")
@@ -550,11 +551,14 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
             return
         }
         
-        do {
-            try await checkForFunctionCall(prompt: userPrompt.content, healthKit: healthKit)
-        } catch {
-            logger.error("queryLLM: checkForFunctionCall threw \(String(reflecting: error), privacy: .public) — localizedDescription=\(error.localizedDescription, privacy: .public)")
-            throw error
+        if userPrompt.content != Constants.ecgAutoPrompt {
+            do {
+                try await checkForFunctionCall(prompt: userPrompt.content, healthKit: healthKit)
+            } catch {
+                logger.error("queryLLM: checkForFunctionCall threw \(String(reflecting: error), privacy: .public) — localizedDescription=\(error.localizedDescription, privacy: .public)")
+                throw error
+            }
+            releaseLLMSessionBetweenGenerations()
         }
 
         do {
@@ -563,6 +567,12 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
             logger.error("queryLLM: defaultResponse threw \(String(reflecting: error), privacy: .public) — localizedDescription=\(error.localizedDescription, privacy: .public)")
             throw error
         }
+    }
+
+    /// Ends any in-flight generation and clears MLX GPU cache before a new `generate()` call.
+    private func releaseLLMSessionBetweenGenerations() {
+        sharedSession?.cancel()
+        GPU.clearCache()
     }
 
     private func shouldRunOpenTSLMSampleInference(for prompt: String) -> Bool {
@@ -664,17 +674,20 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
         
         logger.info("defaultResponse: generating (\(self.context.count, privacy: .public) messages)")
 
-        let assistantOutput: String
+        releaseLLMSessionBetweenGenerations()
+
+        var assistantOutput = ""
         do {
-            assistantOutput = try await llmRunner.oneShot(
-                on: sharedSession,
-                customContext: context.map(\.asDictionary)
-            )
+            for try await stringPiece in try await sharedSession.generate() {
+                assistantOutput += stringPiece
+            }
         } catch {
             logger.error("defaultResponse: generate threw \(String(reflecting: error), privacy: .public)")
             throw error
         }
 
+        sharedSession.cancel()
+        GPU.clearCache()
         logger.info("defaultResponse: finished (\(assistantOutput.count, privacy: .public) chars)")
 
         let assistantMessage = HealthyLLMContextEntity(.assistant, content: assistantOutput, completed: true)

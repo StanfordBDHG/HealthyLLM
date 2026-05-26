@@ -46,7 +46,7 @@ class HealthContextGenerator: DefaultInitializable, Module, EnvironmentAccessibl
         let preview = voltages.prefix(24).map { String(format: "%.4f", $0) }.joined(separator: ", ")
 
                 let normalizedVoltages = zNormalize(voltages)
-                let normalizedPreview = normalizedVoltages.prefix(256).map { String(format: "%.6f", $0) }.joined(separator: ", ")
+                let normalizedPreview = normalizedVoltages.prefix(48).map { String(format: "%.6f", $0) }.joined(separator: ", ")
 
         let averageHeartRateText = sample.averageHeartRate.map(String.init(describing:)) ?? "No Data"
         let samplingFrequencyText = sample.samplingFrequency.map(String.init(describing:)) ?? "No Data"

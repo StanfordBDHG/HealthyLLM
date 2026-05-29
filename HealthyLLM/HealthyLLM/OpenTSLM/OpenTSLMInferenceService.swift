@@ -81,12 +81,12 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
 
             if Constants.openTSLMRunSampleLLMGeneration {
                 let openTSLMLLM = OpenTSLMLLM(llmRunner: llmRunner, session: llmSession)
-                let softPromptSample = try createSoftPromptSample(from: sample, with: projected, tokenizer: openTSLMLLM)
-                let batch = SoftPromptInterleaver.padAndInterleaveBatch([softPromptSample])
-                let generatedText = try await openTSLMLLM.generateWithEmbeddings(
-                    inputsEmbeds: batch.inputsEmbeds,
-                    prompt: createLLMPrompt(from: sample),
-                    maxTokens: 32
+                let generatedText = try await openTSLMLLM.generate(
+                    prePrompt: sample.prePrompt,
+                    timeSeriesText: sample.timeSeriesText,
+                    timeSeriesEmbeddings: projected,
+                    postPrompt: sample.postPrompt,
+                    maxTokens: 200
                 )
 
                 let outputText = """
@@ -218,12 +218,12 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
                 GPU.clearCache()
 
                 let openTSLMLLM = OpenTSLMLLM(llmRunner: llmRunner, session: llmSession)
-                let softPromptSample = try createSoftPromptSample(from: sample, with: projected, tokenizer: openTSLMLLM)
-                let batch = SoftPromptInterleaver.padAndInterleaveBatch([softPromptSample])
-                let generatedText = try await openTSLMLLM.generateWithEmbeddings(
-                    inputsEmbeds: batch.inputsEmbeds,
-                    prompt: createLLMPrompt(from: sample),
-                    maxTokens: 32
+                let generatedText = try await openTSLMLLM.generate(
+                    prePrompt: sample.prePrompt,
+                    timeSeriesText: sample.timeSeriesText,
+                    timeSeriesEmbeddings: projected,
+                    postPrompt: sample.postPrompt,
+                    maxTokens: 200
                 )
 
             let outputText = """
@@ -307,6 +307,89 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
                 ]
             )
         }
+    }
+
+    /// Runs OpenTSLM-SP on a real (e.g. HealthKit) ECG recording and returns the model's
+    /// analysis text. Unlike ``runECGSampleInference`` (a debug command using a hardcoded/JSON
+    /// sample and emitting a verbose report), this uses the supplied recording, requires a live
+    /// LLM session, and returns a clean user-facing answer.
+    func runECGInference(
+        voltages: [Double],
+        samplingFrequency: Double,
+        classification: String?,
+        symptomsStatus: String?,
+        averageHeartRate: Double?,
+        llmRunner: LLMRunner?,
+        llmSession: LLMLocalSession?
+    ) async throws -> String {
+        guard let llmRunner, let llmSession else {
+            throw NSError(
+                domain: "OpenTSLMInferenceService", code: 7,
+                userInfo: [NSLocalizedDescriptionKey: "An LLM session is required to analyze the ECG."])
+        }
+        guard !voltages.isEmpty else {
+            throw NSError(
+                domain: "OpenTSLMInferenceService", code: 8,
+                userInfo: [NSLocalizedDescriptionKey: "The ECG recording has no voltage samples."])
+        }
+
+        logger.info("runECGInference: start voltages=\(voltages.count, privacy: .public) freq=\(samplingFrequency, privacy: .public)")
+        let ecg = ECGSample(
+            source: .healthkit,
+            samplingFrequency: samplingFrequency,
+            classification: classification,
+            symptomsStatus: symptomsStatus,
+            averageHeartRate: averageHeartRate,
+            voltages: voltages
+        )
+        let sample = cappedSample(makeOpenTSLMSample(from: ecg))
+        let projected = try loadPipelineAndProject(sample)
+        logger.info("runECGInference: projected series=\(projected.count, privacy: .public) shape0=\(projected.first?.shape ?? [], privacy: .public)")
+
+        let loraApplied = await applyLoRAIfAvailable(on: llmSession)
+        GPU.clearCache()
+        logger.info("runECGInference: loraApplied=\(loraApplied, privacy: .public); calling generate")
+
+        let openTSLMLLM = OpenTSLMLLM(llmRunner: llmRunner, session: llmSession)
+        let analysis = try await openTSLMLLM.generate(
+            prePrompt: sample.prePrompt,
+            timeSeriesText: sample.timeSeriesText,
+            timeSeriesEmbeddings: projected,
+            postPrompt: sample.postPrompt,
+            maxTokens: 200
+        )
+        logger.info("runECGInference: generate returned \(analysis.count, privacy: .public) chars")
+        let trimmed = analysis.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? "The ECG model did not produce an analysis." : trimmed
+    }
+
+    /// Resolves the encoder/projector checkpoints, loads the SP pipeline, and projects the
+    /// sample's time series to LLM-hidden-size embeddings. Shared by the ECG paths.
+    private func loadPipelineAndProject(_ sample: OpenTSLMSPSample) throws -> [MLXArray] {
+        guard let encoderURL = resolveAssetURL(
+            overridePath: Constants.openTSLMEncoderCheckpointPath,
+            bundledName: Constants.openTSLMEncoderCheckpointName,
+            fileExtension: "safetensors"
+        ) else {
+            throw NSError(domain: "OpenTSLMInferenceService", code: 2, userInfo: [NSLocalizedDescriptionKey: "Missing encoder checkpoint in bundle/OpenTSLM or override path"])
+        }
+        guard let projectorURL = resolveAssetURL(
+            overridePath: Constants.openTSLMProjectorCheckpointPath,
+            bundledName: Constants.openTSLMProjectorCheckpointName,
+            fileExtension: "safetensors"
+        ) else {
+            throw NSError(domain: "OpenTSLMInferenceService", code: 3, userInfo: [NSLocalizedDescriptionKey: "Missing projector checkpoint in bundle/OpenTSLM or override path"])
+        }
+
+        let pipeline = OpenTSLMSPPipeline(hiddenSize: 2048)
+        try pipeline.loadWeights(encoderURL: encoderURL, projectorURL: projectorURL)
+        let projected = pipeline.projectSample(sample)
+        guard let first = projected.first else {
+            throw NSError(domain: "OpenTSLMInferenceService", code: 5, userInfo: [NSLocalizedDescriptionKey: "Projection returned no tensors"])
+        }
+        eval(first)
+        GPU.clearCache()
+        return projected
     }
 
     private func applyLoRAIfAvailable(on llmSession: LLMLocalSession) async -> Bool {
@@ -418,38 +501,6 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
         return url
     }
 
-    private func createSoftPromptSample(from sample: OpenTSLMSPSample, with projectedEmbeddings: [MLXArray], tokenizer: OpenTSLMLLM) throws -> SoftPromptSample {
-        // For now, create simplified embeddings based on text length
-        // In a full implementation, this would use proper tokenization and model embeddings
-        let hiddenSize = 2048 // Llama 3.2 1B hidden size
-
-        // Create embeddings for text segments (simplified approximation)
-        let prePromptEmbeddings = MLXArray.zeros([sample.prePrompt.count / 4 + 1, hiddenSize]) // Rough token approximation
-        let postPromptEmbeddings = MLXArray.zeros([sample.postPrompt.count / 4 + 1, hiddenSize])
-
-        let prePromptMask = MLXArray.ones([Int(prePromptEmbeddings.dim(0))])
-        let postPromptMask = MLXArray.ones([Int(postPromptEmbeddings.dim(0))])
-
-        let prePromptSegment = SoftPromptSegment(embeddings: prePromptEmbeddings, attentionMask: prePromptMask)
-        let postPromptSegment = SoftPromptSegment(embeddings: postPromptEmbeddings, attentionMask: postPromptMask)
-
-        // Create text segments for time series descriptions
-        var timeSeriesTextSegments: [SoftPromptSegment] = []
-        for text in sample.timeSeriesText {
-            let approxTokens = text.count / 4 + 1 // Rough approximation
-            let embeddings = MLXArray.zeros([approxTokens, hiddenSize])
-            let mask = MLXArray.ones([approxTokens])
-            timeSeriesTextSegments.append(SoftPromptSegment(embeddings: embeddings, attentionMask: mask))
-        }
-
-        return SoftPromptSample(
-            prePrompt: prePromptSegment,
-            timeSeriesText: timeSeriesTextSegments,
-            timeSeriesEmbeddings: projectedEmbeddings,
-            postPrompt: postPromptSegment
-        )
-    }
-
     private func cappedSample(_ sample: OpenTSLMSPSample) -> OpenTSLMSPSample {
         let cap = Constants.openTSLMMaxTimeSeriesLength
         guard cap > 0 else { return sample }
@@ -487,17 +538,6 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
             "llm_model: \(Constants.llmModelName)",
             "llm_integration: \(Constants.openTSLMRunSampleLLMGeneration ? "generate" : "encoder+lora-only")",
         ]
-    }
-
-    private func createLLMPrompt(from sample: OpenTSLMSPSample) -> String {
-        """
-        \(sample.prePrompt)
-
-        Time series descriptions:
-        \(sample.timeSeriesText.enumerated().map { "Series \($0.offset + 1): \($0.element)" }.joined(separator: "\n"))
-
-        \(sample.postPrompt)
-        """
     }
 
     private func loadECGSample() throws -> ECGSample {
@@ -538,9 +578,11 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
             You are given a single-lead ECG segment from HealthKit. Analyze rhythm regularity and signal quality conservatively.
 
             """,
+            // One text label per time series (OpenTSLM-SP interleaves 1:1 with the
+            // projected embeddings). The raw signal is supplied via the embeddings,
+            // so it must not also be dumped here as text.
             timeSeriesText: [
                 "The following is the ECG time series sampled at \(String(format: "%.1f", ecg.samplingFrequency))Hz with mean \(String(format: "%.6f", mean)) and std \(String(format: "%.6f", standardDeviation)).",
-                "Normalized preview: [\(normalizedVoltages.prefix(256).map { String(format: "%.6f", $0) }.joined(separator: ", "))]",
             ],
             timeSeries: [normalizedVoltages],
             postPrompt: """
@@ -605,6 +647,7 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
 
 private enum ECGSampleSource: String {
     case hardcoded
+    case healthkit
     case healthkitJSON = "healthkit_json"
     case jsonOverride = "json_override"
 }

@@ -28,18 +28,18 @@ public protocol EmbeddingPrimedLanguageModel {
 /// exact MLX version available in the app target.
 public final class MLXEmbeddingGenerator<Model: EmbeddingPrimedLanguageModel> {
     private let model: Model
-    private let eosTokenId: Int
+    private let eosTokenIds: Set<Int>
     private let tokenSampler: (MLXArray) throws -> Int
     private let decodeTokens: ([Int]) throws -> String
 
     public init(
         model: Model,
-        eosTokenId: Int,
+        eosTokenIds: Set<Int>,
         tokenSampler: @escaping (MLXArray) throws -> Int,
         decodeTokens: @escaping ([Int]) throws -> String
     ) {
         self.model = model
-        self.eosTokenId = eosTokenId
+        self.eosTokenIds = eosTokenIds
         self.tokenSampler = tokenSampler
         self.decodeTokens = decodeTokens
     }
@@ -69,11 +69,13 @@ public final class MLXEmbeddingGenerator<Model: EmbeddingPrimedLanguageModel> {
             let nextToken = try tokenSampler(lastLogits)
             generatedTokenIds.append(nextToken)
 
-            if nextToken == eosTokenId {
+            if eosTokenIds.contains(nextToken) {
                 break
             }
 
-            let inputIds = MLXArray(converting: [Double(nextToken)], [1, 1])
+            // Integer index array — the embedding lookup requires integer ids,
+            // not the float array produced by `MLXArray(converting:)`.
+            let inputIds = MLXArray([Int32(nextToken)], [1, 1])
             logits = try model.callAsFunction(inputIds, cache: cache, inputEmbedding: nil)
         }
 

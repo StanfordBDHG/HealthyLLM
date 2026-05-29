@@ -14,7 +14,7 @@ import MLXNN
 import OSLog
 import SpeziLLMLocal
 
-/// Loads OpenTSLM LoRA adapters into a ``LlamaModel`` (MLX ``LoRALinear``).
+/// Loads OpenTSLM LoRA adapters into an ``EmbeddingLlamaModel`` (MLX ``LoRALinear``).
 ///
 /// Mirrors [OpenTSLMMLX](https://github.com/StanfordBDHG/OpenTSLMMLX) ``_apply_lora``:
 /// ``linear_to_lora_layers`` on all transformer projections, rank 16, alpha 32 (scale 2), PEFT transpose.
@@ -59,15 +59,15 @@ enum OpenTSLMLoRA {
         return candidates.first { fileManager.fileExists(atPath: $0.path) }
     }
 
-    /// Applies LoRA once per in-memory ``LlamaModel`` instance.
+    /// Applies LoRA once per in-memory ``EmbeddingLlamaModel`` instance.
     static func applyLoRAIfNeeded(to model: Module, checkpointURL: URL) throws {
-        guard let llama = model as? LlamaModel else {
+        guard let llama = model as? EmbeddingLlamaModel else {
             return
         }
         try applyIfNeeded(to: llama, checkpointURL: checkpointURL)
     }
 
-    /// Apply LoRA on the Spezi session's loaded ``LlamaModel`` (call from OpenTSLM paths only to save RAM at launch).
+    /// Apply LoRA on the Spezi session's loaded ``EmbeddingLlamaModel`` (call from OpenTSLM paths only to save RAM at launch).
     static func applyIfNeeded(on session: LLMLocalSession) async throws {
         guard let container = await MainActor.run(body: { session.modelContainer }) else {
             throw NSError(
@@ -89,14 +89,14 @@ enum OpenTSLMLoRA {
         }
 
         try await container.perform { context in
-            guard let llama = context.model as? LlamaModel else {
+            guard let llama = context.model as? EmbeddingLlamaModel else {
                 return
             }
             try applyIfNeeded(to: llama, checkpointURL: checkpointURL)
         }
     }
 
-    static func applyIfNeeded(to llama: LlamaModel, checkpointURL: URL) throws {
+    static func applyIfNeeded(to llama: EmbeddingLlamaModel, checkpointURL: URL) throws {
         let modelID = ObjectIdentifier(llama)
         if appliedModelIDs.contains(modelID) {
             return
@@ -119,7 +119,7 @@ enum OpenTSLMLoRA {
     }
 
     /// Convert every attention/MLP linear in all transformer layers (matches ``linear_to_lora_layers`` in OpenTSLMMLX).
-    private static func convertOpenTSLMLoRALayers(on llama: LlamaModel) {
+    private static func convertOpenTSLMLoRALayers(on llama: EmbeddingLlamaModel) {
         llama.freeze()
         let layers = openTSMLLoRALinearLayers(on: llama)
         for (layer, keys) in layers {
@@ -146,7 +146,7 @@ enum OpenTSLMLoRA {
         }
     }
 
-    private static func openTSMLLoRALinearLayers(on llama: LlamaModel) -> LoRALinearLayers {
+    private static func openTSMLLoRALinearLayers(on llama: EmbeddingLlamaModel) -> LoRALinearLayers {
         var groups: [String: [String]] = [:]
         for (path, module) in llama.namedModules() {
             guard module is Linear, !path.contains("lora_") else {

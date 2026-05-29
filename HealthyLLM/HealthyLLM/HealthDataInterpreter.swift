@@ -63,6 +63,12 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
     
     func setup() async throws {
         logger.info("setup(): starting. modelID=\(Constants.llmModelName, privacy: .public) destination=\(Constants.llmLocalModelDirectory.path, privacy: .public)")
+
+        // Make the MLX factory build our embedding-capable Llama for "llama"/"mistral"
+        // model types, so the session's model can be primed with OpenTSLM soft-prompt
+        // embeddings. Idempotent; must run before any LLMModelFactory.shared.loadContainer.
+        EmbeddingLlamaModelRegistration.register()
+
         await MainActor.run {
             loadingStage = .stagingModel
             loadingDetail = Constants.llmModelName
@@ -559,7 +565,42 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
             }
             return
         }
-        
+
+        // The ECG feature (auto-prompt) runs the OpenTSLM soft-prompt model on the user's
+        // actual HealthKit recording, rather than the generic chat path.
+        if userPrompt.content == Constants.ecgAutoPrompt {
+            logger.info("queryLLM: routing ECG auto-prompt to OpenTSLM")
+            do {
+                let ecgSamples = await ecgSamplesForPrompt(healthKit)
+                guard let ecg = ecgSamples.first(where: { !$0.voltages.isEmpty }) else {
+                    logger.info("queryLLM: no ECG with voltages available (samples=\(ecgSamples.count, privacy: .public))")
+                    let reply = "I couldn't find an ECG reading to analyze. Record one with the ECG app on your Apple Watch and try again."
+                    self.context.append(.init(.assistant, content: reply, completed: true))
+                    self.advancedContext.append(.init(.assistant, content: reply, completed: true))
+                    return
+                }
+                logger.info("queryLLM: ECG selected voltages=\(ecg.voltages.count, privacy: .public); running OpenTSLM (on-device, no streaming — may take ~15-30s)")
+                let analysis = try await openTSLMInferenceService.runECGInference(
+                    voltages: ecg.voltages,
+                    samplingFrequency: ecg.samplingFrequency ?? 512.0,
+                    classification: ecg.classification,
+                    symptomsStatus: ecg.symptomsStatus,
+                    averageHeartRate: ecg.averageHeartRate,
+                    llmRunner: llmRunner,
+                    llmSession: sharedSession
+                )
+                logger.info("queryLLM: ECG analysis returned \(analysis.count, privacy: .public) chars")
+                self.context.append(.init(.assistant, content: analysis, completed: true))
+                self.advancedContext.append(.init(.assistant, content: analysis, completed: true))
+            } catch {
+                logger.error("queryLLM: OpenTSLM ECG analysis failed: \(String(reflecting: error), privacy: .public)")
+                let failure = "ECG analysis failed: \(error.localizedDescription)"
+                self.context.append(.init(.assistant, content: failure, completed: true))
+                self.advancedContext.append(.init(.assistant, content: failure, completed: true))
+            }
+            return
+        }
+
         if userPrompt.content != Constants.ecgAutoPrompt {
             do {
                 try await checkForFunctionCall(prompt: userPrompt.content, healthKit: healthKit)

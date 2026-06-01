@@ -8,19 +8,34 @@ public final class SleepEDFDataset {
         case test
     }
 
+    // Verbatim from OpenTSLM `src/time_series_datasets/sleep/SleepEDFCoTQADataset.py`
+    // (`_get_pre_prompt` / `_get_post_prompt`). The post-prompt is *not* a fill-in cue
+    // ending in "Answer:" — it's an instruction telling the model to produce a rationale
+    // and then end its own response with `Answer: <label>`. Diverging from this (as the
+    // previous Swift prompt did) makes greedy decoding skip straight to the label.
     public static let prePrompt = """
-    You are given a 30-second EEG time series segment. Your task is to classify the sleep stage based on the signal's characteristics.
 
-    """
+            You are given a 30-second EEG time series segment. Your task is to classify the sleep stage based on analysis of the data.
 
-    public static let postPrompt = """
-    Possible sleep stages are:
-            Wake, Non-REM stage 1, Non-REM stage 2, Non-REM stage 3, REM sleep, Movement
+            Instructions:
+            - Analyze the data objectively without presuming a particular label.
+            - Reason carefully and methodically about what the signal patterns suggest regarding sleep stage.
+            - Write your reasoning as a single, coherent paragraph. Do not use bullet points, lists, or section headers.
+            - Only reveal the correct class at the very end.
+            - Never state that you are uncertain or unable to classify the data. You must always provide a rationale and a final answer.
 
-    First, describe the key features of this EEG signal (amplitude, frequency, presence of specific waveforms). Then, based on your analysis, classify the sleep stage.
 
-    Answer:
-    """
+
+"""
+
+    // Note: ends with literal `Answer: ` (open quote + space, no closing quote) —
+    // the prompt is mid-instruction and the model continues from there with its
+    // rationale and concludes with `Answer: <label>`. Trailing space is intentional.
+    public static let postPrompt =
+        "Possible sleep stages are:\n"
+        + "        Wake, Non-REM stage 1, Non-REM stage 2, Non-REM stage 3, REM sleep, Movement\n"
+        + "\n"
+        + "        - Please now write your rationale. Make sure that your last word is the answer. You MUST end your response with \"Answer: "
 
     private let samples: [OpenTSLMSPSample]
 

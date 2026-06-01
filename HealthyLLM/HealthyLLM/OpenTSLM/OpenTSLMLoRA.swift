@@ -50,6 +50,22 @@ enum OpenTSLMLoRA {
             candidates.append(bundled)
         }
 
+        // Filesystem-synchronized groups in Xcode 16 install supporting-file
+        // resources at the bundle root, not under the source-tree subdirectory.
+        // Fall back to a root lookup so the bundled LoRA is actually found.
+        if let bundledRoot = Bundle.main.url(
+            forResource: Constants.openTSLMLoRACheckpointName,
+            withExtension: "safetensors"
+        ) {
+            candidates.append(bundledRoot)
+        }
+        if let bundledAdapter = Bundle.main.url(
+            forResource: "adapter_model",
+            withExtension: "safetensors"
+        ) {
+            candidates.append(bundledAdapter)
+        }
+
         if let bundleRoot = Bundle.main.resourceURL {
             let bundledOpenTSLM = bundleRoot.appendingPathComponent(Constants.openTSLMBundleSubdirectory, isDirectory: true)
             candidates.append(bundledOpenTSLM.appendingPathComponent("\(Constants.openTSLMLoRACheckpointName).safetensors"))
@@ -78,6 +94,7 @@ enum OpenTSLMLoRA {
         }
 
         guard let checkpointURL = resolveLoRAURL() else {
+            logger.warning("OpenTSLM LoRA checkpoint not found — running base Llama (set HEALTHYLLM_OPEN_TSLM_LORA_CHECKPOINT or bundle \(Constants.openTSLMLoRACheckpointName).safetensors).")
             if Constants.requireLoRACheckpoint {
                 throw NSError(
                     domain: "OpenTSLMLoRA",

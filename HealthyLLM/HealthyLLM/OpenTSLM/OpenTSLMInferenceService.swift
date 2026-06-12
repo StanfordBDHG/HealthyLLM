@@ -179,8 +179,8 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
         llmRunner: LLMRunner? = nil,
         llmSession: LLMLocalSession? = nil
     ) async throws -> String {
-        let ecg = try loadECGSample()
-        let sample = cappedSample(makeOpenTSLMSample(from: ecg))
+        let loaded = try loadECGQACoTFormattedSample()
+        let sample = loaded.sample
 
         // Load ECG encoder + projector (per-task checkpoints — sleep weights would
         // produce a meaningless projection for ECG inputs).
@@ -196,7 +196,7 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
         // Use provided LLM session or fall back to embedding description
         if let llmRunner = llmRunner, let llmSession = llmSession {
             if Constants.openTSLMRunSampleLLMGeneration {
-                _ = await applyLoRAIfAvailable(
+                let loraApplied = await applyLoRAIfAvailable(
                     on: llmSession,
                     checkpointName: Constants.openTSLMECGLoRACheckpointName
                 )
@@ -217,28 +217,28 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
             \(generatedText)
 
             ---
-            Pre-defined summary: \(sample.answer)
+            Dataset answer: \(sample.answer)
             """
 
             return formatSampleReport(
-                title: "ECG sample inference with LLM generation",
+                title: "ECG-QA CoT sample inference with LLM generation",
                 prePrompt: sample.prePrompt,
                 timeSeriesText: sample.timeSeriesText,
                 postPrompt: sample.postPrompt,
                 label: sample.label,
                 answer: outputText,
-                extraLines: [
-                    "sampling_frequency_hz: \(String(format: "%.1f", ecg.samplingFrequency))",
-                    "voltage_count: \(ecg.voltages.count)",
-                    "source: \(ecg.sourceDescription)",
-                    "embeddings_shape: \(first.shape)",
+                extraLines: ecgQACoTSampleExtraLines(
+                    info: loaded.info,
+                    embeddingsShape: first.shape,
+                    loraApplied: loraApplied
+                ) + [
                     "llm_model: \(Constants.llmModelName)",
                     "llm_integration: generate",
                 ]
             )
             }
 
-            _ = await applyLoRAIfAvailable(
+            let loraApplied = await applyLoRAIfAvailable(
                 on: llmSession,
                 checkpointName: Constants.openTSLMECGLoRACheckpointName
             )
@@ -246,21 +246,21 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
             **OpenTSLM ECG encoder + LoRA (decode skipped — set HEALTHYLLM_OPEN_TSLM_RUN_LLM=1 to generate)**
 
             Embeddings shape: \(first.shape)
-            Pre-defined summary: \(sample.answer)
+            Dataset answer: \(sample.answer)
             """
 
             return formatSampleReport(
-                title: "ECG sample inference (encoder + LoRA)",
+                title: "ECG-QA CoT sample inference (encoder + LoRA)",
                 prePrompt: sample.prePrompt,
                 timeSeriesText: sample.timeSeriesText,
                 postPrompt: sample.postPrompt,
                 label: sample.label,
                 answer: outputText,
-                extraLines: [
-                    "sampling_frequency_hz: \(String(format: "%.1f", ecg.samplingFrequency))",
-                    "voltage_count: \(ecg.voltages.count)",
-                    "source: \(ecg.sourceDescription)",
-                    "embeddings_shape: \(first.shape)",
+                extraLines: ecgQACoTSampleExtraLines(
+                    info: loaded.info,
+                    embeddingsShape: first.shape,
+                    loraApplied: loraApplied
+                ) + [
                     "llm_model: \(Constants.llmModelName)",
                     "llm_integration: encoder+lora-only",
                 ]
@@ -276,21 +276,21 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
             1. Ensure the HealthDataInterpreter is initialized with a valid LLM session
             2. Pass the llmRunner and llmSession parameters to this method
 
-            Pre-defined summary: \(sample.answer)
+            Dataset answer: \(sample.answer)
             """
 
             return formatSampleReport(
-                title: "ECG sample inference (embeddings only)",
+                title: "ECG-QA CoT sample inference (embeddings only)",
                 prePrompt: sample.prePrompt,
                 timeSeriesText: sample.timeSeriesText,
                 postPrompt: sample.postPrompt,
                 label: sample.label,
                 answer: outputText,
-                extraLines: [
-                    "sampling_frequency_hz: \(String(format: "%.1f", ecg.samplingFrequency))",
-                    "voltage_count: \(ecg.voltages.count)",
-                    "source: \(ecg.sourceDescription)",
-                    "embeddings_shape: \(first.shape)",
+                extraLines: ecgQACoTSampleExtraLines(
+                    info: loaded.info,
+                    embeddingsShape: first.shape,
+                    loraApplied: false
+                ) + [
                     "llm_integration: no",
                 ]
             )
@@ -542,6 +542,123 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
             "llm_model: \(Constants.llmModelName)",
             "llm_integration: \(Constants.openTSLMRunSampleLLMGeneration ? "generate" : "encoder+lora-only")",
         ]
+    }
+
+    private func ecgQACoTSampleExtraLines(
+        info: ECGQACoTSampleInfo,
+        embeddingsShape: [Int],
+        loraApplied: Bool
+    ) -> [String] {
+        [
+            "source: \(info.source)",
+            "split: \(info.split)",
+            "sample_index: \(info.sampleIndex)",
+            "ecg_id: \(info.ecgId)",
+            "template_id: \(info.templateId)",
+            "series_count: \(info.seriesCount)",
+            "samples_per_lead: \(info.samplesPerLead)",
+            "embeddings_shape: \(embeddingsShape)",
+            "lora_checkpoint_found: \(OpenTSLMLoRA.resolveLoRAURL(checkpointName: Constants.openTSLMECGLoRACheckpointName) != nil)",
+            "lora_applied: \(loraApplied ? "yes" : "no")",
+        ]
+    }
+
+    private struct LoadedECGQACoTSample {
+        let sample: OpenTSLMSPSample
+        let info: ECGQACoTSampleInfo
+    }
+
+    private struct ECGQACoTSampleInfo {
+        let source: String
+        let split: String
+        let sampleIndex: Int
+        let ecgId: String
+        let templateId: String
+        let seriesCount: Int
+        let samplesPerLead: Int
+    }
+
+    /// Loads the formatted OpenTSLM sample exported from ``ECGQACoTQADataset`` (real PTB-XL + CoT CSV).
+    private func loadECGQACoTFormattedSample() throws -> LoadedECGQACoTSample {
+        guard let url = resolveECGQACoTSampleURL() else {
+            throw NSError(
+                domain: "OpenTSLMInferenceService",
+                code: 9,
+                userInfo: [
+                    NSLocalizedDescriptionKey:
+                        "Missing ECG-QA CoT sample JSON. Bundle \(Constants.openTSLMECGQACoTSampleName).json "
+                        + "or set HEALTHYLLM_OPEN_TSLM_ECG_JSON to the file exported by inference_ecg.py --export-json.",
+                ]
+            )
+        }
+
+        let data = try Data(contentsOf: url)
+        let decoded = try JSONSerialization.jsonObject(with: data)
+        guard let object = decoded as? [String: Any] else {
+            throw NSError(domain: "OpenTSLMInferenceService", code: 10, userInfo: [NSLocalizedDescriptionKey: "ECG-QA JSON root must be an object"])
+        }
+
+        guard let prePrompt = object["pre_prompt"] as? String,
+              let postPrompt = object["post_prompt"] as? String,
+              let timeSeriesText = object["time_series_text"] as? [String],
+              let label = object["label"] as? String,
+              let answer = object["answer"] as? String
+        else {
+            throw NSError(
+                domain: "OpenTSLMInferenceService",
+                code: 11,
+                userInfo: [NSLocalizedDescriptionKey: "ECG-QA JSON missing pre_prompt/post_prompt/time_series_text/label/answer"]
+            )
+        }
+
+        guard let rawSeries = object["time_series"] as? [[Any]], !rawSeries.isEmpty else {
+            throw NSError(domain: "OpenTSLMInferenceService", code: 12, userInfo: [NSLocalizedDescriptionKey: "ECG-QA JSON missing time_series"])
+        }
+
+        let timeSeries: [[Float]] = try rawSeries.map { lead in
+            guard !lead.isEmpty else {
+                throw NSError(domain: "OpenTSLMInferenceService", code: 13, userInfo: [NSLocalizedDescriptionKey: "ECG-QA JSON has empty lead"])
+            }
+            return try lead.map { value in
+                if let f = value as? Float { return f }
+                if let d = value as? Double { return Float(d) }
+                if let i = value as? Int { return Float(i) }
+                throw NSError(domain: "OpenTSLMInferenceService", code: 14, userInfo: [NSLocalizedDescriptionKey: "Invalid time_series value"])
+            }
+        }
+
+        let samplesPerLead = timeSeries.first?.count ?? 0
+        let info = ECGQACoTSampleInfo(
+            source: object["source"] as? String ?? "ecg_qa_cot",
+            split: object["split"] as? String ?? "unknown",
+            sampleIndex: object["sample_idx"] as? Int ?? -1,
+            ecgId: String(describing: object["ecg_id"] ?? "unknown"),
+            templateId: String(describing: object["template_id"] ?? "unknown"),
+            seriesCount: timeSeries.count,
+            samplesPerLead: samplesPerLead
+        )
+
+        let sample = OpenTSLMSPSample(
+            prePrompt: prePrompt,
+            timeSeriesText: timeSeriesText,
+            timeSeries: timeSeries,
+            postPrompt: postPrompt,
+            label: label,
+            answer: answer
+        )
+        return LoadedECGQACoTSample(sample: sample, info: info)
+    }
+
+    private func resolveECGQACoTSampleURL() -> URL? {
+        if let override = resolveECGJSONURL() {
+            return override
+        }
+
+        return resolveAssetURL(
+            overridePath: "",
+            bundledName: Constants.openTSLMECGQACoTSampleName,
+            fileExtension: "json"
+        )
     }
 
     private func loadECGSample() throws -> ECGSample {

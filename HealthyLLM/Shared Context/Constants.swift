@@ -53,6 +53,8 @@ enum Constants {
         ?? ""
     static let openTSLMECGJSONPath = ProcessInfo.processInfo.environment["HEALTHYLLM_OPEN_TSLM_ECG_JSON"]
         ?? ""
+    /// Bundled ECG-QA CoT formatted sample (exported from OpenTSLM ``ECGQACoTQADataset`` via ``inference_ecg.py``).
+    static let openTSLMECGQACoTSampleName = "ecg_qa_cot_test_0"
     static let openTSLMBundleSubdirectory = "OpenTSLM"
     // Sleep checkpoints (the bundled `OpenTSLM/llama-3.2-1b-sleep-sp` conversion).
     static let openTSLMEncoderCheckpointName = "mlx-checkpoint.encoder"

@@ -552,7 +552,7 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
                     llmSession: sharedSession
                 )
                 let reply = """
-                I ran the OpenTSLM ECG sample path directly in the iOS app using the hardcoded ECG fallback or a JSON sample if configured.
+                I ran the OpenTSLM ECG-QA CoT sample path directly in the iOS app using the bundled PTB-XL formatted sample (same input as Python inference_ecg.py).
 
                 \(inferenceResult)
                 """

@@ -88,6 +88,16 @@ enum Constants {
     /// If "1", run a second on-device LLM decode during OpenTSLM samples (high memory; default off).
     static let openTSLMRunSampleLLMGeneration = (ProcessInfo.processInfo.environment["HEALTHYLLM_OPEN_TSLM_RUN_LLM"] ?? "0") == "1"
 
+    /// If "1", open chat on launch and auto-send ``ecgAutoPrompt``. Default off so OpenTSLM
+    /// sample runs start with a clean LLM session (set `HEALTHYLLM_AUTO_ECG_PROMPT=1` to restore).
+    static let autoECGPromptOnLaunch = (ProcessInfo.processInfo.environment["HEALTHYLLM_AUTO_ECG_PROMPT"] ?? "0") == "1"
+
+    /// Debug command routed to ``OpenTSLMInferenceService/runECGSampleInference()``.
+    static let openTSLMECGSampleCommand = "/opentslm-ecg-sample"
+
+    /// If "1" (default), open chat on launch and auto-send ``openTSLMECGSampleCommand``.
+    static let autoOpenTSLMECGSampleOnLaunch = (ProcessInfo.processInfo.environment["HEALTHYLLM_AUTO_ECG_SAMPLE"] ?? "1") == "1"
+
     static let ecgAutoPrompt = "Analyze my latest ECG reading and summarize the rhythm, signal quality, and any notable concerns."
 
     // swiftlint:disable:next line_length

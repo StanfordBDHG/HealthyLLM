@@ -87,6 +87,16 @@
          </EnvironmentVariable>
          <EnvironmentVariable
             key = "HEALTHYLLM_INCLUDE_HARDCODED_ECG"
+            value = "0"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "HEALTHYLLM_AUTO_ECG_PROMPT"
+            value = "0"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "HEALTHYLLM_AUTO_ECG_SAMPLE"
             value = "1"
             isEnabled = "YES">
          </EnvironmentVariable>

@@ -122,8 +122,15 @@ struct HealthyLLMView: View {
         Self.logger.info("initializeInterpreterIfPossible: calling healthDataInterpreter.setup()")
         do {
             try await healthDataInterpreter.setup()
-            Self.logger.info("initializeInterpreterIfPossible: setup() returned; setting firstPrompt")
-            firstPrompt = Constants.ecgAutoPrompt
+            if Constants.autoOpenTSLMECGSampleOnLaunch {
+                Self.logger.info("initializeInterpreterIfPossible: setup() returned; auto-opening OpenTSLM ECG sample")
+                firstPrompt = Constants.openTSLMECGSampleCommand
+            } else if Constants.autoECGPromptOnLaunch {
+                Self.logger.info("initializeInterpreterIfPossible: setup() returned; auto-opening ECG prompt")
+                firstPrompt = Constants.ecgAutoPrompt
+            } else {
+                Self.logger.info("initializeInterpreterIfPossible: setup() returned; waiting for user input")
+            }
         } catch {
             Self.logger.error("initializeInterpreterIfPossible: setup() threw: \(error.localizedDescription, privacy: .public)")
             errorMessage = error.localizedDescription

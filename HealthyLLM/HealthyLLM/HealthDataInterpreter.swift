@@ -525,6 +525,7 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
         self.advancedContext.append(.init(.user, content: userPrompt.content))
 
         if shouldRunOpenTSLMSampleInference(for: userPrompt.content) {
+            await prepareForOpenTSLMSampleInference(keeping: userPrompt.content)
             do {
                 let inferenceResult = try await openTSLMInferenceService.runSleepSampleInference(
                     llmRunner: llmRunner,
@@ -546,6 +547,7 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
         }
 
         if shouldRunOpenTSLMECGSampleInference(for: userPrompt.content) {
+            await prepareForOpenTSLMSampleInference(keeping: userPrompt.content)
             do {
                 let inferenceResult = try await openTSLMInferenceService.runECGSampleInference(
                     llmRunner: llmRunner,
@@ -625,6 +627,18 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
         GPU.clearCache()
     }
 
+    /// Drop prior chat / HealthKit system context so OpenTSLM sample inference runs with minimal memory.
+    private func prepareForOpenTSLMSampleInference(keeping prompt: String) async {
+        let command = HealthyLLMContextEntity(.user, content: prompt)
+        context = [command]
+        advancedContext = [command]
+        sharedSession?.cancel()
+        await MainActor.run {
+            sharedSession?.customContext = []
+        }
+        GPU.clearCache()
+    }
+
     private func shouldRunOpenTSLMSampleInference(for prompt: String) -> Bool {
         let normalized = prompt
             .trimmingCharacters(in: .whitespacesAndNewlines)
@@ -640,7 +654,7 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .lowercased()
 
-        return normalized == "/opentslm-ecg-sample"
+        return normalized == Constants.openTSLMECGSampleCommand
     }
     
     func resetChat() async {

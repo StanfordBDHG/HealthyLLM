@@ -17,7 +17,8 @@ class HealthDataFetcher: DefaultInitializable, Module, EnvironmentAccessible {
         let readTypes = Set([
             HKSeriesType.activitySummaryType(),
             HKSeriesType.workoutRoute(),
-            HKSeriesType.workoutType()
+            HKSeriesType.workoutType(),
+            HKObjectType.electrocardiogramType()
         ]).union(
             Set(allHKQuantityTypeIdentifiers().map { HKQuantityType($0) })
         )

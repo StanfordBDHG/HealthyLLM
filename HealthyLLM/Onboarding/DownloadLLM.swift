@@ -16,7 +16,7 @@ struct DownloadLLM: View {
     var body: some View {
         LLMLocalDownloadView(
             model: .custom(id: Constants.llmModelName),
-            downloadDescription: "DOWNLOAD_MODEL_DESCRIPTION `\(Constants.llmModelName)`"
+            downloadDescription: "Download the \(Constants.llmModelName) model from Hugging Face."
         ) {
             onboardingNavigationPath.nextStep()
         }

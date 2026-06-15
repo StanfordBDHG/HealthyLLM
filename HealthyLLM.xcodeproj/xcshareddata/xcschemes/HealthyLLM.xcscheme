@@ -79,6 +79,38 @@
             ReferencedContainer = "container:HealthyLLM.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "HEALTHYLLM_USE_CUSTOM_CHAT_TEMPLATE"
+            value = "0"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "HEALTHYLLM_INCLUDE_HARDCODED_ECG"
+            value = "0"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "HEALTHYLLM_OPEN_TSLM_MAX_SERIES_LENGTH"
+            value = "250"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "HEALTHYLLM_OPEN_TSLM_RUN_LLM"
+            value = "0"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "HEALTHYLLM_SKIP_LLM_LOAD"
+            value = "1"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "HEALTHYLLM_AUTO_ECG_SAMPLE"
+            value = "1"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

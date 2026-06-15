@@ -23,6 +23,7 @@ class HealthyLLMAppDelegate: SpeziAppDelegate {
             HealthDataFetcher()
             HealthDataInterpreter()
             HealthContextGenerator()
+            OpenTSLMInferenceService()
 
             if HKHealthStore.isHealthDataAvailable() {
                 HealthKit()

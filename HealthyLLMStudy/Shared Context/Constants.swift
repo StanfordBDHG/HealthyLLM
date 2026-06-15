@@ -6,9 +6,11 @@
 // SPDX-License-Identifier: MIT
 //
 
+import Foundation
 import SpeziLLMLocal
 
 enum Constants {
     static let llmModel: LLMLocalModel = .custom(id: llmModelName)
-    static let llmModelName = "mlx-community/Llama3.1-Aloe-Beta-8B"
+    private static let defaultLLMModelName = "meta-llama/Llama-3.2-1B"
+    static let llmModelName = ProcessInfo.processInfo.environment["HEALTHYLLM_MODEL_ID"] ?? defaultLLMModelName
 }

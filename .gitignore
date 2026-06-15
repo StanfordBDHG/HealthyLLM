@@ -28,3 +28,14 @@ xcuserdata/
 report.junit
 report.html
 *.xcresult
+
+# Local ML artifacts
+checkpoints/
+data/
+HealthyLLM/Supporting Files/LocalLLM/model.safetensors
+HealthyLLM/Supporting Files/OpenTSLM/sleep_cot.csv
+HealthyLLM/Supporting Files/OpenTSLM/ecg_qa_cot_test.csv
+HealthyLLM/Supporting Files/OpenTSLM/ecg_qa_waveforms/
+HealthyLLM/Supporting Files/OpenTSLM/ecg_qa_template_answers.json
+HealthyLLM/Supporting Files/OpenTSLM/ecg_qa_waveforms.json
+jsons/model.safetensors

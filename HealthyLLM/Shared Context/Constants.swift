@@ -96,6 +96,10 @@ enum Constants {
     /// If "1", run a second on-device LLM decode during OpenTSLM samples (high memory; default off).
     static let openTSLMRunSampleLLMGeneration = (ProcessInfo.processInfo.environment["HEALTHYLLM_OPEN_TSLM_RUN_LLM"] ?? "0") == "1"
 
+    /// If "1", skip loading Llama at startup — use for on-device OpenTSLM encoder-only validation
+    /// (`HEALTHYLLM_OPEN_TSLM_RUN_LLM=0`) to avoid OOM on physical iPhones.
+    static let skipLLMLoad = (ProcessInfo.processInfo.environment["HEALTHYLLM_SKIP_LLM_LOAD"] ?? "0") == "1"
+
     /// If "1", open chat on launch and auto-send ``ecgAutoPrompt``. Default off so OpenTSLM
     /// sample runs start with a clean LLM session (set `HEALTHYLLM_AUTO_ECG_PROMPT=1` to restore).
     static let autoECGPromptOnLaunch = (ProcessInfo.processInfo.environment["HEALTHYLLM_AUTO_ECG_PROMPT"] ?? "0") == "1"

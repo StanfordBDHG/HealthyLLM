@@ -183,7 +183,18 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
     ) async throws -> String {
         let loaded = try loadECGQACoTSample(split: split, sampleIndex: sampleIndex)
         let sample = cappedSample(loaded.sample)
-        let metadata = loaded.metadata
+        var metadata = loaded.metadata
+        metadata = ECGQACoTSampleMetadata(
+            source: metadata.source,
+            loader: metadata.loader,
+            split: metadata.split,
+            sampleIndex: metadata.sampleIndex,
+            ecgId: metadata.ecgId,
+            templateId: metadata.templateId,
+            questionType: metadata.questionType,
+            seriesCount: sample.timeSeries.count,
+            samplesPerLead: sample.timeSeries.first?.count ?? 0
+        )
 
         // Load ECG encoder + projector (per-task checkpoints — sleep weights would
         // produce a meaningless projection for ECG inputs).
@@ -196,94 +207,23 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
             throw NSError(domain: "OpenTSLMInferenceService", code: 5, userInfo: [NSLocalizedDescriptionKey: "Projection returned no tensors"])
         }
 
-        // Use provided LLM session or fall back to embedding description
-        if let llmRunner = llmRunner, let llmSession = llmSession {
-            if Constants.openTSLMRunSampleLLMGeneration {
-                let loraApplied = await applyLoRAIfAvailable(
-                    on: llmSession,
-                    checkpointName: Constants.openTSLMECGLoRACheckpointName
-                )
-                GPU.clearCache()
+        GPU.clearCache()
 
-                let openTSLMLLM = OpenTSLMLLM(llmRunner: llmRunner, session: llmSession)
-                let generatedText = try await openTSLMLLM.generate(
-                    prePrompt: sample.prePrompt,
-                    timeSeriesText: sample.timeSeriesText,
-                    timeSeriesEmbeddings: projected,
-                    postPrompt: sample.postPrompt,
-                    maxTokens: 200
-                )
-
+        guard Constants.openTSLMRunSampleLLMGeneration,
+              let llmRunner,
+              let llmSession
+        else {
             let outputText = """
-            **LLM-Generated ECG Analysis:**
+            **OpenTSLM ECG encoder (Llama decode skipped)**
 
-            \(generatedText)
-
-            ---
+            Projected time-series embeddings: \(first.shape)
             Dataset answer: \(sample.answer)
+
+            Set `HEALTHYLLM_OPEN_TSLM_RUN_LLM=1` (and do not set `HEALTHYLLM_SKIP_LLM_LOAD=1`) to run Llama decode — likely OOM on physical iPhone.
             """
 
             return formatSampleReport(
-                title: "ECG-QA CoT sample inference with LLM generation",
-                prePrompt: sample.prePrompt,
-                timeSeriesText: sample.timeSeriesText,
-                postPrompt: sample.postPrompt,
-                label: sample.label,
-                answer: outputText,
-                extraLines: ecgQACoTSampleExtraLines(
-                    metadata: metadata,
-                    embeddingsShape: first.shape,
-                    loraApplied: loraApplied
-                ) + [
-                    "llm_model: \(Constants.llmModelName)",
-                    "llm_integration: generate",
-                ]
-            )
-            }
-
-            let loraApplied = await applyLoRAIfAvailable(
-                on: llmSession,
-                checkpointName: Constants.openTSLMECGLoRACheckpointName
-            )
-            let outputText = """
-            **OpenTSLM ECG encoder + LoRA (decode skipped — set HEALTHYLLM_OPEN_TSLM_RUN_LLM=1 to generate)**
-
-            Embeddings shape: \(first.shape)
-            Dataset answer: \(sample.answer)
-            """
-
-            return formatSampleReport(
-                title: "ECG-QA CoT sample inference (encoder + LoRA)",
-                prePrompt: sample.prePrompt,
-                timeSeriesText: sample.timeSeriesText,
-                postPrompt: sample.postPrompt,
-                label: sample.label,
-                answer: outputText,
-                extraLines: ecgQACoTSampleExtraLines(
-                    metadata: metadata,
-                    embeddingsShape: first.shape,
-                    loraApplied: loraApplied
-                ) + [
-                    "llm_model: \(Constants.llmModelName)",
-                    "llm_integration: encoder+lora-only",
-                ]
-            )
-        } else {
-            // Fallback: just describe the embeddings
-            let outputText = """
-            **Embeddings Computed Successfully**
-
-            The ECG time series embeddings were computed (\(first.shape)) but no LLM session was provided for generation.
-
-            To enable LLM generation with embeddings:
-            1. Ensure the HealthDataInterpreter is initialized with a valid LLM session
-            2. Pass the llmRunner and llmSession parameters to this method
-
-            Dataset answer: \(sample.answer)
-            """
-
-            return formatSampleReport(
-                title: "ECG-QA CoT sample inference (embeddings only)",
+                title: "ECG-QA CoT sample inference (encoder only)",
                 prePrompt: sample.prePrompt,
                 timeSeriesText: sample.timeSeriesText,
                 postPrompt: sample.postPrompt,
@@ -294,10 +234,54 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
                     embeddingsShape: first.shape,
                     loraApplied: false
                 ) + [
-                    "llm_integration: no",
+                    "llm_model: \(Constants.llmModelName)",
+                    "llm_integration: encoder-only",
+                    "llama_loaded: \(Constants.skipLLMLoad ? "no" : "yes")",
                 ]
             )
         }
+
+        // Llama loaded + generation requested
+        let loraApplied = await applyLoRAIfAvailable(
+            on: llmSession,
+            checkpointName: Constants.openTSLMECGLoRACheckpointName
+        )
+        GPU.clearCache()
+
+        let openTSLMLLM = OpenTSLMLLM(llmRunner: llmRunner, session: llmSession)
+        let generatedText = try await openTSLMLLM.generate(
+            prePrompt: sample.prePrompt,
+            timeSeriesText: sample.timeSeriesText,
+            timeSeriesEmbeddings: projected,
+            postPrompt: sample.postPrompt,
+            maxTokens: 200
+        )
+
+        let outputText = """
+        **LLM-Generated ECG Analysis:**
+
+        \(generatedText)
+
+        ---
+        Dataset answer: \(sample.answer)
+        """
+
+        return formatSampleReport(
+            title: "ECG-QA CoT sample inference with LLM generation",
+            prePrompt: sample.prePrompt,
+            timeSeriesText: sample.timeSeriesText,
+            postPrompt: sample.postPrompt,
+            label: sample.label,
+            answer: outputText,
+            extraLines: ecgQACoTSampleExtraLines(
+                metadata: metadata,
+                embeddingsShape: first.shape,
+                loraApplied: loraApplied
+            ) + [
+                "llm_model: \(Constants.llmModelName)",
+                "llm_integration: generate",
+            ]
+        )
     }
 
     /// Runs OpenTSLM-SP on a real (e.g. HealthKit) ECG recording and returns the model's
@@ -563,6 +547,8 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
             "series_count: \(metadata.seriesCount)",
             "samples_per_lead: \(metadata.samplesPerLead)",
             "max_series_length: \(Constants.openTSLMMaxTimeSeriesLength)",
+            "skip_llm_load: \(Constants.skipLLMLoad ? "yes" : "no")",
+            "run_llm: \(Constants.openTSLMRunSampleLLMGeneration ? "yes" : "no")",
             "embeddings_shape: \(embeddingsShape)",
             "lora_checkpoint_found: \(OpenTSLMLoRA.resolveLoRAURL(checkpointName: Constants.openTSLMECGLoRACheckpointName) != nil)",
             "lora_applied: \(loraApplied ? "yes" : "no")",
@@ -597,7 +583,8 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
                 csvURL: csvURL,
                 waveformsDirectory: waveformsDirectory,
                 templateAnswersURL: resolveECGTemplateAnswersURL(),
-                split: split
+                split: split,
+                maxRows: max(sampleIndex + 1, 1)
             )
             guard dataset.count > 0 else {
                 throw NSError(domain: "OpenTSLMInferenceService", code: 15, userInfo: [NSLocalizedDescriptionKey: "ECG-QA CoT CSV has no rows"])
@@ -606,7 +593,6 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
             let safeIndex = min(max(sampleIndex, 0), dataset.count - 1)
             let sample = try dataset.sample(at: safeIndex)
             let row = dataset.rowMetadata(at: safeIndex)
-            let samplesPerLead = sample.timeSeries.first?.count ?? 0
 
             return LoadedECGQACoTSample(
                 sample: sample,
@@ -619,7 +605,7 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
                     templateId: String(row.templateId),
                     questionType: row.questionType,
                     seriesCount: sample.timeSeries.count,
-                    samplesPerLead: samplesPerLead
+                    samplesPerLead: sample.timeSeries.first?.count ?? 0
                 )
             )
         }

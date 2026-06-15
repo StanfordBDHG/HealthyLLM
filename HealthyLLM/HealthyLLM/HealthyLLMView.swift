@@ -108,7 +108,7 @@ struct HealthyLLMView: View {
         let sourceExists = localModelSourceExists()
         Self.logger.info("initializeInterpreterIfPossible: modelExists=\(modelExists, privacy: .public) sourceExists=\(sourceExists, privacy: .public) modelID=\(Constants.llmModelName, privacy: .public) destination=\(Constants.llmLocalModelDirectory.path, privacy: .public)")
 
-        guard modelExists || sourceExists else {
+        guard modelExists || sourceExists || Constants.skipLLMLoad else {
             Self.logger.info("initializeInterpreterIfPossible: no local model or source found — surfacing download UI")
             needsModelDownload = true
             if !showModelDownload {

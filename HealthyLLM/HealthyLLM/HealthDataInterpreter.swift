@@ -74,6 +74,16 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
             loadingDetail = Constants.llmModelName
         }
 
+        if Constants.skipLLMLoad {
+            logger.info("setup(): skipping Llama staging/load (HEALTHYLLM_SKIP_LLM_LOAD=1)")
+            await MainActor.run {
+                loaded = true
+                loadingStage = .ready
+                loadingDetail = "Encoder-only (Llama skipped)"
+            }
+            return
+        }
+
         do {
             try await stageLocalModelIfNeeded()
             try removeNonBaseWeightSafetensorsFromModelDirectory()
@@ -549,9 +559,10 @@ class HealthDataInterpreter: DefaultInitializable, Module, EnvironmentAccessible
         if shouldRunOpenTSLMECGSampleInference(for: userPrompt.content) {
             await prepareForOpenTSLMSampleInference(keeping: userPrompt.content)
             do {
+                let useLLM = Constants.openTSLMRunSampleLLMGeneration && !Constants.skipLLMLoad
                 let inferenceResult = try await openTSLMInferenceService.runECGSampleInference(
-                    llmRunner: llmRunner,
-                    llmSession: sharedSession
+                    llmRunner: useLLM ? llmRunner : nil,
+                    llmSession: useLLM ? sharedSession : nil
                 )
                 let reply = """
                 I ran the OpenTSLM ECG-QA CoT sample path directly in the iOS app using the bundled CoT CSV + PTB-XL waveform sidecar (same loader indexing as Python).

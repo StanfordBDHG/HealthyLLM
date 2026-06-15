@@ -176,11 +176,14 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
     }
 
     func runECGSampleInference(
+        split: ECGQACoTDataset.Split = .test,
+        sampleIndex: Int = 0,
         llmRunner: LLMRunner? = nil,
         llmSession: LLMLocalSession? = nil
     ) async throws -> String {
-        let loaded = try loadECGQACoTFormattedSample()
-        let sample = loaded.sample
+        let loaded = try loadECGQACoTSample(split: split, sampleIndex: sampleIndex)
+        let sample = cappedSample(loaded.sample)
+        let metadata = loaded.metadata
 
         // Load ECG encoder + projector (per-task checkpoints — sleep weights would
         // produce a meaningless projection for ECG inputs).
@@ -228,7 +231,7 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
                 label: sample.label,
                 answer: outputText,
                 extraLines: ecgQACoTSampleExtraLines(
-                    info: loaded.info,
+                    metadata: metadata,
                     embeddingsShape: first.shape,
                     loraApplied: loraApplied
                 ) + [
@@ -257,7 +260,7 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
                 label: sample.label,
                 answer: outputText,
                 extraLines: ecgQACoTSampleExtraLines(
-                    info: loaded.info,
+                    metadata: metadata,
                     embeddingsShape: first.shape,
                     loraApplied: loraApplied
                 ) + [
@@ -287,7 +290,7 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
                 label: sample.label,
                 answer: outputText,
                 extraLines: ecgQACoTSampleExtraLines(
-                    info: loaded.info,
+                    metadata: metadata,
                     embeddingsShape: first.shape,
                     loraApplied: false
                 ) + [
@@ -545,18 +548,21 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
     }
 
     private func ecgQACoTSampleExtraLines(
-        info: ECGQACoTSampleInfo,
+        metadata: ECGQACoTSampleMetadata,
         embeddingsShape: [Int],
         loraApplied: Bool
     ) -> [String] {
         [
-            "source: \(info.source)",
-            "split: \(info.split)",
-            "sample_index: \(info.sampleIndex)",
-            "ecg_id: \(info.ecgId)",
-            "template_id: \(info.templateId)",
-            "series_count: \(info.seriesCount)",
-            "samples_per_lead: \(info.samplesPerLead)",
+            "source: \(metadata.source)",
+            "loader: \(metadata.loader)",
+            "split: \(metadata.split)",
+            "sample_index: \(metadata.sampleIndex)",
+            "ecg_id: \(metadata.ecgId)",
+            "template_id: \(metadata.templateId)",
+            "question_type: \(metadata.questionType)",
+            "series_count: \(metadata.seriesCount)",
+            "samples_per_lead: \(metadata.samplesPerLead)",
+            "max_series_length: \(Constants.openTSLMMaxTimeSeriesLength)",
             "embeddings_shape: \(embeddingsShape)",
             "lora_checkpoint_found: \(OpenTSLMLoRA.resolveLoRAURL(checkpointName: Constants.openTSLMECGLoRACheckpointName) != nil)",
             "lora_applied: \(loraApplied ? "yes" : "no")",
@@ -565,10 +571,135 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
 
     private struct LoadedECGQACoTSample {
         let sample: OpenTSLMSPSample
-        let info: ECGQACoTSampleInfo
+        let metadata: ECGQACoTSampleMetadata
     }
 
-    private struct ECGQACoTSampleInfo {
+    private struct ECGQACoTSampleMetadata {
+        let source: String
+        let loader: String
+        let split: String
+        let sampleIndex: Int
+        let ecgId: String
+        let templateId: String
+        let questionType: String
+        let seriesCount: Int
+        let samplesPerLead: Int
+    }
+
+    /// Loads one ECG-QA CoT row via ``ECGQACoTDataset`` (CSV metadata + PTB-XL waveform sidecar).
+    private func loadECGQACoTSample(
+        split: ECGQACoTDataset.Split,
+        sampleIndex: Int
+    ) throws -> LoadedECGQACoTSample {
+        if let csvURL = resolveECGCoTCSVURL(split: split),
+           let waveformsDirectory = resolveECGWaveformsDirectoryURL() {
+            let dataset = try ECGQACoTDataset(
+                csvURL: csvURL,
+                waveformsDirectory: waveformsDirectory,
+                templateAnswersURL: resolveECGTemplateAnswersURL(),
+                split: split
+            )
+            guard dataset.count > 0 else {
+                throw NSError(domain: "OpenTSLMInferenceService", code: 15, userInfo: [NSLocalizedDescriptionKey: "ECG-QA CoT CSV has no rows"])
+            }
+
+            let safeIndex = min(max(sampleIndex, 0), dataset.count - 1)
+            let sample = try dataset.sample(at: safeIndex)
+            let row = dataset.rowMetadata(at: safeIndex)
+            let samplesPerLead = sample.timeSeries.first?.count ?? 0
+
+            return LoadedECGQACoTSample(
+                sample: sample,
+                metadata: ECGQACoTSampleMetadata(
+                    source: "ecg_qa_cot",
+                    loader: "ECGQACoTDataset",
+                    split: row.split.rawValue,
+                    sampleIndex: safeIndex,
+                    ecgId: String(row.ecgId),
+                    templateId: String(row.templateId),
+                    questionType: row.questionType,
+                    seriesCount: sample.timeSeries.count,
+                    samplesPerLead: samplesPerLead
+                )
+            )
+        }
+
+        // Legacy fallback: monolithic JSON exported by inference_ecg.py --export-json.
+        let legacy = try loadECGQACoTFormattedSample()
+        return LoadedECGQACoTSample(
+            sample: legacy.sample,
+            metadata: ECGQACoTSampleMetadata(
+                source: legacy.info.source,
+                loader: "formatted_json",
+                split: legacy.info.split,
+                sampleIndex: legacy.info.sampleIndex,
+                ecgId: legacy.info.ecgId,
+                templateId: legacy.info.templateId,
+                questionType: "unknown",
+                seriesCount: legacy.info.seriesCount,
+                samplesPerLead: legacy.info.samplesPerLead
+            )
+        )
+    }
+
+    private func resolveECGCoTCSVURL(split: ECGQACoTDataset.Split) -> URL? {
+        if !Constants.openTSLMECGCoTCSVPath.isEmpty {
+            let expandedPath = NSString(string: Constants.openTSLMECGCoTCSVPath).expandingTildeInPath
+            let overrideURL = URL(fileURLWithPath: expandedPath)
+            if FileManager.default.fileExists(atPath: overrideURL.path) {
+                return overrideURL
+            }
+        }
+
+        if split == .test {
+            return resolveAssetURL(
+                overridePath: "",
+                bundledName: Constants.openTSLMECGCoTTestCSVName,
+                fileExtension: "csv"
+            )
+        }
+
+        return resolveAssetURL(
+            overridePath: "",
+            bundledName: split.csvBaseName,
+            fileExtension: "csv"
+        )
+    }
+
+    private func resolveECGWaveformsDirectoryURL() -> URL? {
+        if !Constants.openTSLMECGWaveformsPath.isEmpty {
+            let expandedPath = NSString(string: Constants.openTSLMECGWaveformsPath).expandingTildeInPath
+            var isDirectory: ObjCBool = false
+            if FileManager.default.fileExists(atPath: expandedPath, isDirectory: &isDirectory), isDirectory.boolValue {
+                return URL(fileURLWithPath: expandedPath, isDirectory: true)
+            }
+        }
+
+        if let bundledURL = Bundle.main.url(
+            forResource: Constants.openTSLMECGWaveformsDirectoryName,
+            withExtension: nil,
+            subdirectory: Constants.openTSLMBundleSubdirectory
+        ) {
+            return bundledURL
+        }
+
+        return Bundle.main.url(forResource: Constants.openTSLMECGWaveformsDirectoryName, withExtension: nil)
+    }
+
+    private func resolveECGTemplateAnswersURL() -> URL? {
+        return resolveAssetURL(
+            overridePath: "",
+            bundledName: Constants.openTSLMECGTemplateAnswersName,
+            fileExtension: "json"
+        )
+    }
+
+    private struct LoadedECGQACoTFormattedSample {
+        let sample: OpenTSLMSPSample
+        let info: ECGQACoTFormattedSampleInfo
+    }
+
+    private struct ECGQACoTFormattedSampleInfo {
         let source: String
         let split: String
         let sampleIndex: Int
@@ -578,8 +709,8 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
         let samplesPerLead: Int
     }
 
-    /// Loads the formatted OpenTSLM sample exported from ``ECGQACoTQADataset`` (real PTB-XL + CoT CSV).
-    private func loadECGQACoTFormattedSample() throws -> LoadedECGQACoTSample {
+    /// Legacy formatted JSON export from ``inference_ecg.py --export-json``.
+    private func loadECGQACoTFormattedSample() throws -> LoadedECGQACoTFormattedSample {
         guard let url = resolveECGQACoTSampleURL() else {
             throw NSError(
                 domain: "OpenTSLMInferenceService",
@@ -628,7 +759,7 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
         }
 
         let samplesPerLead = timeSeries.first?.count ?? 0
-        let info = ECGQACoTSampleInfo(
+        let info = ECGQACoTFormattedSampleInfo(
             source: object["source"] as? String ?? "ecg_qa_cot",
             split: object["split"] as? String ?? "unknown",
             sampleIndex: object["sample_idx"] as? Int ?? -1,
@@ -646,7 +777,7 @@ class OpenTSLMInferenceService: DefaultInitializable, Module, EnvironmentAccessi
             label: label,
             answer: answer
         )
-        return LoadedECGQACoTSample(sample: sample, info: info)
+        return LoadedECGQACoTFormattedSample(sample: sample, info: info)
     }
 
     private func resolveECGQACoTSampleURL() -> URL? {

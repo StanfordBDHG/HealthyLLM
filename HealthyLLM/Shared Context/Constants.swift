@@ -53,7 +53,15 @@ enum Constants {
         ?? ""
     static let openTSLMECGJSONPath = ProcessInfo.processInfo.environment["HEALTHYLLM_OPEN_TSLM_ECG_JSON"]
         ?? ""
-    /// Bundled ECG-QA CoT formatted sample (exported from OpenTSLM ``ECGQACoTQADataset`` via ``inference_ecg.py``).
+    static let openTSLMECGCoTCSVPath = ProcessInfo.processInfo.environment["HEALTHYLLM_OPEN_TSLM_ECG_CSV"]
+        ?? ""
+    static let openTSLMECGWaveformsPath = ProcessInfo.processInfo.environment["HEALTHYLLM_OPEN_TSLM_ECG_WAVEFORMS"]
+        ?? ""
+    /// Bundled ECG-QA CoT test CSV prefix (metadata rows; waveforms live under ``openTSLMECGWaveformsDirectoryName``).
+    static let openTSLMECGCoTTestCSVName = "ecg_qa_cot_test"
+    static let openTSLMECGWaveformsDirectoryName = "ecg_qa_waveforms"
+    static let openTSLMECGTemplateAnswersName = "ecg_qa_template_answers"
+    /// Legacy single-sample JSON export (fallback only).
     static let openTSLMECGQACoTSampleName = "ecg_qa_cot_test_0"
     static let openTSLMBundleSubdirectory = "OpenTSLM"
     // Sleep checkpoints (the bundled `OpenTSLM/llama-3.2-1b-sleep-sp` conversion).
